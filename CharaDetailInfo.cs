@@ -7,9 +7,7 @@ public static class CharaDetailInfo
   private static readonly string baseUrl = domain + "/wiki/";
   public static async Task<Student?[]> ScanManyCharasDetails(string[] Characters)
   {
-      return await Task.WhenAll(Characters.Select(async chara=>{
-        return await ScanCharaDetails(chara);
-      }).ToArray());
+      return await Task.WhenAll(Characters.Select(chara=> ScanCharaDetails(chara)).ToList ());
   
   } 
 

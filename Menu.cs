@@ -43,7 +43,7 @@ public static class Menu
       case 2: await Updater.LogAvaiblesUpdates(); break;
       case 3: await Updater.ApplyUpdates(); break;
       case 4: await Updater.LogFilesUpdates(); break;
-      case 5: await Updater.ApplyFilesUpdatesBETA(); break;
+      case 5: await Updater.ApplyFilesUpdates(); break;
       case 0: Environment.Exit(0); break;
       default: Console.WriteLine("Opcion no Valida"); break;
     }
