@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 namespace BlueArchiveWebScrapper;
 
 public static class SqliteController
@@ -63,19 +62,7 @@ public class StudentContext : DbContext {
   {
     var DocumentsFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
     var FinalRoute = Path.Join(DocumentsFolder, "BlueArchiveWS");
-    if (!Directory.Exists(FinalRoute)) 
-    {
-      Directory.CreateDirectory(FinalRoute);
-      string[] commands = 
-        [
-          "dotnet tool install --global dotnet-ef",
-          "dotnet add package Microsoft.EntityFrameworkCore.Sqlite",
-          "dotnet add package Microsoft.EntityFrameworkCore.Design",
-          "dotnet ef migrations add InitialCreate",
-          "dotnet ef database update"
-        ];
-      foreach (var command in commands) ExecuteCommand(command);
-    }
+    if (!Directory.Exists(FinalRoute)) Directory.CreateDirectory(FinalRoute);
     DbPath = Path.Join(FinalRoute, "BlueArchive.db");
   }
    protected override void OnConfiguring(DbContextOptionsBuilder options)
@@ -84,31 +71,6 @@ public class StudentContext : DbContext {
     {
       modelBuilder.Entity<Student>()
         .HasKey(s => s.charaName);
-    }
-
-     private static void ExecuteCommand(string command)
-    {
-        try
-        {
-            // Crear proceso para ejecutar el comando
-            var process = new Process();
-            process.StartInfo.FileName = "cmd.exe"; // o "bash" en sistemas Unix/Linux
-            process.StartInfo.Arguments = $"/c {command}"; // /c para ejecutar el comando y luego salir
-            process.StartInfo.RedirectStandardOutput = true;
-            process.StartInfo.UseShellExecute = false;
-            process.StartInfo.CreateNoWindow = true;
-
-            process.Start();
-
-            string output = process.StandardOutput.ReadToEnd();
-            Console.WriteLine(output);
-
-            process.WaitForExit();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error al ejecutar el comando '{command}': {ex.Message}");
-        }
     }
 
 }
