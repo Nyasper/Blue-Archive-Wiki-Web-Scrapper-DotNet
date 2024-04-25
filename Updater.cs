@@ -7,6 +7,7 @@ public class Updater
 
   public static async Task ApplyUpdates()
   {
+    Console.WriteLine("\nUpdating DB...");
     CharaListInfo[] AvailablesUpdates = await SearchUpdates();
     string[] NamesOnly = AvailablesUpdates.Select(x => x.name).ToArray();
 
@@ -45,27 +46,6 @@ public class Updater
     return StudentsToUpdate;
   }
   public static async Task ApplyFilesUpdates()
-  {
-    Student[] AvailablesUpdates = await SqliteController.GetAllStudentsWithoutFiles();
-      
-    IEnumerable<Task> StudentsToDownloadTasks = AvailablesUpdates.Select(c => c.DownloadFiles());
-    try
-    {
-    }
-    catch (System.Exception)
-    {
-      
-      throw;
-    }
-
-    
-    await Task.WhenAll(StudentsToDownloadTasks);
-    // Parallel.ForEachAsync(StudentsToDownload, (student)=>student);
-
-    Console.WriteLine($"\n{StudentsToDownloadTasks.Count()} Student Files Downloaded.");
-  }
-
-  public static async Task ApplyFilesUpdatesBETA()
   {
      Student[] AvailablesUpdates = await SqliteController.GetAllStudentsWithoutFiles();
 
