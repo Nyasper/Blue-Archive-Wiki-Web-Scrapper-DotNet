@@ -1,4 +1,6 @@
-﻿namespace BlueArchiveWebScrapper;
+﻿using System.Xml;
+
+namespace BlueArchiveWebScrapper;
 
 public record class Student
 {
@@ -24,10 +26,21 @@ public record class Student
   public string audioUrl {get;set;} = "no audio";
   public bool files {get; set;} = false;
   public DateTime createdAt {get; set;} = DateTime.Now;
-
   public void LogStudent() 
   {
-    Console.WriteLine($"CharaName: {charaName}\nSchool: {school}\nAge: {age}\nRelease Date: {releaseDate}\nSkin Set: {skinSet}\nPage Url: {pageUrl}\nImage Profile Url: {pageImageProfileUrl}\nImage Full Url: {pageImageFullUrl}\nAudioUrl: {audioUrl}\nCreated At: {createdAt}");
+    var nl = Environment.NewLine;
+    const string Separetor = "-----------------------------------------------------------------------------------------------------------------";
+    string[] valuesToPrint = ["charaName", "school","age","releaseDate","skinSet","pageUrl","pageImageProfileUrl","pageImageFullUrl","audioUrl","createdAt"];
+
+    Console.WriteLine(nl+Separetor);
+    foreach (var PropertyName in valuesToPrint)
+    {
+      var propertyInfo = this.GetType().GetProperty(PropertyName);
+      if (propertyInfo == null) continue;
+      var PropertyValue = propertyInfo.GetValue(this);
+      Console.WriteLine($"{PropertyName}: {PropertyValue??"null"}");
+    }
+    Console.WriteLine(Separetor);
   }
   public static readonly string[] Schools = [
 		"Abydos",

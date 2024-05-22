@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using static BlueArchiveWebScrapper.Menu;
+﻿using static BlueArchiveWebScrapper.Menu;
 namespace BlueArchiveWebScrapper
 {
 	internal class Program
