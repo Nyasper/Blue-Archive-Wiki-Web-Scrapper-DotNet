@@ -22,7 +22,7 @@ public static class Menu
       LogMenu(MainMenuOptions);
       ask = Console.ReadLine();
       parsedSuccefully = int.TryParse(ask, out option);
-    } while (option<0 || option>MainMenuOptions.Length || !parsedSuccefully);
+    } while (!parsedSuccefully || option<0 || option>MainMenuOptions.Length);
     await MainMenuOptionHandler(option);
   }
 
