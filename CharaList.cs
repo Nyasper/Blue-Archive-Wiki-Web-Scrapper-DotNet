@@ -2,39 +2,31 @@
 
 namespace BlueArchiveWebScrapper
 {
-    public record class CharaListInfo (string name, string img, string url)
-    {
-        public string name = name;
-        public string img = img;
-        public string url = url;
-    }
+    public record class CharaListInfo (string name, string img, string url);
 
-    public  class CharaList
+    public class CharaList
     {
         private static readonly string domain = "https://bluearchive.wiki";
         private static readonly string CharaListPageUrl = domain + "/wiki/Characters";
 
-        static public async Task<List<CharaListInfo>> ScanCharaList()
+        static public async Task<List<CharaListInfo>> GetCharaList()
         {
             var html = await HtmlAgility.ScanHtml(CharaListPageUrl);
             var tbody = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody");
             var trCollection = tbody.Elements("tr");
 
-            return ScanInfo(trCollection);
+            return ScanCharaList(trCollection);
         }
         
         static public async Task LogCharaList() 
         {
             Console.Clear();
-            var charaList = await ScanCharaList();
-            foreach (var chara in charaList)
-            {
-                Console.WriteLine($"\nname: {chara.name}\nimg: {chara.img}\nurl: {chara.url}");
-            }
-            Console.WriteLine($"\n{charaList.Count} Characters in total.");
+            var charaList = await GetCharaList();
+            foreach (var chara in charaList) Console.WriteLine($"\nname: {chara.name}\nimg: {chara.img}\nurl: {chara.url}");
+            Console.WriteLine($"{Environment.NewLine}{charaList.Count} Characters in total.");
         }
 
-        private static List<CharaListInfo> ScanInfo(IEnumerable<HtmlNode> trCollection)
+        private static List<CharaListInfo> ScanCharaList(IEnumerable<HtmlNode> trCollection)
         {
             List<CharaListInfo> CharaListInfo = [];
             var trCollectionArr = trCollection.ToArray();

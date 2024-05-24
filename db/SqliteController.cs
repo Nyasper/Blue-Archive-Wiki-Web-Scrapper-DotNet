@@ -16,15 +16,15 @@ public static class SqliteController
     }
   }
   //READ
-  public static async Task<Student[]> GetAllStudentsSqlite()
+  public static async Task<List<Student>> GetAllStudentsSqlite()
   {
     using var db = new StudentContext();
-    return await db.students.ToArrayAsync();
+    return await db.students.AsNoTracking().ToListAsync();
   }
-   public static async Task<Student[]> GetAllStudentsWithoutFiles()
+   public static async Task<List<Student>> GetAllStudentsWithoutFiles()
   {
     using var db = new StudentContext();
-    return await db.students.Where(s => !s.files).ToArrayAsync();
+    return await db.students.Where(s => !s.files).AsNoTracking().ToListAsync();
   }
   public static async Task<Student?> GetDbInfo(this Student student)
   {
