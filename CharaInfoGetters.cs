@@ -1,53 +1,8 @@
 ﻿using HtmlAgilityPack;
-
 namespace BlueArchiveWebScrapper;
-public static class CharaDetailInfo
+
+public partial class CharaInfo
 {
-  private static readonly string domain = "https://bluearchive.wiki";
-  private static readonly string baseUrl = domain + "/wiki/";
-  public static async Task<Student?[]> ScanManyCharasDetails(string[] Characters)
-  {
-    return await Task.WhenAll(Characters.Select(chara=> ScanCharaDetails(chara)).ToList());
-  } 
-
-  public static async Task<Student?> ScanCharaDetails(string CharaNameParam) 
-  {
-    try
-    {
-      var html = await HtmlAgility.ScanHtml(baseUrl + CharaNameParam);
-
-      return new Student
-      {
-        charaName = GetCharaName(html),
-        name = GetName(html),
-        lastName = GetLastName(html),
-        school = GetSchool(html),
-        role =  GetRole(html),
-        combatClass = GetCombatClass(html),
-        weaponType = GetWeaponType(html),
-        age = GetAge(html),
-        birthday = GetBirthday(html),
-        height = GetHeight(html),
-        hobbies = GetHobbies(html),
-        designer = GetDesigner(html),
-        illustrator = GetIllustrator(html),
-        voice = GetVoice(html),
-        releaseDate = GetReleaseDate(html),
-        skinSet = GetSkinSet(CharaNameParam),
-        pageUrl = GetPageUrl(CharaNameParam),
-        pageImageProfileUrl = GetPageImageProfileUrl(html),
-        pageImageFullUrl = await GetPageImageFullUrl(html),
-        audioUrl = GetAudioUrl(html),
-        files = false
-      };
-    }
-    catch (Exception e)
-    {
-      Console.WriteLine($"ERROR al escanear la informacion de {CharaNameParam}\n"+e);
-      return null;
-    }
-  }
-
   private static string GetCharaName(HtmlDocument html) {
     try
     {
@@ -59,7 +14,6 @@ public static class CharaDetailInfo
       throw new Exception("error en 'GetImageFullUrl()'\n");
     }
   }
-
   private static string GetName(HtmlDocument html) 
   {
     try
@@ -72,8 +26,7 @@ public static class CharaDetailInfo
       throw new Exception("Error en 'GetName()'\n");
     }
   }
-
-   private static string GetLastName(HtmlDocument html) 
+  private static string GetLastName(HtmlDocument html) 
   {
     try
     {
@@ -86,7 +39,6 @@ public static class CharaDetailInfo
       throw new Exception("Error en 'GetLastName()'\n");
     }
   }
-
   private static string GetSchool(HtmlDocument html) {
     try
     {
@@ -102,7 +54,6 @@ public static class CharaDetailInfo
       throw new Exception("error en 'GetSchool()'\n");
     }
   }
-
   private static string GetRole(HtmlDocument html)
   {
     try
@@ -115,7 +66,6 @@ public static class CharaDetailInfo
       throw new Exception("Error en 'GetRole()'\n");
     }
   }
-   
   private static string GetCombatClass(HtmlDocument html) 
   {
     try
@@ -140,7 +90,6 @@ public static class CharaDetailInfo
       throw new Exception("Error en 'GetWeaponType()'\n");
     }
   }
-
   private static int? GetAge(HtmlAgilityPack.HtmlDocument html) 
   {
     var AgeString = html.DocumentNode.SelectSingleNode("html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[12]/td").InnerText.Trim();
@@ -294,7 +243,6 @@ public static class CharaDetailInfo
         throw new Exception("error en 'GetImageProfileUrl()'\n");
       }
     }
-
   private static async Task<string> GetPageImageFullUrl(HtmlDocument html) {
     try
     {
@@ -319,7 +267,6 @@ public static class CharaDetailInfo
       throw new Exception("error en 'GetImageFullUrl()'\n");
     }
   }
-
   private static string GetAudioUrl(HtmlDocument html)
   {
     try
@@ -335,4 +282,3 @@ public static class CharaDetailInfo
     }
   }
 }
-

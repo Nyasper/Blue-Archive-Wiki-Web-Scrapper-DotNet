@@ -4,7 +4,7 @@ public static class Menu
 {
   private static readonly string[] MainMenuOptions = 
   [
-    "Scan Chara List", //1
+    "Log Chara List", //1
     "Search Updates", //2
     "Apply Updates", //3
     "Search Files Updates", //4
@@ -16,7 +16,7 @@ public static class Menu
     LogMenu(MainMenuOptions);
     string? ask;
     int option;	
-    bool parsedSuccefully = false;
+    bool parsedSuccefully;
     do {
       Console.Clear();
       LogMenu(MainMenuOptions);

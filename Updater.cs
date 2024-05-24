@@ -1,17 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace BlueArchiveWebScrapper;
-
-public class Updater
+﻿namespace BlueArchiveWebScrapper;
+public static class Updater
 {
-
   public static async Task ApplyUpdates()
   {
     Console.WriteLine("\nUpdating DB...");
-    CharaListInfo[] AvailablesUpdates = await SearchUpdates();
+    List<CharaListInfo> AvailablesUpdates = await SearchUpdates();
     string[] NamesOnly = AvailablesUpdates.Select(x => x.name).ToArray();
 
-    var AllInfoScaned = await CharaDetailInfo.ScanManyCharasDetails(NamesOnly);
+    var AllInfoScaned = await CharaInfo.ScanManyCharasDetails(NamesOnly);
     foreach (var CharaInfo in AllInfoScaned)
     {
       try
@@ -27,27 +23,27 @@ public class Updater
       }
     }
   }
-  private static async Task<CharaListInfo[]> SearchUpdates()
+  private static async Task<List<CharaListInfo>> SearchUpdates()
   {
-    CharaListInfo[] StudentsToUpdate = [];
+    List<CharaListInfo> StudentsToUpdate = [];
 
-    List<CharaListInfo> CharactersInPage = await CharaList.ScanCharaList();
-    Student[] CharactersSqlite = await SqliteController.GetAllStudentsSqlite();
+    List<CharaListInfo> CharactersInPage = await CharaList.GetCharaList();
+    List<Student> CharactersSqlite = await SqliteController.GetAllStudentsSqlite();
 
     int CharaPageCount = CharactersInPage.Count;
-    int CharaSqliteCount = CharactersSqlite.Length;
+    int CharaSqliteCount = CharactersSqlite.Count;
     int newCharactersCount = CharaPageCount - CharaSqliteCount;
 
       Console.WriteLine($"\nChara in Page: {CharaPageCount}\nChara in DB: {CharaSqliteCount}");
 
-    if (newCharactersCount > 0) StudentsToUpdate = SearchUpdatesDifferences(CharactersInPage, CharactersSqlite);
+    if (newCharactersCount > 0) StudentsToUpdate = SearchUpdatesDifferences(CharactersInPage, CharactersSqlite).ToList();
     else Console.WriteLine("All Characters in DB");
 
     return StudentsToUpdate;
   }
   public static async Task ApplyFilesUpdates()
   {
-     Student[] AvailablesUpdates = await SqliteController.GetAllStudentsWithoutFiles();
+    List<Student> AvailablesUpdates = await SqliteController.GetAllStudentsWithoutFiles();
 
     var studentsToDownloadTasks = AvailablesUpdates.Select(c => c.DownloadFiles()).ToList();
 
@@ -75,28 +71,26 @@ public class Updater
     if (failedTasks.Count > 0)
     {
       Console.WriteLine($"\n{failedTasks.Count} Files failed please download again.");
-    } else if (AvailablesUpdates.Length>0&&failedTasks.Count==0) Console.WriteLine("\nAll Files Download Succefully.");
+    } else if (AvailablesUpdates.Count>0&&failedTasks.Count==0) Console.WriteLine("\nAll Files Download Succefully.");
   }
   public static async Task LogFilesUpdates()
   {
     Console.Clear();
-    Student[] AvailableFilesUpdates = await SqliteController.GetAllStudentsWithoutFiles();
-    Console.WriteLine($"\n{AvailableFilesUpdates.Length} Available Students Files to Download\nTotal: {AvailableFilesUpdates.Length*3} files.");
+    List<Student> AvailableFilesUpdates = await SqliteController.GetAllStudentsWithoutFiles();
+    Console.WriteLine($"\n{AvailableFilesUpdates.Count} Available Students Files to Download\nTotal: {AvailableFilesUpdates.Count*3} files.");
   }
    public static async Task LogAvaiblesUpdates()
    {
     Console.Clear();
-    CharaListInfo[] AvailablesUpdates = await SearchUpdates();
+    List<CharaListInfo> AvailablesUpdates = await SearchUpdates();
 
     foreach (var update in AvailablesUpdates)
     {
       Console.WriteLine($"\n{update.name}  {update.url}");
     }
-    Console.WriteLine($"\n{AvailablesUpdates.Length} Availables Updates.");
+    Console.WriteLine($"\n{AvailablesUpdates.Count} Availables Updates.");
    }
 
-  private static CharaListInfo[] SearchUpdatesDifferences(List<CharaListInfo> FirstArray, Student[] SecondArray)
-  {
-    return FirstArray.Where(a => SecondArray.All(b => b.charaName != a.name)).ToArray();
-  }
+  private static IEnumerable<CharaListInfo> SearchUpdatesDifferences(List<CharaListInfo> FirstArray, List<Student> SecondArray) => FirstArray.Where(a => SecondArray.All(b => b.charaName != a.name));
+  
 }
