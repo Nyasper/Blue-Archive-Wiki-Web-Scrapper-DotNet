@@ -1,86 +1,91 @@
 ﻿namespace BlueArchiveWebScrapper;
 
 using System.IO;
-using System.Text.Json;
-
 
 public static class FileHandler 
 {
   private static readonly string DocumentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
   private static readonly string BlueArchiveWSPath = Path.Join(DocumentsPath,"BlueArchiveWS");
   private static readonly string MediaPath = Path.Join(BlueArchiveWSPath,"media");
-  private static readonly string DataPath = Path.Join(BlueArchiveWSPath,"data");
-  private readonly static JsonSerializerOptions JsonOptions = new()
-    {
-      PropertyNameCaseInsensitive = true,
-      WriteIndented = true
-    };
-
-   public static async Task DownloadFiles(this Student student)
+  private enum FileFormats{
+    audio,
+    ImageFull,
+    ImageProfile
+  }
+  public static async Task DownloadFiles(this Student student)
   {
     try
     {
       string SchoolPath = Path.Join(MediaPath, student.school);
       CreateFolderIfNotExist(SchoolPath);
-      string FinalPath = Path.Join(SchoolPath, student.charaName);
+    
+      Task[] FileQueue = [
+        Download(student, FileFormats.ImageProfile),
+        Download(student, FileFormats.ImageFull),
+        Download(student, FileFormats.audio)
+      ];
 
-      await DownloadImgProfile(student, FinalPath);
-      await DownloadImgFull(student, FinalPath);
-      await DownloadAudio(student, FinalPath);
+      await Task.WhenAll(FileQueue);
       await SqliteController.FilesDownloaded(student.charaName);
       Console.WriteLine($"💙 Archivos de {student.charaName} Descargados 💙");
     }
     catch (Exception)
     {
-      Console.WriteLine($"Error al intentar descargar los arhivos de: '{student.charaName}'");
+      Console.WriteLine($"Error on downloading files of: '{student.charaName}'");
       throw;
     }
   }
-  private static async Task DownloadImgProfile(Student student,string FinalPath)
+
+  static private async Task Download(Student student, FileFormats fileFormat)
   {
     try
     {
-      if (student.pageImageProfileUrl == null) throw new ArgumentNullException($"No imageprofileUrl to download from {student.charaName}");
-      using var FileStream = await GetFileStream(student.pageImageProfileUrl);
-      using var streamToWriteTo = File.Open(FinalPath+".png", FileMode.Create);
-      await FileStream.CopyToAsync(streamToWriteTo);  
+      byte[] FileToDownload;
+      string SchoolPath = Path.Join(MediaPath, student.school);
+      CreateFolderIfNotExist(SchoolPath);
+      string FinalPath = Path.Join(SchoolPath, student.charaName);
+
+      if (fileFormat == FileFormats.ImageProfile) 
+      {
+        FileToDownload = await GetByteArray(student.pageImageProfileUrl);
+        FinalPath += ".png";
+      }
+      else if (fileFormat == FileFormats.ImageFull)
+      {
+        FileToDownload = await GetByteArray(student.pageImageFullUrl);
+        FinalPath += "_full.png";
+      }
+      else if (fileFormat == FileFormats.audio)
+      {
+        FileToDownload = await GetByteArray(student.audioUrl);
+        FinalPath += ".ogg";
+      }
+      else throw new Exception("ERROR: Invalid file Format.");
+
+      await File.WriteAllBytesAsync(FinalPath, FileToDownload);
+      Console.WriteLine($"{student.charaName} Files downloaded on {FinalPath}");
     }
     catch (Exception)
     {
-      throw new Exception($"Error al intentar descargar 'image profile' de '{student.charaName}' en {student.pageImageProfileUrl}'");
+      Console.WriteLine($"Error on dowloading {fileFormat} of {student.charaName}");
+      throw;
     }
   }
 
-  private static async Task DownloadImgFull(Student student, string FinalPath)
+  public static async Task nuevoMetodoParaDescargarArchivo(this Student student)
   {
-     try
-    {
-      if (student.pageImageFullUrl == null) throw new ArgumentNullException($"No imageFullUrl to download from {student.charaName}");
-      using var FileStream = await GetFileStream(student.pageImageFullUrl);
-      using var streamToWriteTo = File.Open(FinalPath+"_full.png", FileMode.Create);
-      await FileStream.CopyToAsync(streamToWriteTo);  
-    }
-    catch (Exception)
-    {
-      throw new Exception($"Error al intentar descargar 'image full' de '{student.charaName}' en '{student.pageImageFullUrl}'");
-    }
-  }
+    string DesktopFolder = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "probandoCsharp");
+    CreateFolderIfNotExist(DesktopFolder);
+    string FinalPath = Path.Join(DesktopFolder, student.charaName+".png");
 
-  private static async Task DownloadAudio(Student student, string FinalPath)
-  {
-    try
-    {
-      if (student.audioUrl == null) throw new ArgumentNullException($"No audioUrl to download from {student.charaName}");
-      using var FileStream = await GetFileStream(student.audioUrl);
-      using var streamToWriteTo = File.Open(FinalPath+".ogg", FileMode.Create);
-      await FileStream.CopyToAsync(streamToWriteTo);  
-    }
-    catch (Exception)
-    {
-      throw new Exception($"Error al intentar descargar 'audio' de '{student.charaName}' en '{student.audioUrl}'");
-    }
-  }
 
+    using var client = new HttpClient();
+    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0");
+    byte[] imageBytes = await client.GetByteArrayAsync(student.pageImageFullUrl);
+
+    // save the image to the hard drive
+    await File.WriteAllBytesAsync(FinalPath, imageBytes);
+  }
   private static void CreateFolderIfNotExist(string FolderName)
   {
     FolderName = $"{FolderName}";
@@ -89,65 +94,20 @@ public static class FileHandler
       Directory.CreateDirectory(FolderName);
     }
   }
-
-  public static async Task CreateJson(this Student student)
-  {
-    if (student.school == null) throw new ArgumentNullException($"school null on {student.charaName}");
-    string JsonContent = JsonSerializer.Serialize(student,JsonOptions);
-
-    string FinalPath = Path.Join(DataPath,student.school,student.charaName);
-    CreateFolderIfNotExist(FinalPath);
-
-    await WriteFile(FinalPath+".json",JsonContent);
-  }
-
-  public static async Task ReadJson(this Student student)
-  {
-    string FinalPath = Path.Join(DataPath,student.school,student.charaName);
-
-    var JsonContent = await ReadFile(FinalPath+".json");
-    var DeserializedJson = JsonSerializer.Deserialize<Student>(JsonContent);
-    Console.WriteLine("El json es: "+DeserializedJson);
-  }
-
-   private static async Task<Stream> GetFileStream(string FileUrl)
+  private static async Task<byte[]> GetByteArray(string FileUrl)
   {
      try
     {
       using var client = new HttpClient();
-      var res = await client.GetAsync(FileUrl);
-      return await res.Content.ReadAsStreamAsync();
+       client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0");
+      byte[] res = await client.GetByteArrayAsync(FileUrl);
+      return res;
     }
     catch (Exception)
     {
-      Console.WriteLine($"Error al intetnar obtener el Stream desde '{FileUrl}'");
+      Console.WriteLine($"Error on getting ByteArray from URL: '{FileUrl}'");
       throw;
     }
   }
-      public static async Task<string> ReadFile(string Path) 
-  {
-    try
-    {
-      using var reader = new StreamReader(Path);
-      return await reader.ReadToEndAsync();
-    }
-    catch (Exception)
-    {
-      throw;
-    }
-    }
-
-  private static async Task WriteFile(string Path,string Content) 
-  {
-    try
-    {
-      using var writer = new StreamWriter(Path);
-      await writer.WriteAsync(Content);
-    }
-    catch (Exception)
-    {
-      throw;
-    } 
-  }
-
 }
+

@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using System.ComponentModel.DataAnnotations;
+using HtmlAgilityPack;
 
 namespace BlueArchiveWebScrapper
 {
@@ -34,13 +35,20 @@ namespace BlueArchiveWebScrapper
             {
                 var character = trCollectionArr[i].Elements("td").ToArray()[0].FirstChild.FirstChild;
                 string url = domain + character.Attributes.ToArray()[0].Value;
-                string name = url.Split("/wiki/")[1];
+                string name = ManageCharaNameFormat(url);
                 string img = "https:" + character.FirstChild.Attributes.ToArray()[1].Value;
                 
                 CharaListInfo Chara = new (name, img, url);
                 CharaListInfo.Add(Chara);
             }
             return CharaListInfo;
+        }
+        private static string ManageCharaNameFormat(string url)
+        {
+            string charaName = url.Split("/wiki/")[1];
+            if (charaName.Contains("Shiroko%EF%BC%8ATerror")) return "Shiroko_(Terror)";
+
+            return charaName;
         }
     }
 
