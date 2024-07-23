@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BlueArchiveWebScrapper")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1e0968d407e65fc0b4550cd910108d97cb0259c9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2e77370e4cf3b5645bc1f8b4ba9d89e7c2dd31ae")]
 [assembly: System.Reflection.AssemblyProductAttribute("BlueArchiveWebScrapper")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BlueArchiveWebScrapper")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

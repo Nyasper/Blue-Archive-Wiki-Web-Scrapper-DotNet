@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "FLIrxv5VGg7ePuG2b8Zrq0ZmVT58iNHUud/zgAf4Cby7Z+xJ/ZHcKwb9/jfxx09yvQh9h7N3HtpVdIu6vxp63A==",
+  "dgSpecHash": "w4tzlLafE/0j+KQYM1t/RZPyZJz/MDA8DTaZeh1flZTfPXkGXxPlZzmF3UtkjdJJ/gMjVarCju9GYwXDG7brEA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\herre\\Documents\\Proyectos\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper.csproj",
+  "projectFilePath": "C:\\Users\\herre\\Documents\\Proyectos Programacion\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\herre\\.nuget\\packages\\htmlagilitypack\\1.11.59\\htmlagilitypack.1.11.59.nupkg.sha512",
     "C:\\Users\\herre\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\herre\\Documents\\Proyectos\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper.csproj": {}
+    "C:\\Users\\herre\\Documents\\Proyectos Programacion\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper.csproj": {}
   },
   "projects": {
-    "C:\\Users\\herre\\Documents\\Proyectos\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper.csproj": {
+    "C:\\Users\\herre\\Documents\\Proyectos Programacion\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\herre\\Documents\\Proyectos\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper.csproj",
+        "projectUniqueName": "C:\\Users\\herre\\Documents\\Proyectos Programacion\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper.csproj",
         "projectName": "BlueArchiveWebScrapper",
-        "projectPath": "C:\\Users\\herre\\Documents\\Proyectos\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper.csproj",
+        "projectPath": "C:\\Users\\herre\\Documents\\Proyectos Programacion\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper.csproj",
         "packagesPath": "C:\\Users\\herre\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\herre\\Documents\\Proyectos\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper\\obj\\",
+        "outputPath": "C:\\Users\\herre\\Documents\\Proyectos Programacion\\BlueArchiveWebScrapper\\BlueArchiveWebScrapper\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\herre\\AppData\\Roaming\\NuGet\\NuGet.Config"
