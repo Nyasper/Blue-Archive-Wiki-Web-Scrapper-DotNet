@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-namespace BlueArchiveWebScrapper;
+namespace BlueArchiveWebScrapper.db;
 
 public static class SqliteController
 {
@@ -19,12 +19,13 @@ public static class SqliteController
   public static async Task<List<Student>> GetAllStudentsSqlite()
   {
     using var db = new StudentContext();
-    return await db.students.AsNoTracking().ToListAsync();
+ 
+    return await db.students.AsNoTracking().MyCustomOrdenated().ToListAsync();
   }
    public static async Task<List<Student>> GetAllStudentsWithoutFiles()
   {
     using var db = new StudentContext();
-    return await db.students.Where(s => !s.files).AsNoTracking().ToListAsync();
+    return await db.students.Where(s => !s.files).AsNoTracking().MyCustomOrdenated().ToListAsync();
   }
   public static async Task<Student?> GetDbInfo(this Student student)
   {
@@ -53,6 +54,12 @@ public static class SqliteController
     db.students.Remove(student);
     await db.SaveChangesAsync();
   }
+
+  private static IQueryable<Student> MyCustomOrdenated(this IQueryable<Student> students)
+  {
+    return students.OrderBy(s => s.school).ThenBy(s => s.charaName);
+  }
+
 }
 
 public class StudentContext : DbContext {
@@ -68,9 +75,10 @@ public class StudentContext : DbContext {
    protected override void OnConfiguring(DbContextOptionsBuilder options)
     => options.UseSqlite($"Data Source={DbPath}");
   protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-      modelBuilder.Entity<Student>()
-        .HasKey(s => s.charaName);
-    }
+  {
+    modelBuilder.Entity<Student>()
+      .HasKey(s => s.charaName);
+    modelBuilder.Entity<Student>().HasIndex(s=>s.charaName);
+  }
 
 }

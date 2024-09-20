@@ -1,4 +1,7 @@
-﻿namespace BlueArchiveWebScrapper;
+﻿using System.Diagnostics;
+using BlueArchiveWebScrapper.db;
+
+namespace BlueArchiveWebScrapper;
 public static class Updater
 {
   public static async Task ApplyUpdates()
@@ -22,6 +25,15 @@ public static class Updater
         throw new Exception($"Error en 'ApplyUpdates()' personaje: '{CharaInfo?.charaName}'\n");
       }
     }
+    Console.WriteLine("All characters updated succefully\n");
+    await SaveDataJSON();
+  }
+  public static async Task SaveDataJSON()
+  {
+    List<Student> AllCharactersSqlite = await SqliteController.GetAllStudentsSqlite();
+    await FileHandler.SaveDataInJSON(AllCharactersSqlite);
+    Console.WriteLine($"data.json generated.\n");
+    await FileHandler.CreateHTMLImagesPreview();
   }
   private static async Task<List<CharaListInfo>> SearchUpdates()
   {
@@ -55,7 +67,7 @@ public static class Updater
       if (CounterRetry == 2) break;
       try
       {
-        await Task.WhenAll(studentsToDownloadTasks);
+        await Task.WhenAll(studentsToDownloadTasks);;
         break;
       }
       catch
@@ -72,6 +84,7 @@ public static class Updater
     {
       Console.WriteLine($"\n{failedTasks.Count} Files failed please download again.");
     } else if (AvailablesUpdates.Count>0&&failedTasks.Count==0) Console.WriteLine("\nAll Files Download Succefully.");
+    await SaveDataJSON();
   }
   public static async Task LogFilesUpdates()
   {
@@ -91,6 +104,9 @@ public static class Updater
     Console.WriteLine($"\n{AvailablesUpdates.Count} Availables Updates.");
    }
 
-  private static IEnumerable<CharaListInfo> SearchUpdatesDifferences(List<CharaListInfo> FirstArray, List<Student> SecondArray) => FirstArray.Where(a => SecondArray.All(b => b.charaName != a.name));
-  
+  private static List<CharaListInfo> SearchUpdatesDifferences(List<CharaListInfo> FirstArray, List<Student> SecondArray)
+  {
+    var charaNames = new HashSet<string>(SecondArray.Select(b => b.charaName)); // HashSet tiene mas rendimiento
+    return FirstArray.Where(a => charaNames.Contains(a.name)).ToList();
+  }
 }

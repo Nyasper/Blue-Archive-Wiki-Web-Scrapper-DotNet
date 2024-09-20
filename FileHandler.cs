@@ -1,6 +1,9 @@
 ﻿namespace BlueArchiveWebScrapper;
 
 using System.IO;
+using System.IO.Enumeration;
+using System.Text.Json;
+using BlueArchiveWebScrapper.db;
 
 public static class FileHandler 
 {
@@ -35,7 +38,37 @@ public static class FileHandler
       throw;
     }
   }
+  public static async Task SaveDataInJSON(List<Student> students)
+  {
+    string FileName = "data";
+    string DataFinalPath = Path.Join(BlueArchiveWSPath,FileName+".json");
+    string DataFinalPath2 = $"{BlueArchiveWSPath}/{FileName}.json";
 
+    string jsonData = JsonSerializer.Serialize(students);
+    await File.WriteAllTextAsync(DataFinalPath, jsonData);
+  }
+  public static async Task CreateHTMLImagesPreview()
+  {
+    const string FileName = "imagesPreview";
+    List<Student> students = await SqliteController.GetAllStudentsSqlite();
+    IGrouping<string, Student>[] allSchools = students.GroupBy((s)=>s.school).ToArray();
+
+    // Generar el contenido HTML
+    const string HTMLHeader = "<html>\n<head>\n<link rel=\"stylesheet\" href=\"styles.css\">\n<title>Students Images Preview</title>\n</head>\n<body>";
+    const string HTMLFooter = "\n</body>\n</html>";
+
+    List<string> SchoolContainer = allSchools.Select(school=> string.Join("\n",[$"\n<h2 class=\"schoolTitle\">{school.Key}</h2>\n  <div class=\"schoolContainer\">\n ",string.Join("\n",school.Select((student, index) => 
+      $" <div class=\"studentContainer\">\n  <h2>{index + 1}: {student.charaName}</h2>\n  <div class=\"imageContainer\">\n   <img src=\"media/{student.school}/{student.charaName}.png\" class=\"profileImage\" alt=\"profileImage of {student.charaName}\"></img>\n   <img src=\"media/{student.school}/{student.charaName}_full.png\" class=\"fullImage\" alt=\"fullImage of {student.charaName}\">\n </div>\n</div>")),"</div>"])).ToList();
+
+    string HtmlContent = string.Join("\n", SchoolContainer);
+
+    // Concatenar todas las partes del HTML
+    string finalHTML = $"{HTMLHeader}\n{HtmlContent}{HTMLFooter}";
+    
+    string filePath = Path.Join(BlueArchiveWSPath,FileName+".html");
+    await File.WriteAllTextAsync(filePath, finalHTML);
+    Console.WriteLine($"{FileName}.html generated.\n");
+  }
   static private async Task Download(Student student, FileFormats fileFormat)
   {
     try
@@ -70,21 +103,6 @@ public static class FileHandler
       Console.WriteLine($"Error on dowloading {fileFormat} of {student.charaName}");
       throw;
     }
-  }
-
-  public static async Task nuevoMetodoParaDescargarArchivo(this Student student)
-  {
-    string DesktopFolder = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "probandoCsharp");
-    CreateFolderIfNotExist(DesktopFolder);
-    string FinalPath = Path.Join(DesktopFolder, student.charaName+".png");
-
-
-    using var client = new HttpClient();
-    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0");
-    byte[] imageBytes = await client.GetByteArrayAsync(student.pageImageFullUrl);
-
-    // save the image to the hard drive
-    await File.WriteAllBytesAsync(FinalPath, imageBytes);
   }
   private static void CreateFolderIfNotExist(string FolderName)
   {
