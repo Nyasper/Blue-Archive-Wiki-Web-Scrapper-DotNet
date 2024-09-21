@@ -1,4 +1,6 @@
-﻿namespace BlueArchiveWebScrapper;
+﻿using BlueArchiveWebScrapper.model;
+
+namespace BlueArchiveWebScrapper;
 public static partial class CharaInfo
 {
   private static readonly string domain = "https://bluearchive.wiki";

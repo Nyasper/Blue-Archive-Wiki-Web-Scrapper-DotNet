@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Enumeration;
 using System.Text.Json;
 using BlueArchiveWebScrapper.db;
+using BlueArchiveWebScrapper.model;
 
 public static class FileHandler 
 {
@@ -38,14 +39,13 @@ public static class FileHandler
       throw;
     }
   }
-  public static async Task SaveDataInJSON(List<Student> students)
+  public static async Task<string> SaveDataInJSON<T>(IEnumerable<T> model, string FileName)
   {
-    string FileName = "data";
     string DataFinalPath = Path.Join(BlueArchiveWSPath,FileName+".json");
-    string DataFinalPath2 = $"{BlueArchiveWSPath}/{FileName}.json";
 
-    string jsonData = JsonSerializer.Serialize(students);
+    string jsonData = JsonSerializer.Serialize(model);
     await File.WriteAllTextAsync(DataFinalPath, jsonData);
+    return DataFinalPath;
   }
   public static async Task CreateHTMLImagesPreview()
   {

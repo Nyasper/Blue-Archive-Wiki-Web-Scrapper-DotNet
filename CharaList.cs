@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Nodes;
 using HtmlAgilityPack;
 
 namespace BlueArchiveWebScrapper
@@ -10,6 +11,12 @@ namespace BlueArchiveWebScrapper
         private static readonly string domain = "https://bluearchive.wiki";
         private static readonly string CharaListPageUrl = domain + "/wiki/Characters";
 
+        static public async Task SaveCharaListInJSON()
+        {
+            List<CharaListInfo> charaList = await GetCharaList();
+            string JSONpath = await FileHandler.SaveDataInJSON(charaList, "charaList");
+            Console.WriteLine("\nCharaList JSON saved in: "+JSONpath);
+        }
         static public async Task<List<CharaListInfo>> GetCharaList()
         {
             var html = await HtmlAgility.ScanHtml(CharaListPageUrl);

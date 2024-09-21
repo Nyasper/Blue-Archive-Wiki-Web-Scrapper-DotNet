@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using BlueArchiveWebScrapper.model;
+using HtmlAgilityPack;
 namespace BlueArchiveWebScrapper;
 
 public partial class CharaInfo

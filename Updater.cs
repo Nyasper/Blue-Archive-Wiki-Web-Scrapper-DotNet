@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using BlueArchiveWebScrapper.db;
+using BlueArchiveWebScrapper.model;
 
 namespace BlueArchiveWebScrapper;
 public static class Updater
@@ -31,8 +32,8 @@ public static class Updater
   public static async Task SaveDataJSON()
   {
     List<Student> AllCharactersSqlite = await SqliteController.GetAllStudentsSqlite();
-    await FileHandler.SaveDataInJSON(AllCharactersSqlite);
-    Console.WriteLine($"data.json generated.\n");
+    string JSONpath = await FileHandler.SaveDataInJSON(AllCharactersSqlite, "data");
+    Console.WriteLine($"data.json generated in {JSONpath}\n");
     await FileHandler.CreateHTMLImagesPreview();
   }
   private static async Task<List<CharaListInfo>> SearchUpdates()
@@ -103,7 +104,6 @@ public static class Updater
     }
     Console.WriteLine($"\n{AvailablesUpdates.Count} Availables Updates.");
    }
-
   private static List<CharaListInfo> SearchUpdatesDifferences(List<CharaListInfo> FirstArray, List<Student> SecondArray)
   {
     var charaNames = new HashSet<string>(SecondArray.Select(b => b.charaName)); // HashSet tiene mas rendimiento

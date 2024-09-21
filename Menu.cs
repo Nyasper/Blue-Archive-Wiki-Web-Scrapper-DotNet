@@ -4,7 +4,7 @@ public static class Menu
 {
   private static readonly string[] MainMenuOptions = 
   [
-    "Log Chara List", //1
+    "Scan Chara List and save it to JSON", //1
     "Search Updates", //2
     "Apply Updates", //3
     "Search Files Updates", //4
@@ -27,7 +27,12 @@ public static class Menu
     await MainMenuOptionHandler(option);
     Console.ReadKey();
   }
-
+  public static bool YesNoMenu()
+  {
+    Console.WriteLine("\nproceed? (y/n)\n");
+    char key = char.ToLower(Console.ReadKey(intercept:true).KeyChar);
+    return key == 'y';
+  }
   private static void LogMenu(string[] Options)
   {
     Console.WriteLine("\nSeleccionar una Opcion Valida");
@@ -41,7 +46,7 @@ public static class Menu
   {
     switch (Option)
     {
-      case 1: await CharaList.LogCharaList(); break;
+      case 1: await CharaList.SaveCharaListInJSON(); break;
       case 2: await Updater.LogAvaiblesUpdates(); break;
       case 3: await Updater.ApplyUpdates(); break;
       case 4: await Updater.LogFilesUpdates(); break;
@@ -51,4 +56,5 @@ public static class Menu
       default: Console.WriteLine("Opcion no Valida"); break;
     }
   }
+
 }

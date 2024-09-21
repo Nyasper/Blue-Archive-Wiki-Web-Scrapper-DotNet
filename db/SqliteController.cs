@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BlueArchiveWebScrapper.model;
+using Microsoft.EntityFrameworkCore;
 namespace BlueArchiveWebScrapper.db;
 
 public static class SqliteController

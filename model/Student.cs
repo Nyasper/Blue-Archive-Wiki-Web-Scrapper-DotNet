@@ -1,6 +1,6 @@
 ﻿using System.Xml;
 
-namespace BlueArchiveWebScrapper;
+namespace BlueArchiveWebScrapper.model;
 
 public record class Student
 {
