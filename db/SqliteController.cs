@@ -5,56 +5,73 @@ namespace BlueArchiveWebScrapper.db;
 public static class SqliteController
 {
   //CREATE
-  public static async Task SaveSqlite(this Student student)
+  public static async Task AddToDatabase(Student student)
   {
     using var db = new StudentContext();
-    var ExistStudent = await db.FindAsync<Student>(student.charaName);
-    if (ExistStudent == null) {
-      await db.Database.MigrateAsync();
+    Student? existStudent = await GetStudentById(student.charaName);
+
+    if (existStudent is null) {
       db.students.Add(student);
-      await db.SaveChangesAsync();
       Console.WriteLine($"{student.charaName} saved in Sqlite");
     }
   }
+
+  public static async Task SaveManyInDatabase(IEnumerable<Student> students)
+  {
+    using var db = new StudentContext();
+    using var transaction = await db.Database.BeginTransactionAsync();
+
+    try
+    {
+      foreach (var student in students){
+        await AddToDatabase(student);
+      }
+      await db.SaveChangesAsync();
+      await transaction.CommitAsync();
+    }
+    catch (Exception ex)
+    {
+      await transaction.RollbackAsync();
+      Console.WriteLine($"Error saving students: {ex.Message}");
+    }
+  }
   //READ
-  public static async Task<List<Student>> GetAllStudentsSqlite()
+  public static async Task<Student?> GetStudentById(string CharaName)
   {
     using var db = new StudentContext();
- 
-    return await db.students.AsNoTracking().MyCustomOrdenated().ToListAsync();
+    return await db.students.FindAsync(CharaName);
   }
-   public static async Task<List<Student>> GetAllStudentsWithoutFiles()
+  public static async Task<Student[]> GetAllStudents()
   {
     using var db = new StudentContext();
-    return await db.students.Where(s => !s.files).AsNoTracking().MyCustomOrdenated().ToListAsync();
+    return await db.students.AsNoTracking().MyCustomOrdenated().ToArrayAsync();
   }
-  public static async Task<Student?> GetDbInfo(this Student student)
+   public static async Task<Student[]> GetAllStudentsWithoutFiles()
   {
     using var db = new StudentContext();
-    var StudentFound = await db.FindAsync<Student>(student.charaName);
-    return StudentFound;
+    return await db.students.Where(s => !s.files).AsNoTracking().MyCustomOrdenated().ToArrayAsync();
   }
-
-
+  // public static async Task<Student?> GetDbInfo(this Student student) => await GetStudentById(student.charaName);
   //UPDATE
-  public static async Task FilesDownloaded(string CharaNameParam)
+  public static async Task UpdateFilesDownloaded(IEnumerable<Student> students)
   {
     using var db = new StudentContext();
-    Student? student = await db.students.FirstOrDefaultAsync(s=>s.charaName == CharaNameParam);
-    if (student != null)
+    
+    foreach (var student in students)
     {
       student.files = true;
-      await db.SaveChangesAsync();
+      db.Entry(student).Property(s=>s.files).IsModified = true; // Marcar la entidad como modificada solo en su propiedad files.
     }
+    await db.SaveChangesAsync();
   }
 
   //DELETE
-  public static async Task DeleteSqlite(this Student student)
-  {
-    using var db = new StudentContext();
-    db.students.Remove(student);
-    await db.SaveChangesAsync();
-  }
+  // public static async Task DeleteSqlite(Student student)
+  // {
+  //   using var db = new StudentContext();
+  //   db.students.Remove(student);
+  //   await db.SaveChangesAsync();
+  // }
 
   private static IQueryable<Student> MyCustomOrdenated(this IQueryable<Student> students)
   {

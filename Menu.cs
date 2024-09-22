@@ -4,12 +4,9 @@ public static class Menu
 {
   private static readonly string[] MainMenuOptions = 
   [
-    "Scan Chara List and save it to JSON", //1
-    "Search Updates", //2
-    "Apply Updates", //3
-    "Search Files Updates", //4
-    "Apply Files Updates", //5
-    "Update data.JSON" //6
+    "Scan Chara List and save in a JSON", //1
+    "Update Database", //2
+    "Update Files", //3
   ];
   public static async Task MainMenu()
   {
@@ -27,11 +24,13 @@ public static class Menu
     await MainMenuOptionHandler(option);
     Console.ReadKey();
   }
-  public static bool YesNoMenu()
+  public static bool YesNoQuestion(string questionMessage)
   {
-    Console.WriteLine("\nproceed? (y/n)\n");
+    Console.WriteLine(Notifier.NL+questionMessage+"? (y/n)"+Notifier.NL);
     char key = char.ToLower(Console.ReadKey(intercept:true).KeyChar);
-    return key == 'y';
+    bool response = key == 'y';
+    if (response == false) Notifier.MessageTaskCancelled("Task Cancelled");
+    return response;
   }
   private static void LogMenu(string[] Options)
   {
@@ -47,11 +46,8 @@ public static class Menu
     switch (Option)
     {
       case 1: await CharaList.SaveCharaListInJSON(); break;
-      case 2: await Updater.LogAvaiblesUpdates(); break;
-      case 3: await Updater.ApplyUpdates(); break;
-      case 4: await Updater.LogFilesUpdates(); break;
-      case 5: await Updater.ApplyFilesUpdates(); break;
-      case 6: await Updater.SaveDataJSON(); break;
+      case 2: await Updater.UpdateDatabase(); break;
+      case 3: await Updater.UpdateStudentsFiles(); break;
       case 0: Environment.Exit(0); break;
       default: Console.WriteLine("Opcion no Valida"); break;
     }

@@ -1,112 +1,123 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using BlueArchiveWebScrapper.db;
 using BlueArchiveWebScrapper.model;
 
 namespace BlueArchiveWebScrapper;
 public static class Updater
 {
-  public static async Task ApplyUpdates()
+  public static async Task UpdateDatabase()
   {
-    Console.WriteLine("\nUpdating DB...");
-    List<CharaListInfo> AvailablesUpdates = await SearchUpdates();
-    string[] NamesOnly = AvailablesUpdates.Select(x => x.name).ToArray();
+    Notifier.NewBlankMessage("Update Database");
 
-    var AllInfoScaned = await CharaInfo.ScanManyCharasDetails(NamesOnly);
-    foreach (var CharaInfo in AllInfoScaned)
+    Notifier.MessageInitiatingTask("Searching for Updates");
+    CharaListInfo[] AvailablesUpdates = await SearchDatabaseUpdates();
+
+    if (AvailablesUpdates.Length == 0)
     {
-      try
+      Notifier.MessageNothingToDo("All Students in Database");
+      return;
+    }
+
+    Notifier.LogStudentsList($"{AvailablesUpdates.Length} New Students to Save:",AvailablesUpdates);
+    bool Continue = Menu.YesNoQuestion("Proceed to update the database");
+    if (!Continue) return;
+
+    Notifier.MessageInitiatingTask("Scanning Students Data");
+    string[] CharaNames = AvailablesUpdates.Select(s => s.name).ToArray(); // Get only de names
+    Student?[] AllInfoScaned = await CharaInfo.ScanManyCharasDetails(CharaNames);
+    Notifier.MessageTaskCompleted("All data scanned sucefully");
+
+    Notifier.MessageInitiatingTask("Saving data in Database");
+    await SqliteController.SaveManyInDatabase(AllInfoScaned!);
+    Notifier.MessageTaskCompleted("\nAll characters updated succefully ✔️");
+
+    await GenerateDataJSON();
+  }
+  public static async Task UpdateStudentsFiles()
+  {
+    Notifier.NewBlankMessage("Files Update");
+    
+    Notifier.MessageInitiatingTask("Verifying All Students Files");
+    Student[] AvailablesUpdates = await VerifyAllStudentsFiles();
+
+    if (AvailablesUpdates.Length == 0)
+    {
+      Notifier.MessageNothingToDo("All students files OK");
+      return;
+    }
+
+    Notifier.LogStudentsList($"{AvailablesUpdates.Length} New Files to Save:",AvailablesUpdates);
+
+    bool Continue = Menu.YesNoQuestion("Proceed to download the files");
+    if (!Continue) return;
+
+    Notifier.MessageInitiatingTask("Downloading missing Students Files");
+    Task[] studentsToDownloadTasks = AvailablesUpdates.Select(FileHandler.DownloadFiles).ToArray();
+
+    try
+    {
+      await Task.WhenAll(studentsToDownloadTasks);
+      Notifier.MessageTaskCompleted("All students files Downloaded Succefully");
+    }
+    catch (Exception ex)
+    {
+      if (ex is AggregateException aggregateException)
       {
-        if (CharaInfo != null)
+        foreach (var innerException in aggregateException.InnerExceptions)
         {
-          await CharaInfo.SaveSqlite();
+          Console.WriteLine($"\nERROR: {innerException.Message}");
         }
       }
-      catch (Exception)
+      else
       {
-        throw new Exception($"Error en 'ApplyUpdates()' personaje: '{CharaInfo?.charaName}'\n");
+        Console.WriteLine($"\nERROR: {ex.Message}");
       }
+      throw;
     }
-    Console.WriteLine("All characters updated succefully\n");
-    await SaveDataJSON();
+    await GenerateHTMLImagePreview();
   }
-  public static async Task SaveDataJSON()
+  private static async Task<Student[]> VerifyAllStudentsFiles()
   {
-    List<Student> AllCharactersSqlite = await SqliteController.GetAllStudentsSqlite();
-    string JSONpath = await FileHandler.SaveDataInJSON(AllCharactersSqlite, "data");
-    Console.WriteLine($"data.json generated in {JSONpath}\n");
-    await FileHandler.CreateHTMLImagesPreview();
-  }
-  private static async Task<List<CharaListInfo>> SearchUpdates()
-  {
-    List<CharaListInfo> StudentsToUpdate = [];
+    Student[] AllStudents = await SqliteController.GetAllStudents();
+    ConcurrentBag<Student> StudentsWithoutAllFiles = []; //ConcurrentBag<> = List<> but for Paralelism.
 
+    Parallel.ForEach(AllStudents, student =>
+    {
+      var result = FileHandler.VerifyStudentFilesExists(student);
+
+      if (!result.HasProfileImage || !result.HasFullImage || !result.HasAudio)
+      {
+        StudentsWithoutAllFiles.Add(student);
+      }
+
+      if (!result.HasProfileImage) Notifier.MessageFileMissing(type: "Profile Image",result);
+      if (!result.HasFullImage) Notifier.MessageFileMissing(type: "Full Image",result);
+      if (!result.HasAudio) Notifier.MessageFileMissing(type: "Audio",result);
+    });
+    return [..StudentsWithoutAllFiles];
+  }
+  private static async Task<CharaListInfo[]> SearchDatabaseUpdates()
+  {
     List<CharaListInfo> CharactersInPage = await CharaList.GetCharaList();
-    List<Student> CharactersSqlite = await SqliteController.GetAllStudentsSqlite();
+    Student[] CharactersSqlite = await SqliteController.GetAllStudents();
 
-    int CharaPageCount = CharactersInPage.Count;
-    int CharaSqliteCount = CharactersSqlite.Count;
-    int newCharactersCount = CharaPageCount - CharaSqliteCount;
-
-      Console.WriteLine($"\nChara in Page: {CharaPageCount}\nChara in DB: {CharaSqliteCount}");
-
-    if (newCharactersCount > 0) StudentsToUpdate = SearchUpdatesDifferences(CharactersInPage, CharactersSqlite).ToList();
-    else Console.WriteLine("All Characters in DB");
-
-    return StudentsToUpdate;
+    // Search Differences
+    var charaNames = new HashSet<string>(CharactersSqlite.Select(b => b.charaName)); // HashSet tiene mas rendimiento
+    return CharactersInPage.Where(a => !charaNames.Contains(a.name)).ToArray();
   }
-  public static async Task ApplyFilesUpdates()
+  private static async Task GenerateDataJSON()
   {
-    List<Student> AvailablesUpdates = await SqliteController.GetAllStudentsWithoutFiles();
-
-    var studentsToDownloadTasks = AvailablesUpdates.Select(c => c.DownloadFiles()).ToList();
-
-    List<Task> failedTasks = [];
-
-    int CounterRetry = 0;
-    while (studentsToDownloadTasks.Count > 0)
-    {
-      if (CounterRetry == 2) break;
-      try
-      {
-        await Task.WhenAll(studentsToDownloadTasks);;
-        break;
-      }
-      catch
-      {
-        failedTasks.AddRange(studentsToDownloadTasks.Where(t => t.IsFaulted));
-        
-        studentsToDownloadTasks = studentsToDownloadTasks.Where(t => !t.IsFaulted).ToList();
-        CounterRetry++;
-      }
-      studentsToDownloadTasks.AddRange(failedTasks);
-      await Task.Delay(200);
-    }
-    if (failedTasks.Count > 0)
-    {
-      Console.WriteLine($"\n{failedTasks.Count} Files failed please download again.");
-    } else if (AvailablesUpdates.Count>0&&failedTasks.Count==0) Console.WriteLine("\nAll Files Download Succefully.");
-    await SaveDataJSON();
+    Student[] students = await SqliteController.GetAllStudents();
+    string JSONpath = await FileHandler.SaveDataInJSON(model: students, FileName: "data");
+    
+    Notifier.MessageTaskCompleted($"data json generated in: {JSONpath}");
   }
-  public static async Task LogFilesUpdates()
+  private static async Task GenerateHTMLImagePreview()
   {
-    Console.Clear();
-    List<Student> AvailableFilesUpdates = await SqliteController.GetAllStudentsWithoutFiles();
-    Console.WriteLine($"\n{AvailableFilesUpdates.Count} Available Students Files to Download\nTotal: {AvailableFilesUpdates.Count*3} files.");
-  }
-   public static async Task LogAvaiblesUpdates()
-   {
-    Console.Clear();
-    List<CharaListInfo> AvailablesUpdates = await SearchUpdates();
+    Student[] students = await SqliteController.GetAllStudents();
+    string HTMLPath = await FileHandler.CreateHTMLImagesPreview(students);
 
-    foreach (var update in AvailablesUpdates)
-    {
-      Console.WriteLine($"\n{update.name}  {update.url}");
-    }
-    Console.WriteLine($"\n{AvailablesUpdates.Count} Availables Updates.");
-   }
-  private static List<CharaListInfo> SearchUpdatesDifferences(List<CharaListInfo> FirstArray, List<Student> SecondArray)
-  {
-    var charaNames = new HashSet<string>(SecondArray.Select(b => b.charaName)); // HashSet tiene mas rendimiento
-    return FirstArray.Where(a => charaNames.Contains(a.name)).ToList();
+    Notifier.MessageTaskCompleted($"Images preview HTML generated in: {HTMLPath}");
   }
 }

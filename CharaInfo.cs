@@ -42,6 +42,9 @@ public static partial class CharaInfo
       return null;
     }
   }
-  public static async Task<Student?[]> ScanManyCharasDetails(string[] Characters) => await Task.WhenAll(Characters.Select(c=> ScanInfo(c)).ToList());
+  public static async Task<Student?[]> ScanManyCharasDetails(string[] CharaNames)
+  {
+    return await Task.WhenAll(CharaNames.Select(c=> ScanInfo(c)).ToArray());
+  }
 
 }

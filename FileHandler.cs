@@ -1,7 +1,6 @@
 ﻿namespace BlueArchiveWebScrapper;
 
 using System.IO;
-using System.IO.Enumeration;
 using System.Text.Json;
 using BlueArchiveWebScrapper.db;
 using BlueArchiveWebScrapper.model;
@@ -16,7 +15,7 @@ public static class FileHandler
     ImageFull,
     ImageProfile
   }
-  public static async Task DownloadFiles(this Student student)
+  public static async Task DownloadFiles(Student student)
   {
     try
     {
@@ -30,7 +29,6 @@ public static class FileHandler
       ];
 
       await Task.WhenAll(FileQueue);
-      await SqliteController.FilesDownloaded(student.charaName);
       Console.WriteLine($"💙 Archivos de {student.charaName} Descargados 💙");
     }
     catch (Exception)
@@ -47,10 +45,9 @@ public static class FileHandler
     await File.WriteAllTextAsync(DataFinalPath, jsonData);
     return DataFinalPath;
   }
-  public static async Task CreateHTMLImagesPreview()
+  public static async Task<string> CreateHTMLImagesPreview(Student[] students)
   {
     const string FileName = "imagesPreview";
-    List<Student> students = await SqliteController.GetAllStudentsSqlite();
     IGrouping<string, Student>[] allSchools = students.GroupBy((s)=>s.school).ToArray();
 
     // Generar el contenido HTML
@@ -117,9 +114,9 @@ body {
     
     string filePath = Path.Join(BlueArchiveWSPath,FileName+".html");
     await File.WriteAllTextAsync(filePath, finalHTML);
-    Console.WriteLine($"{FileName}.html generated.\n");
+    return filePath;
   }
-  static private async Task Download(Student student, FileFormats fileFormat)
+  private static async Task Download(Student student, FileFormats fileFormat)
   {
     try
     {
@@ -154,6 +151,27 @@ body {
       throw;
     }
   }
+  public static FileVerification VerifyStudentFilesExists(Student student)
+  {
+    string BasePath = Path.Join(MediaPath, student.school, student.charaName);
+    string profileImagePath = BasePath+".png";
+    string fullImagePath = BasePath+"_full.png";
+    string audioPath = BasePath+".ogg";
+    
+    return 
+      new(
+        CharaName: student.charaName,
+        School: student.school,
+        HasProfileImage: FileExists(profileImagePath),
+        HasFullImage: FileExists(fullImagePath), 
+        HasAudio: FileExists(audioPath)
+      );
+  }
+  private static bool FileExists(string FilePath)
+  {
+    var fileInfo = new FileInfo(FilePath);
+    return fileInfo.Exists && fileInfo.Length > 0;
+  }
   private static void CreateFolderIfNotExist(string FolderName)
   {
     FolderName = $"{FolderName}";
@@ -177,5 +195,8 @@ body {
       throw;
     }
   }
+  public record FileVerification(string CharaName, string School, bool HasProfileImage, bool HasFullImage, bool HasAudio);
 }
+
+
 
