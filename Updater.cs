@@ -47,7 +47,7 @@ public static class Updater
       return;
     }
 
-    Notifier.LogStudentsList($"{AvailablesUpdates.Length} New Files to Save:",AvailablesUpdates);
+    Notifier.LogStudentsList($"{AvailablesUpdates.Length} New Student's Files to Save:",AvailablesUpdates);
 
     bool Continue = Menu.YesNoQuestion("Proceed to download the files");
     if (!Continue) return;
@@ -103,7 +103,7 @@ public static class Updater
     Student[] CharactersSqlite = await SqliteController.GetAllStudents();
 
     // Search Differences
-    var charaNames = new HashSet<string>(CharactersSqlite.Select(b => b.charaName)); // HashSet tiene mas rendimiento
+    var charaNames = new HashSet<string>(CharactersSqlite.Select(b => b.charaName)); // HashSet has more performance
     return CharactersInPage.Where(a => !charaNames.Contains(a.name)).ToArray();
   }
   private static async Task GenerateDataJSON()

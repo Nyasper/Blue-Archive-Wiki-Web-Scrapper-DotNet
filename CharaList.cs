@@ -28,7 +28,7 @@ namespace BlueArchiveWebScrapper
       
     static public async Task LogCharaList() 
     {
-      Console.Clear();
+      Notifier.NewBlankMessage("Showing Chara List");
       var charaList = await GetCharaList();
       foreach (var chara in charaList) Console.WriteLine($"\nname: {chara.name}\nimg: {chara.img}\nurl: {chara.url}");
       Console.WriteLine($"{Environment.NewLine}{charaList.Count} Characters in total.");

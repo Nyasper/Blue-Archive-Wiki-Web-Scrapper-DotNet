@@ -29,7 +29,6 @@ public static class FileHandler
       ];
 
       await Task.WhenAll(FileQueue);
-      Console.WriteLine($"💙 Archivos de {student.charaName} Descargados 💙");
     }
     catch (Exception)
     {
@@ -143,7 +142,6 @@ body {
       else throw new Exception("ERROR: Invalid file Format.");
 
       await File.WriteAllBytesAsync(FinalPath, FileToDownload);
-      Console.WriteLine($"{student.charaName} Files downloaded on {FinalPath}");
     }
     catch (Exception)
     {

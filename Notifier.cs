@@ -22,7 +22,6 @@ public static class Notifier
   }
   public static void MessageTaskCompleted(string message)
   {
-    Console.Clear();
     Console.WriteLine(NL+message+" ✔️");
   }
   public static void MessageNothingToDo(string message)
