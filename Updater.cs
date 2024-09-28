@@ -26,11 +26,11 @@ public static class Updater
     Notifier.MessageInitiatingTask("Scanning Students Data");
     string[] CharaNames = AvailablesUpdates.Select(s => s.name).ToArray(); // Get only de names
     Student?[] AllInfoScaned = await CharaInfo.ScanManyCharasDetails(CharaNames);
-    Notifier.MessageTaskCompleted("All data scanned sucefully");
+    Notifier.MessageTaskCompleted("All data scanned succefully");
 
     Notifier.MessageInitiatingTask("Saving data in Database");
     await SqliteController.SaveManyInDatabase(AllInfoScaned!);
-    Notifier.MessageTaskCompleted("\nAll characters updated succefully ✔️");
+    Notifier.MessageTaskCompleted("All characters updated succefully");
 
     await GenerateDataJSON();
   }

@@ -1,12 +1,11 @@
-﻿using BlueArchiveWebScrapper.db;
-using static BlueArchiveWebScrapper.Menu;
-namespace BlueArchiveWebScrapper
+﻿using static BlueArchiveWebScrapper.Menu;
+
+namespace BlueArchiveWebScrapper;
+
+internal class Program
 {
-	internal class Program
+	static async Task Main()
 	{
-		static async Task Main()
-		{
-			await MainMenu();
-		}
+		await MainMenu();
 	}
 }

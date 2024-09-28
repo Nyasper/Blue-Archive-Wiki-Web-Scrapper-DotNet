@@ -5,13 +5,12 @@ namespace BlueArchiveWebScrapper.db;
 public static class SqliteController
 {
   //CREATE
-  public static async Task AddToDatabase(Student student)
+  public static async Task AddToDatabase(StudentContext db, Student student)
   {
-    using var db = new StudentContext();
-    Student? existStudent = await GetStudentById(student.charaName);
+    Student? existStudent = await db.students.FindAsync(student.charaName);
 
     if (existStudent is null) {
-      db.students.Add(student);
+      await db.students.AddAsync(student);
       Console.WriteLine($"{student.charaName} saved in Sqlite");
     }
   }
@@ -24,7 +23,7 @@ public static class SqliteController
     try
     {
       foreach (var student in students){
-        await AddToDatabase(student);
+        await AddToDatabase(db,student);
       }
       await db.SaveChangesAsync();
       await transaction.CommitAsync();
@@ -36,11 +35,6 @@ public static class SqliteController
     }
   }
   //READ
-  public static async Task<Student?> GetStudentById(string CharaName)
-  {
-    using var db = new StudentContext();
-    return await db.students.FindAsync(CharaName);
-  }
   public static async Task<Student[]> GetAllStudents()
   {
     using var db = new StudentContext();

@@ -1,4 +1,6 @@
 using System;
+using System.Data.Common;
+using System.Net.Http.Json;
 using System.Xml;
 using BlueArchiveWebScrapper.model;
 
@@ -55,4 +57,5 @@ public static class Notifier
       Console.WriteLine($"{i+1}: {students[i].name} 💙");      
     }
   }
+
 }
