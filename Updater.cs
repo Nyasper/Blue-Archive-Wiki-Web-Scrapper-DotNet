@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
+
 using BlueArchiveWebScrapper.db;
 using BlueArchiveWebScrapper.model;
 
@@ -19,9 +20,9 @@ public static class Updater
       return;
     }
 
-    Notifier.LogStudentsList($"{AvailablesUpdates.Length} New Students to Save:",AvailablesUpdates);
-    bool Continue = Menu.YesNoQuestion("Proceed to update the database");
-    if (!Continue) return;
+    Notifier.LogStudentsList($"{AvailablesUpdates.Length} New Students to Save:", AvailablesUpdates);
+    bool ccontinue = Menu.YesNoQuestion("Proceed to update the database");
+    if (!ccontinue) return;
 
     Notifier.MessageInitiatingTask("Scanning Students Data");
     string[] CharaNames = AvailablesUpdates.Select(s => s.name).ToArray(); // Get only de names
@@ -37,7 +38,7 @@ public static class Updater
   public static async Task UpdateStudentsFiles()
   {
     Notifier.NewBlankMessage("Files Update");
-    
+
     Notifier.MessageInitiatingTask("Verifying All Students Files");
     Student[] AvailablesUpdates = await VerifyAllStudentsFiles();
 
@@ -47,7 +48,7 @@ public static class Updater
       return;
     }
 
-    Notifier.LogStudentsList($"{AvailablesUpdates.Length} New Student's Files to Save:",AvailablesUpdates);
+    Notifier.LogStudentsList($"{AvailablesUpdates.Length} New Student's Files to Save:", AvailablesUpdates);
 
     bool Continue = Menu.YesNoQuestion("Proceed to download the files");
     if (!Continue) return;
@@ -91,11 +92,11 @@ public static class Updater
         StudentsWithoutAllFiles.Add(student);
       }
 
-      if (!result.HasProfileImage) Notifier.MessageFileMissing(type: "Profile Image",result);
-      if (!result.HasFullImage) Notifier.MessageFileMissing(type: "Full Image",result);
-      if (!result.HasAudio) Notifier.MessageFileMissing(type: "Audio",result);
+      if (!result.HasProfileImage) Notifier.MessageFileMissing(type: "Profile Image", result);
+      if (!result.HasFullImage) Notifier.MessageFileMissing(type: "Full Image", result);
+      if (!result.HasAudio) Notifier.MessageFileMissing(type: "Audio", result);
     });
-    return [..StudentsWithoutAllFiles];
+    return [.. StudentsWithoutAllFiles];
   }
   private static async Task<CharaListInfo[]> SearchDatabaseUpdates()
   {
@@ -110,7 +111,7 @@ public static class Updater
   {
     Student[] students = await SqliteController.GetAllStudents();
     string JSONpath = await FileHandler.SaveDataInJSON(model: students, FileName: "data");
-    
+
     Notifier.MessageTaskCompleted($"data json generated in: {JSONpath}");
   }
   private static async Task GenerateHTMLImagePreview()

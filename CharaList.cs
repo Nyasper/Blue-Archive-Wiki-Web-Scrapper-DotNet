@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Nodes;
+
 using HtmlAgilityPack;
 
 namespace BlueArchiveWebScrapper
 {
-  public record class CharaListInfo (string name, string img, string url);
+  public record class CharaListInfo(string name, string img, string url);
 
   public class CharaList
   {
@@ -14,8 +15,8 @@ namespace BlueArchiveWebScrapper
     static public async Task SaveCharaListInJSON()
     {
       List<CharaListInfo> charaList = await GetCharaList();
-      string JSONpath = await FileHandler.SaveDataInJSON(model:charaList, FileName:"charaList");
-      Console.WriteLine("\nCharaList JSON saved in: "+JSONpath);
+      string JSONpath = await FileHandler.SaveDataInJSON(model: charaList, FileName: "charaList");
+      Console.WriteLine("\nCharaList JSON saved in: " + JSONpath);
     }
     static public async Task<List<CharaListInfo>> GetCharaList()
     {
@@ -25,8 +26,8 @@ namespace BlueArchiveWebScrapper
 
       return ScanCharaList(trCollection);
     }
-      
-    static public async Task LogCharaList() 
+
+    static public async Task LogCharaList()
     {
       Notifier.NewBlankMessage("Showing Chara List");
       var charaList = await GetCharaList();
@@ -44,8 +45,8 @@ namespace BlueArchiveWebScrapper
         string url = domain + character.Attributes.ToArray()[0].Value;
         string name = ManageCharaNameFormat(url);
         string img = "https:" + character.FirstChild.Attributes.ToArray()[1].Value;
-        
-        CharaListInfo Chara = new (name, img, url);
+
+        CharaListInfo Chara = new(name, img, url);
         CharaListInfo.Add(Chara);
       }
       return CharaListInfo;

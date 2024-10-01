@@ -5,7 +5,7 @@ public static partial class CharaInfo
 {
   private static readonly string domain = "https://bluearchive.wiki";
   private static readonly string baseUrl = domain + "/wiki/";
-  public static async Task<Student?> ScanInfo(string CharaNameParam) 
+  public static async Task<Student?> ScanInfo(string CharaNameParam)
   {
     try
     {
@@ -17,7 +17,7 @@ public static partial class CharaInfo
         name = GetName(html),
         lastName = GetLastName(html),
         school = GetSchool(html),
-        role =  GetRole(html),
+        role = GetRole(html),
         combatClass = GetCombatClass(html),
         weaponType = GetWeaponType(html),
         age = GetAge(html),
@@ -38,13 +38,13 @@ public static partial class CharaInfo
     }
     catch (Exception e)
     {
-      Console.WriteLine($"ERROR al escanear la informacion de {CharaNameParam}\n"+e);
+      Console.WriteLine($"ERROR al escanear la informacion de {CharaNameParam}\n" + e);
       return null;
     }
   }
   public static async Task<Student?[]> ScanManyCharasDetails(string[] CharaNames)
   {
-    return await Task.WhenAll(CharaNames.Select(c=> ScanInfo(c)).ToArray());
+    return await Task.WhenAll(CharaNames.Select(c => ScanInfo(c)).ToArray());
   }
 
 }

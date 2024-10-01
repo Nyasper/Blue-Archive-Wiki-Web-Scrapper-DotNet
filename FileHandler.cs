@@ -2,15 +2,17 @@
 
 using System.IO;
 using System.Text.Json;
+
 using BlueArchiveWebScrapper.db;
 using BlueArchiveWebScrapper.model;
 
-public static class FileHandler 
+public static class FileHandler
 {
   private static readonly string DocumentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-  private static readonly string BlueArchiveWSPath = Path.Join(DocumentsPath,"BlueArchiveWS");
-  private static readonly string MediaPath = Path.Join(BlueArchiveWSPath,"media");
-  private enum FileFormats{
+  private static readonly string BlueArchiveWSPath = Path.Join(DocumentsPath, "BlueArchiveWS");
+  private static readonly string MediaPath = Path.Join(BlueArchiveWSPath, "media");
+  private enum FileFormats
+  {
     audio,
     ImageFull,
     ImageProfile
@@ -21,7 +23,7 @@ public static class FileHandler
     {
       string SchoolPath = Path.Join(MediaPath, student.school);
       CreateFolderIfNotExist(SchoolPath);
-    
+
       Task[] FileQueue = [
         Download(student, FileFormats.ImageProfile),
         Download(student, FileFormats.ImageFull),
@@ -38,7 +40,7 @@ public static class FileHandler
   }
   public static async Task<string> SaveDataInJSON<T>(IEnumerable<T> model, string FileName)
   {
-    string DataFinalPath = Path.Join(BlueArchiveWSPath,FileName+".json");
+    string DataFinalPath = Path.Join(BlueArchiveWSPath, FileName + ".json");
 
     string jsonData = JsonSerializer.Serialize(model);
     await File.WriteAllTextAsync(DataFinalPath, jsonData);
@@ -47,7 +49,7 @@ public static class FileHandler
   public static async Task<string> CreateHTMLImagesPreview(Student[] students)
   {
     const string FileName = "imagesPreview";
-    IGrouping<string, Student>[] allSchools = students.GroupBy((s)=>s.school).ToArray();
+    IGrouping<string, Student>[] allSchools = students.GroupBy((s) => s.school).ToArray();
 
     // Generar el contenido HTML
     const string HTMLHeader = "<html>\n<head>\n<link rel=\"stylesheet\" href=\"style.css\">\n<title>Students Images Preview</title>\n</head>\n<body>";
@@ -103,15 +105,15 @@ body {
     overflow: hidden;
 }";
     const string HTMLFooter = $"\n<style>{stylesCSS}\n</style>\n</body>\n</html>";
-    List<string> SchoolContainer = allSchools.Select(school=> string.Join("\n",[$"\n<h2 class=\"schoolTitle\">{school.Key}</h2>\n  <div class=\"schoolContainer\">\n ",string.Join("\n",school.Select((student, index) => 
+    List<string> SchoolContainer = allSchools.Select(school => string.Join("\n", [$"\n<h2 class=\"schoolTitle\">{school.Key}</h2>\n  <div class=\"schoolContainer\">\n ",string.Join("\n",school.Select((student, index) =>
       $" <div class=\"studentContainer\">\n  <h2>{index + 1}: {student.charaName}</h2>\n  <div class=\"imageContainer\">\n   <img src=\"media/{student.school}/{student.charaName}.png\" class=\"profileImage\" alt=\"profileImage of {student.charaName}\"></img>\n   <img src=\"media/{student.school}/{student.charaName}_full.png\" class=\"fullImage\" alt=\"fullImage of {student.charaName}\">\n </div>\n</div>")),"</div>"])).ToList();
 
     string HtmlContent = string.Join("\n", SchoolContainer);
 
     // Concatenar todas las partes del HTML
     string finalHTML = $"{HTMLHeader}\n{HtmlContent}{HTMLFooter}";
-    
-    string filePath = Path.Join(BlueArchiveWSPath,FileName+".html");
+
+    string filePath = Path.Join(BlueArchiveWSPath, FileName + ".html");
     await File.WriteAllTextAsync(filePath, finalHTML);
     return filePath;
   }
@@ -124,7 +126,7 @@ body {
       CreateFolderIfNotExist(SchoolPath);
       string FinalPath = Path.Join(SchoolPath, student.charaName);
 
-      if (fileFormat == FileFormats.ImageProfile) 
+      if (fileFormat == FileFormats.ImageProfile)
       {
         FileToDownload = await GetByteArray(student.pageImageProfileUrl);
         FinalPath += ".png";
@@ -152,16 +154,16 @@ body {
   public static FileVerification VerifyStudentFilesExists(Student student)
   {
     string BasePath = Path.Join(MediaPath, student.school, student.charaName);
-    string profileImagePath = BasePath+".png";
-    string fullImagePath = BasePath+"_full.png";
-    string audioPath = BasePath+".ogg";
-    
-    return 
+    string profileImagePath = BasePath + ".png";
+    string fullImagePath = BasePath + "_full.png";
+    string audioPath = BasePath + ".ogg";
+
+    return
       new(
         CharaName: student.charaName,
         School: student.school,
         HasProfileImage: FileExists(profileImagePath),
-        HasFullImage: FileExists(fullImagePath), 
+        HasFullImage: FileExists(fullImagePath),
         HasAudio: FileExists(audioPath)
       );
   }
@@ -180,10 +182,10 @@ body {
   }
   private static async Task<byte[]> GetByteArray(string FileUrl)
   {
-     try
+    try
     {
       using var client = new HttpClient();
-       client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0");
+      client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0");
       byte[] res = await client.GetByteArrayAsync(FileUrl);
       return res;
     }
