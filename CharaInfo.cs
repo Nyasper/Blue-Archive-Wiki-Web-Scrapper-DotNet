@@ -33,7 +33,6 @@ public static partial class CharaInfo
         pageImageProfileUrl = GetPageImageProfileUrl(html),
         pageImageFullUrl = await GetPageImageFullUrl(html),
         audioUrl = GetAudioUrl(html),
-        files = false
       };
     }
     catch (Exception e)

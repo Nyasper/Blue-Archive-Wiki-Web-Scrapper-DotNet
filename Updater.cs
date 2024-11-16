@@ -100,7 +100,7 @@ public static class Updater
   }
   private static async Task<CharaListInfo[]> SearchDatabaseUpdates()
   {
-    List<CharaListInfo> CharactersInPage = await CharaList.GetCharaList();
+    HashSet<CharaListInfo> CharactersInPage = await CharaList.GetCharaList();
     Student[] CharactersSqlite = await SqliteController.GetAllStudents();
 
     // Search Differences

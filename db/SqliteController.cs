@@ -1,4 +1,7 @@
-﻿using BlueArchiveWebScrapper.model;
+﻿using System.Text.Json;
+
+using BlueArchiveWebScrapper.model;
+
 using Microsoft.EntityFrameworkCore;
 namespace BlueArchiveWebScrapper.db;
 
@@ -9,7 +12,8 @@ public static class SqliteController
   {
     Student? existStudent = await db.students.FindAsync(student.charaName);
 
-    if (existStudent is null) {
+    if (existStudent is null)
+    {
       await db.students.AddAsync(student);
       Console.WriteLine($"{student.charaName} saved in Sqlite");
     }
@@ -22,8 +26,9 @@ public static class SqliteController
 
     try
     {
-      foreach (var student in students){
-        await AddToDatabase(db,student);
+      foreach (var student in students)
+      {
+        await AddToDatabase(db, student);
       }
       await db.SaveChangesAsync();
       await transaction.CommitAsync();
@@ -34,30 +39,35 @@ public static class SqliteController
       Console.WriteLine($"Error saving students: {ex.Message}");
     }
   }
+  public static async Task ImportFromJsonFile(string jsonFile)
+  {
+    string archivo = await File.ReadAllTextAsync(jsonFile);
+    try
+    {
+
+    }
+    catch (FileNotFoundException)
+    {
+      System.Console.WriteLine($"{jsonFile} does not exist.");
+      return;
+    }
+    var estudiantes = JsonSerializer.Deserialize<Student[]>(archivo);
+
+    if (estudiantes != null)
+    {
+      await SaveManyInDatabase(estudiantes);
+    }
+
+    System.Console.WriteLine($"Database Updated with {jsonFile}");
+  }
+
   //READ
   public static async Task<Student[]> GetAllStudents()
   {
     using var db = new StudentContext();
     return await db.students.AsNoTracking().MyCustomOrdenated().ToArrayAsync();
   }
-   public static async Task<Student[]> GetAllStudentsWithoutFiles()
-  {
-    using var db = new StudentContext();
-    return await db.students.Where(s => !s.files).AsNoTracking().MyCustomOrdenated().ToArrayAsync();
-  }
-  // public static async Task<Student?> GetDbInfo(this Student student) => await GetStudentById(student.charaName);
-  //UPDATE
-  public static async Task UpdateFilesDownloaded(IEnumerable<Student> students)
-  {
-    using var db = new StudentContext();
-    
-    foreach (var student in students)
-    {
-      student.files = true;
-      db.Entry(student).Property(s=>s.files).IsModified = true; // Marcar la entidad como modificada solo en su propiedad files.
-    }
-    await db.SaveChangesAsync();
-  }
+
 
   //DELETE
   // public static async Task DeleteSqlite(Student student)
@@ -74,7 +84,8 @@ public static class SqliteController
 
 }
 
-public class StudentContext : DbContext {
+public class StudentContext : DbContext
+{
   public DbSet<Student> students { get; set; }
   public string DbPath { get; }
   public StudentContext()
@@ -84,13 +95,13 @@ public class StudentContext : DbContext {
     if (!Directory.Exists(FinalRoute)) Directory.CreateDirectory(FinalRoute);
     DbPath = Path.Join(FinalRoute, "BlueArchive.db");
   }
-   protected override void OnConfiguring(DbContextOptionsBuilder options)
-    => options.UseSqlite($"Data Source={DbPath}");
+  protected override void OnConfiguring(DbContextOptionsBuilder options)
+   => options.UseSqlite($"Data Source={DbPath}");
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
     modelBuilder.Entity<Student>()
       .HasKey(s => s.charaName);
-    modelBuilder.Entity<Student>().HasIndex(s=>s.charaName);
+    modelBuilder.Entity<Student>().HasIndex(s => s.charaName);
   }
 
 }
