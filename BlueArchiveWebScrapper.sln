@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlueArchiveWebScrapper", "BlueArchiveWebScrapper.csproj", "{BD6510E4-CD9F-49D7-8DD9-8449F71028F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Main", "Main\Main.csproj", "{BD6510E4-CD9F-49D7-8DD9-8449F71028F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Scanner", "Scanner\Scanner.csproj", "{A44B1B9B-AF2F-4D05-8CA4-0194ED3327AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,11 +17,17 @@ Global
 		{BD6510E4-CD9F-49D7-8DD9-8449F71028F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD6510E4-CD9F-49D7-8DD9-8449F71028F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD6510E4-CD9F-49D7-8DD9-8449F71028F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A44B1B9B-AF2F-4D05-8CA4-0194ED3327AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A44B1B9B-AF2F-4D05-8CA4-0194ED3327AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A44B1B9B-AF2F-4D05-8CA4-0194ED3327AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A44B1B9B-AF2F-4D05-8CA4-0194ED3327AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C133846C-9253-4B93-BF0F-9E53B2F7CF7F}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 EndGlobal
