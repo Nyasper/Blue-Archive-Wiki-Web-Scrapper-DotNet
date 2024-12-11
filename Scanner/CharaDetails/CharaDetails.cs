@@ -40,7 +40,10 @@ public class CharaDetails(IHtmlHandler htmlHandler) : ICharaDetails<Student>
 			throw;
 		}
 	}
-
+	public async Task<IEnumerable<Student>> ScanMany(IEnumerable<Student> students)
+	{
+		return await Task.WhenAll(students.Select(s => ScanInfo(s.charaName)));
+	}
 	public async Task<IEnumerable<Student>> ScanMany(IEnumerable<CharaListItem> charasItems)
 	{
 		return await Task.WhenAll(charasItems.Select(s => ScanInfo(s.Name)));
