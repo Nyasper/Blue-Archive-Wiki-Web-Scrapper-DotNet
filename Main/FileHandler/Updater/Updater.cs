@@ -18,10 +18,7 @@ public class Updater(
 
 	public async Task UpdateAll()
 	{
-		Queue<Func<Task>> toUpdate = [];
-		toUpdate.Enqueue(UpdateDatabase);
-		toUpdate.Enqueue(UpdateLocalFiles);
-
+		Queue<Func<Task>> toUpdate = new([UpdateDatabase, UpdateLocalFiles]);
 		while (toUpdate.Count > 0)
 		{
 			Func<Task> taskToRun = toUpdate.Dequeue();
