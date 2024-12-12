@@ -34,7 +34,7 @@ public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 	{
 		string charaName = url.Split("/wiki/")[1];
 
-		string[] exludeNames = ["Shiroko%EF%BC%8ATerror"];
+		string[] exludeNames = ["Shiroko%EF%BC%8ATerror", "Shiroko_(Terror)"];
 		return exludeNames.Contains(charaName) ? "Shiroko" : charaName;
 	}
 }
