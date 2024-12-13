@@ -58,9 +58,9 @@ public class Repository(StudentContext context) : IRepository<Student>
   }
 
   //READ
-  public async Task<HashSet<Student>> GetAll()
+  public async Task<Student[]> GetAll()
   {
-    return await context.students.AsNoTracking().OrderBy(s => s.school).ThenBy(s => s.charaName).ToHashSetAsync();
+    return await context.students.AsNoTracking().OrderBy(s => s.school).ThenBy(s => s.charaName).ToArrayAsync();
   }
 
 

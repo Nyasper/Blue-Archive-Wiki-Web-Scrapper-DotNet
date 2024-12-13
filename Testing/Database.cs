@@ -21,6 +21,8 @@ public class Database
 	public async Task GetAll()
 	{
 		var students = await _repository.GetAll();
-		Assert.IsInstanceOfType<HashSet<Student>>(students, "Should return HashSet<Student> type");
+		Console.WriteLine($"cant students: {students.Length}");
+		Assert.IsInstanceOfType<Student[]>(students, "Should return Student[] type");
 	}
 }
+

@@ -35,11 +35,11 @@ public sealed class Scanners
 	public async Task CharaList()
 	{
 		var students = await _repository.GetAll();
-		var pageCharaList = await _charaListScanner.ScanCharaList();
+		var pageCharaList = (await _charaListScanner.ScanCharaList()).ToArray();
 
-		Assert.IsInstanceOfType<HashSet<CharaListItem>>(pageCharaList, "Should return CharaListItem");
-		Assert.IsTrue( pageCharaList.Count >= students.Count, "The number of characters in the page should be at least the number of students");
-		Console.WriteLine($"students in DB: {students.Count}\nstudents in page: {pageCharaList.Count}");
+		Assert.IsInstanceOfType<IEnumerable<CharaListItem>>(pageCharaList, "Should return CharaListItem");
+		Assert.IsTrue( pageCharaList.Length >= students.Length, "The number of characters in the page should be at least the number of students");
+		Console.WriteLine($"students in DB: {students.Length}\nstudents in page: {pageCharaList.Length}");
 	}
 
 	[TestMethod]
@@ -49,14 +49,14 @@ public sealed class Scanners
 		Random random = new();
 
 		string[] excludeCharas = ["Shiroko_(Terror)"];
-		var allStudents = (await _repository.GetAll()).Where(s=> !excludeCharas.Contains(s.charaName)).ToHashSet();
-		var randomStudents = allStudents.OrderBy(x => random.Next()).Take(maxScanned).ToHashSet();
-		var scannedData = (await _charaDetails.ScanMany(randomStudents)).ToHashSet();
+		var allStudents = (await _repository.GetAll()).Where(s=> !excludeCharas.Contains(s.charaName)).ToArray();
+		var randomStudents = allStudents.OrderBy(x => random.Next()).Take(maxScanned).ToArray();
+		var scannedData = (await _charaDetails.ScanMany(randomStudents)).ToArray();
 
 		int charasInterestions = randomStudents.IntersectBy(scannedData.Select(scanned=> scanned.charaName), s=>s.charaName).Count();
 
-		Assert.AreEqual(maxScanned, randomStudents.Count);
-		Assert.AreEqual(maxScanned, scannedData.Count);
+		Assert.AreEqual(maxScanned, randomStudents.Length);
+		Assert.AreEqual(maxScanned, scannedData.Length);
 		Assert.AreEqual(maxScanned, charasInterestions, $"Should have {charasInterestions}/{maxScanned} intersections");
 		Console.WriteLine($"characters in database/page intersections {charasInterestions}/{maxScanned}");
 	}
