@@ -46,6 +46,7 @@ public class Updater(
 		Notifier.MessageInitiatingTask("Saving data in Database");
 		await _studentRepository.SaveInDatabase(scannedData);
 		Notifier.MessageTaskCompleted("Database updated successfully");
+
 		await creator.GenerateJsonData();
 	}
 	public async Task UpdateLocalFiles()

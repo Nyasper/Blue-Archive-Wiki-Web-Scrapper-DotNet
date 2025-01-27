@@ -16,7 +16,7 @@ public static class Program
 {
 	public static async Task Main()
 	{
-		var services = new ServiceCollection()
+		IServiceProvider services = new ServiceCollection()
 			.AddDbContext<StudentContext>()
 			.AddSingleton<IDownloader, Downloader>()
 			.AddSingleton<ICreator, Creator>()
@@ -35,7 +35,6 @@ public static class Program
 	{
 		var updater = services.GetRequiredService<Updater>();
 		await updater.UpdateAll();
-		await updater.UpdateLocalFiles();
 		Console.WriteLine("Press any key to finish");
 		Console.ReadKey();
 	}
