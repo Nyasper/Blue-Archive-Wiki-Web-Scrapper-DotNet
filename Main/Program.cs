@@ -31,10 +31,11 @@ public static class Program
 		await Run(services);
 	}
 
-	private static async Task Run(ServiceProvider services)
+	private static async Task Run(IServiceProvider services)
 	{
 		var updater = services.GetRequiredService<Updater>();
 		await updater.UpdateAll();
+		await updater.UpdateLocalFiles();
 		Console.WriteLine("Press any key to finish");
 		Console.ReadKey();
 	}

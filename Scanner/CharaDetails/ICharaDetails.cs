@@ -1,4 +1,6 @@
-﻿namespace Scanner.CharaDetails;
+﻿using System.Collections;
+
+namespace Scanner.CharaDetails;
 using Model;
 
 

@@ -37,7 +37,9 @@ public sealed class Scanners
 		var students = await _repository.GetAll();
 		var pageCharaList = (await _charaListScanner.ScanCharaList()).ToArray();
 
-		Assert.IsInstanceOfType<IEnumerable<CharaListItem>>(pageCharaList, "Should return CharaListItem");
+		Assert.IsInstanceOfType<IEnumerable<CharaListItem>>(pageCharaList, "Should return CharaListItem Collection");
+		Assert.IsTrue(pageCharaList.All(item => item is CharaListItem), "All elements should be of type CharaListItem");
+
 		Assert.IsTrue( pageCharaList.Length >= students.Length, "The number of characters in the page should be at least the number of students");
 		Console.WriteLine($"students in DB: {students.Length}\nstudents in page: {pageCharaList.Length}");
 	}

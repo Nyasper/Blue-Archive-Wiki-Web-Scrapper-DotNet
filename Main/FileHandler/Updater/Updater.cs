@@ -29,16 +29,15 @@ public class Updater(
 	public async Task UpdateDatabase()
 	{
 		Notifier.MessageInitiatingTask("Searching for Updates");
-		IEnumerable<CharaListItem> availableUpdates = await verifier.SearchDatabaseUpdates();
-		int updatesCount = availableUpdates.Count();
-		if (updatesCount == 0)
+		CharaListItem[] availableUpdates = (await verifier.SearchDatabaseUpdates()).ToArray();
+		if (availableUpdates.Length == 0)
 		{
 			Notifier.MessageNothingToDo("Database OK");
 			return;
 		}
 
-		Notifier.LogStudentsList($"{updatesCount} New Students to Save:", availableUpdates);
-		// bool continuee = Menu.YesNoQuestion("Update the database");
+		Notifier.LogStudentsList($"{availableUpdates.Length} New Students to Save:", availableUpdates);
+		// bool continue = Menu.YesNoQuestion("Update the database");
 
 		Notifier.MessageInitiatingTask("Scanning Students Data");
 		IEnumerable<Student> scannedData = await charaDetailsScanner.ScanMany(availableUpdates);
@@ -52,20 +51,19 @@ public class Updater(
 	public async Task UpdateLocalFiles()
 	{
 		Notifier.MessageInitiatingTask("Verifying students files");
-		IEnumerable<Student> studentsWithoutFiles = await verifier.VerifyAllStudentsFiles();
-		int studentsWithoutFilesCount = studentsWithoutFiles.Count();
+		Student[] studentsWithoutFiles = (await verifier.VerifyAllStudentsFiles()).ToArray();
 
-		if (studentsWithoutFilesCount == 0)
+		if (studentsWithoutFiles.Length == 0)
 		{
 			Notifier.MessageNothingToDo("All files OK");
 			return;
 		}
-		// bool continuee = Menu.YesNoQuestion("Proceed to download the files");
+		// bool continue = Menu.YesNoQuestion("Proceed to download the files");
 		Notifier.MessageInitiatingTask("Downloading missing files");
 		await downloader.DownloadFiles(studentsWithoutFiles);
 		Notifier.MessageTaskCompleted("All files updated successfully");
 
-		await creator.GenerateJsonData();
+		await creator.GenerateHtmlImagePreview();
 	}
 }
 

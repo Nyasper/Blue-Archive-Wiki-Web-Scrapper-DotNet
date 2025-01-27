@@ -1,4 +1,6 @@
-﻿namespace Scanner.Model;
+﻿using System.Reflection;
+
+namespace Scanner.Model;
 public record class Student
 {
   public required string charaName { get; init; }
@@ -23,21 +25,21 @@ public record class Student
   public string audioUrl { get; init; } = "no audio";
 
   public DateTime createdAt { get; init; } = DateTime.Now;
-  public void LogStudent()
+  public override string ToString()
   {
     var nl = Environment.NewLine;
     const string separetor = "-----------------------------------------------------------------------------------------------------------------";
-    string[] valuesToPrint = ["charaName", "school", "age", "releaseDate", "skinSet", "pageUrl", "pageImageProfileUrl", "pageImageFullUrl", "audioUrl", "createdAt"];
+    string[] valuesToPrintConstants = ["charaName", "school", "age", "releaseDate", "skinSet", "pageUrl", "pageImageProfileUrl", "pageImageFullUrl", "audioUrl", "createdAt"];
 
-    Console.WriteLine(nl + separetor);
-    foreach (var propertyName in valuesToPrint)
+    string result = nl + separetor;
+    PropertyInfo[] properties = GetType().GetProperties();
+    var propertiesToPrint = properties.Where(p => valuesToPrintConstants.Contains(p.Name)).ToArray();
+    foreach (var property in propertiesToPrint)
     {
-      var propertyInfo = this.GetType().GetProperty(propertyName);
-      if (propertyInfo == null) continue;
-      var propertyValue = propertyInfo.GetValue(this);
-      Console.WriteLine($"{propertyName}: {propertyValue ?? "null"}");
+      result += $"{nl}{property.Name}: {property.GetValue(this) ?? "null"}";
     }
-    Console.WriteLine(separetor);
+    result += nl + separetor;
+    return result;
   }
   public static readonly string[] Schools = [
     "Abydos",

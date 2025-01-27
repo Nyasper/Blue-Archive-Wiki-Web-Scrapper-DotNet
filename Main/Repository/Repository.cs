@@ -17,7 +17,7 @@ public class Repository(StudentContext context) : IRepository<Student>
     }
   }
   public async Task SaveInDatabase(IEnumerable<Student> students)
-  { ;
+  {
     await using var transaction = await context.Database.BeginTransactionAsync();
 
     try
