@@ -1,30 +1,19 @@
-﻿namespace Scanner.CharaDetails;
+﻿using Scanner.CharaList;
+using Scanner.Configuration;
+using Scanner.Model;
+using Scanner.Utils;
 
-using Configuration;
+namespace Scanner.CharaDetails;
 
 using HtmlAgilityPack;
 
-using Model;
-
-using Utils;
-
-public static class Getters
+public class GetterNew(HtmlDocument html, string studentCharaName) : IGetter
 {
-	private static readonly string Nl = Environment.NewLine;
+	private readonly string Nl = Environment.NewLine;
 
-	public static string GetCharaName(HtmlDocument html)
-	{
-		try
-		{
-			var charaName = html.DocumentNode.SelectSingleNode("html/body/div[3]/h1/span").InnerText;
-			return charaName.Trim().Replace(" ", "_");
-		}
-		catch (Exception)
-		{
-			throw new Exception("error in 'GetImageFullUrl()'" + Nl);
-		}
-	}
-	public static string GetName(HtmlDocument html)
+	public string GetCharaName() => studentCharaName;
+
+	public string GetName()
 	{
 		try
 		{
@@ -36,7 +25,8 @@ public static class Getters
 			throw new Exception("error in 'GetName()'" + Nl);
 		}
 	}
-	public static string GetLastName(HtmlDocument html)
+
+	public string GetLastName()
 	{
 		try
 		{
@@ -45,11 +35,11 @@ public static class Getters
 		}
 		catch (Exception)
 		{
-
 			throw new Exception("error in 'GetLastName()'" + Nl);
 		}
 	}
-	public static string GetSchool(HtmlDocument html)
+
+	public string GetSchool()
 	{
 		try
 		{
@@ -61,7 +51,8 @@ public static class Getters
 			throw new Exception("error in 'GetSchool()'" + Nl);
 		}
 	}
-	public static string GetRole(HtmlDocument html)
+
+	public string GetRole()
 	{
 		try
 		{
@@ -73,7 +64,8 @@ public static class Getters
 			throw new Exception("error in 'GetRole()'" + Nl);
 		}
 	}
-	public static string GetCombatClass(HtmlDocument html)
+
+	public string GetCombatClass()
 	{
 		try
 		{
@@ -85,7 +77,8 @@ public static class Getters
 			throw new Exception("error in 'GetCombatClass()'" + Nl);
 		}
 	}
-	public static string GetWeaponType(HtmlDocument html)
+
+	public string GetWeaponType()
 	{
 		try
 		{
@@ -97,7 +90,8 @@ public static class Getters
 			throw new Exception("error in 'GetWeaponType()'" + Nl);
 		}
 	}
-	public static int? GetAge(HtmlDocument html)
+
+	public int? GetAge()
 	{
 		var AgeString = html.DocumentNode.SelectSingleNode("html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[12]/td").InnerText.Trim();
 		try
@@ -114,7 +108,8 @@ public static class Getters
 			throw new Exception("error in 'GetAge()'" + Nl);
 		}
 	}
-	public static string? GetBirthday(HtmlDocument html)
+
+	public string? GetBirthday()
 	{
 		try
 		{
@@ -126,7 +121,8 @@ public static class Getters
 			throw new Exception("error in 'GetBirthday()'" + Nl);
 		}
 	}
-	public static int? GetHeight(HtmlDocument html)
+
+	public int? GetHeight()
 	{
 		try
 		{
@@ -140,7 +136,8 @@ public static class Getters
 			throw new Exception("error in 'GetHeight()'" + Nl);
 		}
 	}
-	public static string GetHobbies(HtmlDocument html)
+
+	public string GetHobbies()
 	{
 		try
 		{
@@ -152,7 +149,8 @@ public static class Getters
 			throw new Exception("error in 'GetHobbies()'" + Nl);
 		}
 	}
-	public static string? GetDesigner(HtmlDocument html)
+
+	public string? GetDesigner()
 	{
 		try
 		{
@@ -164,7 +162,8 @@ public static class Getters
 			throw new Exception("error in 'GetDesigner()'" + Nl);
 		}
 	}
-	public static string? GetIllustrator(HtmlDocument html)
+
+	public string? GetIllustrator()
 	{
 		try
 		{
@@ -176,7 +175,8 @@ public static class Getters
 			throw new Exception("error in 'GetIllustrator()'" + Nl);
 		}
 	}
-	public static string GetVoice(HtmlDocument html)
+
+	public string GetVoice()
 	{
 		try
 		{
@@ -188,7 +188,8 @@ public static class Getters
 			throw new Exception("error in 'GetVoice()'" + Nl);
 		}
 	}
-	public static string GetReleaseDate(HtmlDocument html)
+
+	public string GetReleaseDate()
 	{
 		try
 		{
@@ -200,23 +201,26 @@ public static class Getters
 			throw new Exception("error in 'GetReleaseDate()'" + Nl);
 		}
 	}
-	public static string GetSkinSet(string CharaName)
+
+	public string GetSkinSet()
 	{
 		try
 		{
-			if (!CharaName.EndsWith(')') || !CharaName.Contains("_(") || Student.ExcludeSkinSets.Contains(CharaName)) return "default";
-			return CharaName.Split('(')[1].Split(')')[0].Trim().ToLower();
+			if (!studentCharaName.EndsWith(')') || !studentCharaName.Contains("_(") || Student.ExcludeSkinSets.Contains(studentCharaName)) return "default";
+			return studentCharaName.Split('(')[1].Split(')')[0].Trim().ToLower();
 		}
 		catch (Exception)
 		{
 			throw new Exception("error in 'GetSkinSet()'" + Nl);
 		}
 	}
-	public static string GetPageUrl(string charaName)
+
+	public string GetPageUrl()
 	{
-		return Constants.BaseUrl + charaName;
+		return Constants.BaseUrl + studentCharaName;
 	}
-	public static string GetPageImageProfileUrl(HtmlDocument html)
+
+	public string GetPageImageProfileUrl()
 	{
 		try
 		{
@@ -231,7 +235,8 @@ public static class Getters
 			throw new Exception("error in 'GetImageProfileUrl()'" + Nl);
 		}
 	}
-	public static async Task<string> GetPageImageFullUrl(HtmlDocument html)
+
+	public async Task<string> GetPageImageFullUrl()
 	{
 		Console.WriteLine("scanning page image full url...");
 		try
@@ -242,9 +247,9 @@ public static class Getters
 
 			string toOriginalImageUrl = $"{Constants.Domain}{toOriginalImageHrefAttr}";
 
-			HtmlDocument imgFullHtml = await new HtmlHandler().ScanHtml(toOriginalImageUrl);
+			var imgFull_html = await new HtmlHandler().ScanHtml(toOriginalImageUrl);
 			const string originalImageUrlXpath = "/html/body/div[3]/div[3]/div[5]/div[2]/p/bdi/a";
-			string originalImageHref = imgFullHtml.DocumentNode.SelectSingleNode(originalImageUrlXpath).GetAttributes("href").First().Value;
+			string originalImageHref = imgFull_html.DocumentNode.SelectSingleNode(originalImageUrlXpath).GetAttributes("href").First().Value;
 			if (String.IsNullOrEmpty(originalImageHref)) throw new Exception("error in 'GetImageFullUrl()'" + Nl);
 			Console.WriteLine($"original image href: {originalImageHref}");
 			string result = "https:" + originalImageHref;
@@ -255,7 +260,8 @@ public static class Getters
 			throw new Exception("error in 'GetImageFullUrl()'" + Nl);
 		}
 	}
-	public static string GetAudioUrl(HtmlDocument html)
+
+	public string GetAudioUrl()
 	{
 		try
 		{
@@ -266,7 +272,6 @@ public static class Getters
 		}
 		catch (Exception)
 		{
-
 			throw new Exception("error in 'GetAudioUrl()'" + Nl);
 		}
 	}

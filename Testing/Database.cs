@@ -25,4 +25,3 @@ public class Database
 		Assert.IsTrue(students.All(student => student is Student), "All elements should be of type Student");
 	}
 }
-

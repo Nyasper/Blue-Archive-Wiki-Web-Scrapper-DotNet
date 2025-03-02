@@ -4,10 +4,10 @@ namespace Scanner.CharaDetails;
 using Model;
 
 
-public interface ICharaDetails<S>
+public interface ICharaDetails
 {
-	Task<S> ScanInfo(string charaNameParam);
-	Task<IEnumerable<S>> ScanMany(IEnumerable<CharaListItem> charasItems);
-	Task<IEnumerable<S>> ScanMany(IEnumerable<Student> students);
+	Task<Student> ScanInfo(string charaNameParam);
+	Task<IEnumerable<Student>> ScanInfo(IEnumerable<CharaListItem> charasItems);
+	Task<IEnumerable<Student>> ScanInfo(IEnumerable<Student> students);
 
 }

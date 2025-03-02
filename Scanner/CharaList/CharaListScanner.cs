@@ -1,11 +1,13 @@
 ﻿namespace Scanner.CharaList;
 using Configuration;
+
 using Model;
+
 using Utils;
 
 public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 {
-	public async Task<IEnumerable<CharaListItem>> ScanCharaList()
+	public async Task<CharaListItem[]> ScanCharaList()
 	{
 		var html = await htmlHandler.ScanHtml(Constants.CharaListPageUrl);
 

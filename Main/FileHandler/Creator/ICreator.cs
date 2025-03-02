@@ -1,4 +1,6 @@
-﻿namespace Main.FileHandler.Creator;
+﻿using Main.FileHandler.Downloader;
+
+namespace Main.FileHandler.Creator;
 
 public interface ICreator
 {

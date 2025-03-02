@@ -3,5 +3,5 @@ using Model;
 
 public interface ICharaListScanner
 {
-	Task<IEnumerable<CharaListItem>> ScanCharaList();
+	Task<CharaListItem[]> ScanCharaList();
 }

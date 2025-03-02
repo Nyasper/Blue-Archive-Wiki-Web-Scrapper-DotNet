@@ -1,8 +1,11 @@
 ﻿namespace Main.FileHandler.Creator;
-using Repository;
 using System.Text.Json;
-using Utils;
+
+using Repository;
+
 using Scanner.Model;
+
+using Utils;
 
 
 public class Creator(IRepository<Student> repository) : ICreator
@@ -30,14 +33,14 @@ public class Creator(IRepository<Student> repository) : ICreator
 		return htmlPath;
 	}
 
-	 private static async Task<string> CreateHtmlImagesPreview(IEnumerable<Student> students)
-  {
-    const string fileName = "imagesPreview";
-    IGrouping<string, Student>[] allSchools = students.GroupBy((s) => s.school).ToArray();
+	private static async Task<string> CreateHtmlImagesPreview(IEnumerable<Student> students)
+	{
+		const string fileName = "imagesPreview";
+		IGrouping<string, Student>[] allSchools = students.GroupBy((s) => s.school).ToArray();
 
-    // Generar el contenido HTML
-    const string htmlHeader = "<html>\n<head>\n<link rel=\"stylesheet\" href=\"style.css\">\n<title>Students Images Preview</title>\n</head>\n<body>";
-    const string stylesCss = @"
+		// Generar el contenido HTML
+		const string htmlHeader = "<html>\n<head>\n<link rel=\"stylesheet\" href=\"style.css\">\n<title>Students Images Preview</title>\n</head>\n<body>";
+		const string stylesCss = @"
 			:root {
 			    color-scheme: light dark;
 			}
@@ -88,17 +91,17 @@ public class Creator(IRepository<Student> repository) : ICreator
 			    object-fit: contain;
 			    overflow: hidden;
 			}";
-    const string htmlFooter = $"\n<style>{stylesCss}\n</style>\n</body>\n</html>";
-    List<string> schoolContainer = allSchools.Select(school => string.Join("\n", [$"\n<h2 class=\"schoolTitle\">{school.Key}</h2>\n  <div class=\"schoolContainer\">\n ",string.Join("\n",school.Select((student, index) =>
-      $" <div class=\"studentContainer\">\n  <h2>{index + 1}: {student.charaName}</h2>\n  <div class=\"imageContainer\">\n   <img src=\"../media/{student.school}/{student.charaName}.png\" class=\"profileImage\" alt=\"profileImage of {student.charaName}\"></img>\n   <img src=\"../media/{student.school}/{student.charaName}_full.png\" class=\"fullImage\" alt=\"fullImage of {student.charaName}\">\n</div>\n\n<audio controls><source src=\"../media/{student.school}/{student.charaName}.ogg\" type=\"audio/ogg\"></audio></div>")),"</div>"])).ToList();
+		const string htmlFooter = $"\n<style>{stylesCss}\n</style>\n</body>\n</html>";
+		List<string> schoolContainer = allSchools.Select(school => string.Join("\n", [$"\n<h2 class=\"schoolTitle\">{school.Key}</h2>\n  <div class=\"schoolContainer\">\n ",string.Join("\n",school.Select((student, index) =>
+			$" <div class=\"studentContainer\">\n  <h2>{index + 1}: {student.charaName}</h2>\n  <div class=\"imageContainer\">\n   <img src=\"../media/{student.school}/{student.charaName}.png\" class=\"profileImage\" alt=\"profileImage of {student.charaName}\"></img>\n   <img src=\"../media/{student.school}/{student.charaName}_full.png\" class=\"fullImage\" alt=\"fullImage of {student.charaName}\">\n</div>\n\n<audio controls><source src=\"../media/{student.school}/{student.charaName}.ogg\" type=\"audio/ogg\"></audio></div>")),"</div>"])).ToList();
 
-    string htmlContent = string.Join("\n", schoolContainer);
+		string htmlContent = string.Join("\n", schoolContainer);
 
-    // Concatenar todas las partes del HTML
-    string finalHtml = $"{htmlHeader}\n{htmlContent}{htmlFooter}";
+		// Concatenar todas las partes del HTML
+		string finalHtml = $"{htmlHeader}\n{htmlContent}{htmlFooter}";
 
-    string filePath = Path.Join(Constants.DataPath, fileName + ".html");
-    await File.WriteAllTextAsync(filePath, finalHtml);
-    return filePath;
-  }
+		string filePath = Path.Join(Constants.DataPath, fileName + ".html");
+		await File.WriteAllTextAsync(filePath, finalHtml);
+		return filePath;
+	}
 }

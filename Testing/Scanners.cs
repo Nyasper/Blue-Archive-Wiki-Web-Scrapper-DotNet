@@ -1,9 +1,10 @@
 ﻿namespace Testing;
 using Main.Repository;
+
+using Scanner.CharaDetails;
 using Scanner.CharaList;
 using Scanner.Configuration;
 using Scanner.Model;
-using Scanner.CharaDetails;
 
 [TestClass]
 public sealed class Scanners
@@ -12,7 +13,7 @@ public sealed class Scanners
 	private Repository _repository;
 	private IHtmlHandler _htmlHandler;
 	private CharaListScanner _charaListScanner;
-	private ICharaDetails<Student> _charaDetails;
+	private ICharaDetails _charaDetails;
 
 	[TestInitialize]
 	public void Setup()
@@ -40,7 +41,7 @@ public sealed class Scanners
 		Assert.IsInstanceOfType<IEnumerable<CharaListItem>>(pageCharaList, "Should return CharaListItem Collection");
 		Assert.IsTrue(pageCharaList.All(item => item is CharaListItem), "All elements should be of type CharaListItem");
 
-		Assert.IsTrue( pageCharaList.Length >= students.Length, "The number of characters in the page should be at least the number of students");
+		Assert.IsTrue(pageCharaList.Length >= students.Length, "The number of characters in the page should be at least the number of students");
 		Console.WriteLine($"students in DB: {students.Length}\nstudents in page: {pageCharaList.Length}");
 	}
 
@@ -51,15 +52,19 @@ public sealed class Scanners
 		Random random = new();
 
 		string[] excludeCharas = ["Shiroko_(Terror)"];
-		var allStudents = (await _repository.GetAll()).Where(s=> !excludeCharas.Contains(s.charaName)).ToArray();
+		var allStudents = (await _repository.GetAll()).Where(s => !excludeCharas.Contains(s.charaName)).ToArray();
 		var randomStudents = allStudents.OrderBy(x => random.Next()).Take(maxScanned).ToArray();
-		var scannedData = (await _charaDetails.ScanMany(randomStudents)).ToArray();
+		var scannedData = (await _charaDetails.ScanInfo(randomStudents)).ToArray();
 
-		int charasInterestions = randomStudents.IntersectBy(scannedData.Select(scanned=> scanned.charaName), s=>s.charaName).Count();
+		int charasInterestions = randomStudents.IntersectBy(scannedData.Select(scanned => scanned.charaName), s => s.charaName).Count();
 
 		Assert.AreEqual(maxScanned, randomStudents.Length);
 		Assert.AreEqual(maxScanned, scannedData.Length);
 		Assert.AreEqual(maxScanned, charasInterestions, $"Should have {charasInterestions}/{maxScanned} intersections");
 		Console.WriteLine($"characters in database/page intersections {charasInterestions}/{maxScanned}");
+		foreach (var result in scannedData)
+		{
+			Console.WriteLine(result.ToString());
+		}
 	}
 }

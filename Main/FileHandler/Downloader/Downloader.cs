@@ -1,5 +1,8 @@
-﻿namespace Main.FileHandler.Downloader;
+﻿using Main.Repository;
+
+namespace Main.FileHandler.Downloader;
 using Scanner.Model;
+using Repository;
 using Utils;
 
 public class Downloader : IDownloader
@@ -10,6 +13,7 @@ public class Downloader : IDownloader
 		ImageFull,
 		ImageProfile
 	}
+
 	public async Task DownloadFiles(Student student)
 	{
 		try
@@ -28,11 +32,11 @@ public class Downloader : IDownloader
 			throw;
 		}
 	}
-	public async Task DownloadFiles(IEnumerable<Student> students)
+	public async Task DownloadFiles(Student[] students)
 	{
 		try
 		{
-			Task[] toDownload = students.Select(DownloadFiles).ToArray();
+			Task[] toDownload = students.Select(s => DownloadFiles(s)).ToArray();
 			await Task.WhenAll(toDownload);
 		}
 		catch (Exception)
@@ -57,6 +61,7 @@ public class Downloader : IDownloader
 					finalPath += ".png";
 					break;
 				case FileFormat.ImageFull:
+					Console.WriteLine($"Downloading image full of'{student.charaName}' from '{student.pageImageFullUrl}'");
 					fileToDownload = await GetByteArray(student.pageImageFullUrl);
 					finalPath += "_full.png";
 					break;
@@ -75,26 +80,26 @@ public class Downloader : IDownloader
 			throw;
 		}
 	}
-	private static void CreateFolderIfNotExist(string FolderName)
+	private static void CreateFolderIfNotExist(string folderName)
 	{
-		FolderName = $"{FolderName}";
-		if (!Directory.Exists(FolderName))
+		folderName = $"{folderName}";
+		if (!Directory.Exists(folderName))
 		{
-			Directory.CreateDirectory(FolderName);
+			Directory.CreateDirectory(folderName);
 		}
 	}
-	private static async Task<byte[]> GetByteArray(string FileUrl)
+	private static async Task<byte[]> GetByteArray(string fileUrl)
 	{
 		try
 		{
 			using var client = new HttpClient();
 			client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0");
-			byte[] res = await client.GetByteArrayAsync(FileUrl);
+			byte[] res = await client.GetByteArrayAsync(fileUrl);
 			return res;
 		}
 		catch (Exception)
 		{
-			Console.WriteLine($"Error on getting ByteArray from URL: '{FileUrl}'");
+			Console.WriteLine($"Error on getting ByteArray from URL: '{fileUrl}'");
 			throw;
 		}
 	}

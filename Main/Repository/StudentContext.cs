@@ -1,8 +1,9 @@
 ﻿using Main.Utils;
 
 namespace Main.Repository;
-using Scanner.Model;
 using Microsoft.EntityFrameworkCore;
+
+using Scanner.Model;
 
 public class StudentContext : DbContext
 {

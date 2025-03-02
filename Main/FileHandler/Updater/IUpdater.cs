@@ -3,6 +3,6 @@
 public interface IUpdater
 {
 	Task UpdateAll();
-	Task UpdateDatabase();
-	Task UpdateLocalFiles();
+	Task UpdateDatabaseOnly();
+	Task UpdateLocalFilesOnly();
 }

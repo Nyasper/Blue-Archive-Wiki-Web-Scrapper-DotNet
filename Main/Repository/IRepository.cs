@@ -1,9 +1,10 @@
 ﻿namespace Main.Repository;
 
-public interface IRepository<S>
+public interface IRepository<T>
 {
-	Task SaveInDatabase(S entity);
-	Task SaveInDatabase(IEnumerable<S> entities);
+	Task SaveInDatabase(T entity);
+	Task SaveInDatabase(IEnumerable<T> entities);
 	Task SaveInDbFromJsonFile(string jsonFile);
-	Task<S[]> GetAll();
+	Task<T?> Get (string charaName);
+	Task<T[]> GetAll();
 }

@@ -1,24 +1,32 @@
-﻿namespace Main.FileHandler.Updater;
-using Scanner.Model;
-using Scanner.CharaDetails;
+﻿using Scanner.CharaList;
+
+namespace Main.FileHandler.Updater;
 using Creator;
+
 using Downloader;
-using Verifier;
+
 using Repository;
+
+using Scanner.CharaDetails;
+using Scanner.Model;
+
 using Utils;
+
+using Verifier;
 
 public class Updater(
 	IRepository<Student> repository,
-	IVerifier<Student> verifier,
+	IFileVerifier fileVerifier,
 	ICreator creator,
 	IDownloader downloader,
-	ICharaDetails<Student> charaDetailsScanner) : IUpdater
+	ICharaDetails charaDetailsScanner,
+	ICharaListScanner charaListScanner) : IUpdater
 {
 	private readonly IRepository<Student> _studentRepository = repository;
 
 	public async Task UpdateAll()
 	{
-		Queue<Func<Task>> toUpdate = new([UpdateDatabase, UpdateLocalFiles]);
+		Queue<Func<Task>> toUpdate = new([UpdateDatabaseOnly, UpdateLocalFilesOnly]);
 		while (toUpdate.Count > 0)
 		{
 			Func<Task> taskToRun = toUpdate.Dequeue();
@@ -26,10 +34,10 @@ public class Updater(
 		}
 	}
 
-	public async Task UpdateDatabase()
+	public async Task UpdateDatabaseOnly()
 	{
 		Notifier.MessageInitiatingTask("Searching for Updates");
-		CharaListItem[] availableUpdates = (await verifier.SearchDatabaseUpdates()).ToArray();
+		CharaListItem[] availableUpdates = await SearchDatabaseUpdates();
 		if (availableUpdates.Length == 0)
 		{
 			Notifier.MessageNothingToDo("Database OK");
@@ -40,7 +48,7 @@ public class Updater(
 		// bool continue = Menu.YesNoQuestion("Update the database");
 
 		Notifier.MessageInitiatingTask("Scanning Students Data");
-		IEnumerable<Student> scannedData = await charaDetailsScanner.ScanMany(availableUpdates);
+		IEnumerable<Student> scannedData = await charaDetailsScanner.ScanInfo(availableUpdates);
 		Notifier.MessageTaskCompleted("All data scanned successfully");
 
 		Notifier.MessageInitiatingTask("Saving data in Database");
@@ -49,11 +57,13 @@ public class Updater(
 
 		await creator.GenerateJsonData();
 	}
-	public async Task UpdateLocalFiles()
+	public async Task UpdateLocalFilesOnly()
 	{
 		Notifier.MessageInitiatingTask("Verifying students files");
-		Student[] studentsWithoutFiles = (await verifier.VerifyAllStudentsFiles()).ToArray();
+		Student[] students = await _studentRepository.GetAll();
+		FileVerification[] studentsWithoutFiles = fileVerifier.VerifyLocalFiles(students);
 
+		students = students.IntersectBy(studentsWithoutFiles.Select(f=>f.CharaName), s=>s.charaName).ToArray();
 		if (studentsWithoutFiles.Length == 0)
 		{
 			Notifier.MessageNothingToDo("All files OK");
@@ -61,11 +71,18 @@ public class Updater(
 		}
 		// bool continue = Menu.YesNoQuestion("Proceed to download the files");
 		Notifier.MessageInitiatingTask("Downloading missing files");
-		await downloader.DownloadFiles(studentsWithoutFiles);
+		await downloader.DownloadFiles(students);
 		Notifier.MessageTaskCompleted("All files updated successfully");
 
 		await creator.GenerateHtmlImagePreview();
 	}
+
+	private async Task<CharaListItem[]> SearchDatabaseUpdates()
+	{
+		var charactersInPage = await charaListScanner.ScanCharaList();
+		var charactersSqlite = await repository.GetAll();
+
+		// Search Differences
+		return charactersInPage.ExceptBy(charactersSqlite.Select(db => db.charaName), p => p.Name).ToArray();
+	}
 }
-
-

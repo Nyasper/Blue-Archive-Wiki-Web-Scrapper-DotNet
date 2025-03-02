@@ -1,15 +1,18 @@
 ﻿namespace Main;
 
-using Scanner.CharaDetails;
-using Repository;
 using FileHandler.Creator;
 using FileHandler.Downloader;
 using FileHandler.Updater;
 using FileHandler.Verifier;
-using Scanner.Model;
+
+using Microsoft.Extensions.DependencyInjection;
+
+using Repository;
+
+using Scanner.CharaDetails;
 using Scanner.CharaList;
 using Scanner.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Scanner.Model;
 
 
 public static class Program
@@ -18,14 +21,14 @@ public static class Program
 	{
 		IServiceProvider services = new ServiceCollection()
 			.AddDbContext<StudentContext>()
-			.AddSingleton<IDownloader, Downloader>()
-			.AddSingleton<ICreator, Creator>()
-			.AddSingleton<ICharaListScanner, CharaListScanner>()
-			.AddSingleton<ICharaDetails<Student>, CharaDetails>()
-			.AddSingleton<IHtmlHandler, HtmlHandler>()
-			.AddSingleton<IVerifier<Student>, Verifier>()
-			.AddSingleton<Updater>()
 			.AddSingleton<IRepository<Student>, Repository.Repository>()
+			.AddSingleton<IHtmlHandler, HtmlHandler>()
+			.AddSingleton<ICharaListScanner, CharaListScanner>()
+			.AddSingleton<ICharaDetails, CharaDetails>()
+			.AddSingleton<IDownloader, Downloader>()
+			.AddSingleton<IFileVerifier, FileVerifier>()
+			.AddSingleton<ICreator, Creator>()
+			.AddSingleton<IUpdater, Updater>()
 			.BuildServiceProvider();
 
 		await Run(services);
@@ -33,8 +36,9 @@ public static class Program
 
 	private static async Task Run(IServiceProvider services)
 	{
-		var updater = services.GetRequiredService<Updater>();
+		var updater = services.GetRequiredService<IUpdater>();
 		await updater.UpdateAll();
+
 		Console.WriteLine("Press any key to finish");
 		Console.ReadKey();
 	}
