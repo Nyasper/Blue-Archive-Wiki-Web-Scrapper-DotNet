@@ -45,6 +45,7 @@ public record class Student
 		"Abydos",
 		"Arius",
 		"Gehenna",
+		"Highlander",
 		"Hyakkiyako",
 		"Millennium",
 		"Red Winter",
