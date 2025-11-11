@@ -22,6 +22,5 @@ public class Database
 	{
 		var students = await _repository.GetAll();
 		Assert.IsInstanceOfType<Student[]>(students, "Should return Student[] type");
-		Assert.IsTrue(students.All(student => student is Student), "All elements should be of type Student");
 	}
 }

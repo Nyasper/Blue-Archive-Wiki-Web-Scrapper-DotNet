@@ -77,7 +77,7 @@ public class Updater(
 		await creator.GenerateHtmlImagePreview();
 	}
 
-	private async Task<CharaListItem[]> SearchDatabaseUpdates()
+	public async Task<CharaListItem[]> SearchDatabaseUpdates()
 	{
 		var charactersInPage = await charaListScanner.ScanCharaList();
 		var charactersSqlite = await repository.GetAll();

@@ -16,7 +16,7 @@ Los datos y archivos extraídos con este programa son utilizados in este otro [p
 
 ## How to run this program
 
-1. [Install .NET 9](https://dotnet.microsoft.com/es-es/download) (if you don't have it)
+1. [Install .NET 10](https://dotnet.microsoft.com/es-es/download) (if you don't have it)
 2. Download this project, then in the project folder run the following commands:
 3. Install Entity Framework tool: `dotnet tool install --global dotnet-ef`
 4. Install Entity Framework.Sqlite: `dotnet add package Microsoft.EntityFrameworkCore.Sqlite`

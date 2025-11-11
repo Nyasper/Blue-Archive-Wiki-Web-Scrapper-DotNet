@@ -32,11 +32,14 @@ public static class Program
 			.BuildServiceProvider();
 
 		await Run(services);
+
 	}
 
 	private static async Task Run(IServiceProvider services)
 	{
-		var updater = services.GetRequiredService<IUpdater>();
+
+
+		IUpdater updater = services.GetRequiredService<IUpdater>();
 		await updater.UpdateAll();
 
 		Console.WriteLine("Press any key to finish");
