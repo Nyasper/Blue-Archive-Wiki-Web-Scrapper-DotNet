@@ -37,8 +37,6 @@ public static class Program
 
 	private static async Task Run(IServiceProvider services)
 	{
-
-
 		IUpdater updater = services.GetRequiredService<IUpdater>();
 		await updater.UpdateAll();
 

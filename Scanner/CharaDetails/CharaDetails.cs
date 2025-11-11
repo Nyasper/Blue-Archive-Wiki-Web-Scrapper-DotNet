@@ -13,7 +13,7 @@ public class CharaDetails(IHtmlHandler htmlHandler) : ICharaDetails
 		try
 		{
 			var html = await htmlHandler.ScanHtml(Constants.BaseUrl + charaNameParam);
-			IGetter getter = new GetterNew(html, charaNameParam);
+			IGetter getter = new Getter(html, charaNameParam);
 
 			return new Student
 			{

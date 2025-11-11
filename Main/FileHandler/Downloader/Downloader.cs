@@ -36,7 +36,7 @@ public class Downloader : IDownloader
 	{
 		try
 		{
-			Task[] toDownload = students.Select(s => DownloadFiles(s)).ToArray();
+			Task[] toDownload = students.Select(DownloadFiles).ToArray();
 			await Task.WhenAll(toDownload);
 		}
 		catch (Exception)
@@ -53,7 +53,6 @@ public class Downloader : IDownloader
 			string schoolPath = Path.Join(Constants.MediaPath, student.school);
 			CreateFolderIfNotExist(schoolPath);
 			string finalPath = Path.Join(schoolPath, student.charaName);
-
 			switch (fileFormat)
 			{
 				case FileFormat.ImageProfile:

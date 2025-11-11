@@ -1,4 +1,6 @@
-﻿using Scanner.CharaList;
+﻿using System.ComponentModel;
+
+using Scanner.CharaList;
 using Scanner.Configuration;
 using Scanner.Model;
 using Scanner.Utils;
@@ -7,7 +9,7 @@ namespace Scanner.CharaDetails;
 
 using HtmlAgilityPack;
 
-public class GetterNew(HtmlDocument html, string studentCharaName) : IGetter
+public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 {
 	private readonly string Nl = Environment.NewLine;
 
@@ -15,14 +17,24 @@ public class GetterNew(HtmlDocument html, string studentCharaName) : IGetter
 
 	public string GetName()
 	{
+		static string ExtractName(string name) => name.Split(' ')[1].Split('(')[0];
+
 		try
 		{
 			var name = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[11]/td").InnerText.Trim();
-			return name.Split(' ')[1].Split('(')[0];
+
+			char asianChar = name.FirstOrDefault(Main.Utils.UtilsMethods.HasAsianCharacter);
+			// if it has an asian char split before.
+			if (asianChar != '\0')
+			{
+				return ExtractName(name).Split(asianChar)[0];
+			}
+
+			return ExtractName(name);
 		}
-		catch (Exception)
+		catch (Exception ex)
 		{
-			throw new Exception("error in 'GetName()'" + Nl);
+			throw new Exception("error in 'GetName()'" + Nl, ex);
 		}
 	}
 
@@ -251,7 +263,6 @@ public class GetterNew(HtmlDocument html, string studentCharaName) : IGetter
 			const string originalImageUrlXpath = "/html/body/div[3]/div[3]/div[5]/div[2]/p/bdi/a";
 			string originalImageHref = imgFull_html.DocumentNode.SelectSingleNode(originalImageUrlXpath).GetAttributes("href").First().Value;
 			if (String.IsNullOrEmpty(originalImageHref)) throw new Exception("error in 'GetImageFullUrl()'" + Nl);
-			Console.WriteLine($"original image href: {originalImageHref}");
 			string result = "https:" + originalImageHref;
 			return result;
 		}
@@ -265,10 +276,17 @@ public class GetterNew(HtmlDocument html, string studentCharaName) : IGetter
 	{
 		try
 		{
-			var AudioElement = html.DocumentNode.SelectSingleNode("html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[18]/td");
-			string AudioUrl = AudioElement.GetAttributes("data-voice").First().Value;
-			if (string.IsNullOrEmpty(AudioUrl)) throw new Exception("error in 'GetAudioUrl()'" + Nl);
-			return "https:" + AudioUrl;
+			// este es el audioElement original
+			var elementWithDataVoiceAttribute =  html.DocumentNode.SelectSingleNode("//*[@data-voice]");
+			string audioUrl = elementWithDataVoiceAttribute.GetAttributeValue("data-voice", "");
+
+			if (string.IsNullOrEmpty(audioUrl))
+			{
+				throw new Exception("error in 'GetAudioUrl()'" + Nl);
+			}
+
+			Console.WriteLine("Audio URl: " + audioUrl);
+			return "https:" + audioUrl;
 		}
 		catch (Exception)
 		{

@@ -53,6 +53,7 @@ public record class Student
 		"Shanhaijing",
 		"Trinity",
 		"Valkyrie",
+		"Wildhunt"
 	];
 	public static readonly string[] ExcludeSkinSets = [
 		"kid"
