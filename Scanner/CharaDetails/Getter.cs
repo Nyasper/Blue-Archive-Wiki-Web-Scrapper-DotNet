@@ -285,7 +285,6 @@ public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 				throw new Exception("error in 'GetAudioUrl()'" + Nl);
 			}
 
-			Console.WriteLine("Audio URl: " + audioUrl);
 			return "https:" + audioUrl;
 		}
 		catch (Exception)
