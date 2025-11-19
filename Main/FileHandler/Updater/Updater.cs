@@ -19,7 +19,7 @@ public class Updater(
 	IFileVerifier fileVerifier,
 	ICreator creator,
 	IDownloader downloader,
-	ICharaDetails charaDetailsScanner,
+	ICharaDetailsScanner charaDetailsScannerScanner,
 	ICharaListScanner charaListScanner) : IUpdater
 {
 	private readonly IRepository<Student> _studentRepository = repository;
@@ -37,7 +37,7 @@ public class Updater(
 	public async Task UpdateDatabaseOnly()
 	{
 		Notifier.MessageInitiatingTask("Searching for Updates");
-		CharaListItem[] availableUpdates = await SearchDatabaseUpdates();
+		var availableUpdates = await SearchDatabaseUpdates();
 		if (availableUpdates.Length == 0)
 		{
 			Notifier.MessageNothingToDo("Database OK");
@@ -48,7 +48,7 @@ public class Updater(
 		// bool continue = Menu.YesNoQuestion("Update the database");
 
 		Notifier.MessageInitiatingTask("Scanning Students Data");
-		IEnumerable<Student> scannedData = await charaDetailsScanner.ScanInfo(availableUpdates);
+		IEnumerable<Student> scannedData = await charaDetailsScannerScanner.ScanInfo(availableUpdates);
 		Notifier.MessageTaskCompleted("All data scanned successfully");
 
 		Notifier.MessageInitiatingTask("Saving data in Database");
@@ -77,12 +77,12 @@ public class Updater(
 		await creator.GenerateHtmlImagePreview();
 	}
 
-	public async Task<CharaListItem[]> SearchDatabaseUpdates()
+	public async Task<CharaListStudent[]> SearchDatabaseUpdates()
 	{
 		var charactersInPage = await charaListScanner.ScanCharaList();
 		var charactersSqlite = await repository.GetAll();
 
 		// Search Differences
-		return charactersInPage.ExceptBy(charactersSqlite.Select(db => db.charaName), p => p.Name).ToArray();
+		return charactersInPage.ExceptBy(charactersSqlite.Select(db => db.charaName), p => p.CharaName).ToArray();
 	}
 }

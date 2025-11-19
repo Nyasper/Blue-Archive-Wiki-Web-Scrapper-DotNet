@@ -50,14 +50,13 @@ public static class Notifier
 			Console.WriteLine($"{i + 1}: {students[i].charaName} 💙");
 		}
 	}
-	public static void LogStudentsList(string message, IEnumerable<CharaListItem> studentsCollection)
+	public static void LogStudentsList(string message, CharaListStudent[] studentsCollection)
 	{
 		NormalMessage(message + " 💚");
 
-		CharaListItem[] students = studentsCollection.ToArray();
-		for (int i = 0; i < students.Length; i++)
+		for (int i = 0; i < studentsCollection.Length; i++)
 		{
-			Console.WriteLine($"{i + 1}: {students[i].Name} 💙");
+			Console.WriteLine($"{i + 1}: {studentsCollection[i].CharaName} 💙");
 		}
 		Console.WriteLine(Nl);
 	}

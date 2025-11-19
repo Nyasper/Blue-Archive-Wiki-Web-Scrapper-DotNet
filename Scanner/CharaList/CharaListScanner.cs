@@ -1,29 +1,35 @@
 ﻿namespace Scanner.CharaList;
 using Configuration;
-
 using Model;
-
 using Utils;
 
 public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 {
-	public async Task<CharaListItem[]> ScanCharaList()
+	public async Task<CharaListStudent[]> ScanCharaList()
 	{
 		var html = await htmlHandler.ScanHtml(Constants.CharaListPageUrl);
+		var tableNodes = html.DocumentNode.SelectNodes("//tbody[1]/tr").ToList();
 
-		// table element
-		var tbody = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table/tbody");
-		var trCollection = tbody.Elements("tr").ToArray();
-		// The first element is the header so skip
-		CharaListItem[] charaListItems = trCollection.Skip(1).Select((tr) =>
+		CharaListStudent[] charaListItems = tableNodes.Skip(1).Select((item) =>
 		{
-			var character = tr.Elements("td").ToArray()[0].FirstChild.FirstChild;
-			if (character == null) throw new Exception("Error Scanning chara list");
+			// the charaName is in an anchor: '<a title="charaName">'
+			var aElement = item.SelectSingleNode(".//a[@title]");
+			var imgElement = aElement.SelectSingleNode(".//img[@src]");
 
-			string url = Constants.Domain + character.Attributes.ToArray()[0].Value;
-			string name = GetCharaName(url);
-			string img = "https:" + character.FirstChild.Attributes.ToArray()[1].Value;
-			return new CharaListItem(name, img, url);
+			string charaName = aElement.GetAttributeValue("title", "");
+			string school = item.GetAttributeValue("data-school", "");
+			string releaseDate = item.GetAttributeValue("data-releasedate-jp", "");
+			string skinSet = GetSkinSet(charaName);
+			string smallImgUrl = "https:" + imgElement.GetAttributeValue("src", "");
+
+			return new CharaListStudent()
+			{
+				CharaName = charaName,
+				School = school,
+				ReleaseDate = releaseDate,
+				SkinSet = skinSet,
+				SmallImgUrl =  smallImgUrl
+			};
 		}).ToArray();
 
 		return charaListItems;
@@ -35,5 +41,12 @@ public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 
 		string[] excludedNames = ["Shiroko%EF%BC%8ATerror", "Shiroko_(Terror)"];
 		return excludedNames.Contains(charaName) ? "Shiroko" : charaName;
+	}
+
+
+	static private string GetSkinSet(string charaName)
+	{
+		if (!charaName.EndsWith(')') || !charaName.Contains("_(") || Student.ExcludeSkinSets.Contains(charaName)) return "default";
+		return charaName.Split('(')[1].Split(')')[0].Trim().ToLower();
 	}
 }

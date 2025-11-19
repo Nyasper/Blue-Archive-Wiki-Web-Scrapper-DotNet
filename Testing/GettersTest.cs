@@ -13,7 +13,7 @@ public class GettersTest
 {
 	private IHtmlHandler _htmlHandler;
 	private HtmlDocument? _html;
-	private const string studentCharaName = "Shiroko";
+	private const string studentCharaName = "Yukari_(Swimsuit)";
 
 	private async Task<HtmlDocument> GetHtml()
 	{

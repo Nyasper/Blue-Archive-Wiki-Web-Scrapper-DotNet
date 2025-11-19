@@ -6,7 +6,7 @@ using Model;
 
 using Utils;
 
-public class CharaDetails(IHtmlHandler htmlHandler) : ICharaDetails
+public class CharaDetailsScanner(IHtmlHandler htmlHandler) : ICharaDetailsScanner
 {
 	public async Task<Student> ScanInfo(string charaNameParam)
 	{
@@ -49,8 +49,8 @@ public class CharaDetails(IHtmlHandler htmlHandler) : ICharaDetails
 	{
 		return await Task.WhenAll(students.Select(s => ScanInfo(s.charaName)));
 	}
-	public async Task<IEnumerable<Student>> ScanInfo(IEnumerable<CharaListItem> charasItems)
+	public async Task<IEnumerable<Student>> ScanInfo(IEnumerable<CharaListStudent> charasItems)
 	{
-		return await Task.WhenAll(charasItems.Select(s => ScanInfo(s.Name)));
+		return await Task.WhenAll(charasItems.Select(s => ScanInfo(s.CharaName)));
 	}
 }

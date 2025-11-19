@@ -24,7 +24,7 @@ public static class Program
 			.AddSingleton<IRepository<Student>, Repository.Repository>()
 			.AddSingleton<IHtmlHandler, HtmlHandler>()
 			.AddSingleton<ICharaListScanner, CharaListScanner>()
-			.AddSingleton<ICharaDetails, CharaDetails>()
+			.AddSingleton<ICharaDetailsScanner, CharaDetailsScanner>()
 			.AddSingleton<IDownloader, Downloader>()
 			.AddSingleton<IFileVerifier, FileVerifier>()
 			.AddSingleton<ICreator, Creator>()

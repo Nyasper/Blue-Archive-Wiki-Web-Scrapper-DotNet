@@ -7,5 +7,5 @@ public interface IUpdater
 	Task UpdateAll();
 	Task UpdateDatabaseOnly();
 	Task UpdateLocalFilesOnly();
-	Task<CharaListItem[]> SearchDatabaseUpdates();
+	Task<CharaListStudent[]> SearchDatabaseUpdates();
 }

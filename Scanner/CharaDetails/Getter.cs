@@ -9,6 +9,22 @@ namespace Scanner.CharaDetails;
 
 using HtmlAgilityPack;
 
+/*
+
+
+ TODO: What I need to scann from details page:
+ - name
+ - lastName
+ - age
+ - height
+ - birthday
+ - hobbies
+ - designer
+ - illustrator
+ - voice
+ - urls
+ */
+
 public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 {
 	private readonly string Nl = Environment.NewLine;
@@ -56,6 +72,7 @@ public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 		try
 		{
 			var school = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[4]/td[1]").InnerText.Trim();
+
 			return Student.Schools.Contains(school) ? school : "other";
 		}
 		catch (Exception)
@@ -205,7 +222,10 @@ public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 	{
 		try
 		{
-			var releaseDate = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[19]/td").InnerText.Trim().Replace("/", "-");
+			var releaseDateNode = html.DocumentNode.SelectSingleNode("//th[normalize-space(text()) = 'Release Date JP']/following-sibling::td[1]");
+			if (string.IsNullOrEmpty(releaseDateNode.InnerText)) throw new Exception("error in 'GetReleaseDate()'" + Nl);
+
+			var releaseDate = releaseDateNode.InnerText.Trim().Replace("/", "-");
 			return releaseDate;
 		}
 		catch (Exception)
