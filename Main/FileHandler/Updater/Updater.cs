@@ -48,7 +48,7 @@ public class Updater(
 		// bool continue = Menu.YesNoQuestion("Update the database");
 
 		Notifier.MessageInitiatingTask("Scanning Students Data");
-		IEnumerable<Student> scannedData = await charaDetailsScannerScanner.ScanInfo(availableUpdates);
+		IEnumerable<Student> scannedData = await charaDetailsScannerScanner.ScanStudentDetails(availableUpdates);
 		Notifier.MessageTaskCompleted("All data scanned successfully");
 
 		Notifier.MessageInitiatingTask("Saving data in Database");
@@ -77,7 +77,7 @@ public class Updater(
 		await creator.GenerateHtmlImagePreview();
 	}
 
-	public async Task<CharaListStudent[]> SearchDatabaseUpdates()
+	public async Task<StudentListItem[]> SearchDatabaseUpdates()
 	{
 		var charactersInPage = await charaListScanner.ScanCharaList();
 		var charactersSqlite = await repository.GetAll();

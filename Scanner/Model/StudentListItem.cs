@@ -1,7 +1,7 @@
 ﻿namespace Scanner.Model;
 using static Scanner.Utils.Constants;
 
-public record class CharaListStudent
+public record class StudentListItem
 {
 	public required string CharaName
 	{
@@ -47,4 +47,12 @@ public record class CharaListStudent
 			field = string.IsNullOrEmpty(value) ? DefaultCharaListStudentFields.SmallImgUrl : value;
 		}
 	} = DefaultCharaListStudentFields.SmallImgUrl;
+	public string PageUrl
+	{
+		get;
+		set
+		{
+			field = string.IsNullOrEmpty(value) ? DefaultCharaListStudentFields.PageUrl : value;
+		}
+	} = DefaultCharaListStudentFields.PageUrl;
 };

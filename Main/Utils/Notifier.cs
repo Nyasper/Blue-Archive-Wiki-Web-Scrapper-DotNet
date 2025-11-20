@@ -50,7 +50,7 @@ public static class Notifier
 			Console.WriteLine($"{i + 1}: {students[i].charaName} 💙");
 		}
 	}
-	public static void LogStudentsList(string message, CharaListStudent[] studentsCollection)
+	public static void LogStudentsList(string message, StudentListItem[] studentsCollection)
 	{
 		NormalMessage(message + " 💚");
 

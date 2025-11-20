@@ -21,5 +21,34 @@ public class StudentContext : DbContext
 		modelBuilder.Entity<Student>()
 			.HasKey(s => s.charaName);
 		modelBuilder.Entity<Student>().HasIndex(s => s.charaName);
+
+		// change table names to camelCase
+		foreach (var entity in modelBuilder.Model.GetEntityTypes())
+		{
+			var tableName = entity.GetTableName();
+			if (!string.IsNullOrEmpty(tableName))
+			{
+				entity.SetTableName(ToCamelCase(tableName));
+			}
+
+			// change column names to camelCase
+			foreach (var property in entity.GetProperties())
+			{
+				var columnName = property.GetColumnName();
+				property.SetColumnName(ToCamelCase(columnName));
+			}
+		}
+	}
+
+	private static string ToCamelCase(string name)
+	{
+		if (string.IsNullOrEmpty(name) || name.Length < 2)
+			return name;
+
+		// Si ya empieza con minúscula lo dejamos
+		if (char.IsLower(name[0]))
+			return name;
+
+		return char.ToLowerInvariant(name[0]) + name.Substring(1);
 	}
 }

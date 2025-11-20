@@ -1,4 +1,6 @@
-﻿namespace Scanner.CharaDetails;
+﻿using HtmlAgilityPack;
+
+namespace Scanner.CharaDetails;
 
 using Configuration;
 
@@ -8,35 +10,32 @@ using Utils;
 
 public class CharaDetailsScanner(IHtmlHandler htmlHandler) : ICharaDetailsScanner
 {
-	public async Task<Student> ScanInfo(string charaNameParam)
+	private HtmlDocument? _html = null;
+	public async Task<Student> ScanStudentDetails(string charaNameParam)
 	{
 		try
 		{
-			var html = await htmlHandler.ScanHtml(Constants.BaseUrl + charaNameParam);
-			IGetter getter = new Getter(html, charaNameParam);
+			var html = await GetHtml(charaNameParam);
+			IGetter detailsGetter = new DetailsGetter(html, charaNameParam);
 
-			return new Student
+			return new StudentDetailsItem()
 			{
-				charaName = getter.GetCharaName(),
-				name = getter.GetName(),
-				lastName = getter.GetLastName(),
-				school = getter.GetSchool(),
-				role = getter.GetRole(),
-				combatClass = getter.GetCombatClass(),
-				weaponType = getter.GetWeaponType(),
-				age = getter.GetAge(),
-				birthday = getter.GetBirthday(),
-				height = getter.GetHeight(),
-				hobbies = getter.GetHobbies(),
-				designer = getter.GetDesigner(),
-				illustrator = getter.GetIllustrator(),
-				voice = getter.GetVoice(),
-				releaseDate = getter.GetReleaseDate(),
-				skinSet = getter.GetSkinSet(),
-				pageUrl = getter.GetPageUrl(),
-				pageImageProfileUrl = getter.GetPageImageProfileUrl(),
-				pageImageFullUrl = await getter.GetPageImageFullUrl(),
-				audioUrl = getter.GetAudioUrl(),
+				Name = detailsGetter.GetName(),
+				LastName = detailsGetter.GetLastName(),
+				school = detailsGetter.GetSchool(),
+				age = detailsGetter.GetAge(),
+				birthday = detailsGetter.GetBirthday(),
+				height = detailsGetter.GetHeight(),
+				hobbies = detailsGetter.GetHobbies(),
+				designer = detailsGetter.GetDesigner(),
+				illustrator = detailsGetter.GetIllustrator(),
+				voice = detailsGetter.GetVoice(),
+				releaseDate = detailsGetter.GetReleaseDate(),
+				skinSet = detailsGetter.GetSkinSet(),
+				pageUrl = detailsGetter.GetPageUrl(),
+				pageImageProfileUrl = detailsGetter.GetPageImageProfileUrl(),
+				pageImageFullUrl = await detailsGetter.GetPageImageFullUrl(),
+				audioUrl = detailsGetter.GetAudioUrl(),
 			};
 		}
 		catch (Exception)
@@ -45,12 +44,12 @@ public class CharaDetailsScanner(IHtmlHandler htmlHandler) : ICharaDetailsScanne
 			throw;
 		}
 	}
-	public async Task<IEnumerable<Student>> ScanInfo(IEnumerable<Student> students)
+	public async Task<IEnumerable<Student>> ScanStudentDetails(IEnumerable<Student> students)
 	{
 		return await Task.WhenAll(students.Select(s => ScanInfo(s.charaName)));
 	}
-	public async Task<IEnumerable<Student>> ScanInfo(IEnumerable<CharaListStudent> charasItems)
+	public async Task<IEnumerable<Student>> ScanStudentDetails(IEnumerable<StudentListItem> studentListItems)
 	{
-		return await Task.WhenAll(charasItems.Select(s => ScanInfo(s.CharaName)));
+		return await Task.WhenAll(studentListItems.Select(s => ScanStudentDetails(s.CharaName)));
 	}
 }

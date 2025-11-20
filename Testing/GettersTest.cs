@@ -20,7 +20,7 @@ public class GettersTest
 		return _html ??= await _htmlHandler.ScanHtml(Constants.BaseUrl + studentCharaName);
 	}
 
-	private async Task<Getter> GetGetter() => new Getter(await GetHtml(), studentCharaName);
+	private async Task<DetailsGetter> GetGetter() => new DetailsGetter(await GetHtml(), studentCharaName);
 
 	[TestInitialize]
 	public void Setup()

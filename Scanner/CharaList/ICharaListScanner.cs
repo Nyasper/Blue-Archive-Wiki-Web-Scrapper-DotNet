@@ -3,5 +3,5 @@ using Model;
 
 public interface ICharaListScanner
 {
-	Task<CharaListStudent[]> ScanCharaList();
+	Task<StudentListItem[]> ScanCharaList();
 }

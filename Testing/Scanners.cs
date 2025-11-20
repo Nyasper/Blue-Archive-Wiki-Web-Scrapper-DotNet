@@ -29,7 +29,7 @@ public sealed class Scanners
 		_charaListScanner = new CharaListScanner(_htmlHandler);
 
 		// chara details
-		_charaDetailsScanner = new Scanner.CharaDetails.CharaDetailsScanner(_htmlHandler);
+		_charaDetailsScanner = new CharaDetailsScanner(_htmlHandler);
 	}
 
 	[TestMethod]
@@ -38,7 +38,7 @@ public sealed class Scanners
 		var studentsOnDb = await _repository.GetAll();
 		var studentsOnPage = (await _charaListScanner.ScanCharaList()).ToArray();
 
-		Assert.IsInstanceOfType<IEnumerable<CharaListStudent>>(studentsOnPage, "Should return CharaListItem Collection");
+		Assert.IsInstanceOfType<IEnumerable<StudentListItem>>(studentsOnPage, "Should return CharaListItem Collection");
 		Assert.IsGreaterThanOrEqualTo(studentsOnDb.Length, studentsOnPage.Length, "The number of characters in the page should be at least the number of students");
 		Console.WriteLine($"students in DB: {studentsOnDb.Length}\nstudents in page: {studentsOnPage.Length}");
 	}
@@ -52,7 +52,7 @@ public sealed class Scanners
 		string[] excludeCharas = ["Shiroko_(Terror)"];
 		var allStudents = (await _repository.GetAll()).Where(s => !excludeCharas.Contains(s.charaName)).ToArray();
 		var randomStudents = allStudents.OrderBy(x => random.Next()).Take(maxScanned).ToArray();
-		var scannedData = (await _charaDetailsScanner.ScanInfo(randomStudents)).ToArray();
+		var scannedData = (await _charaDetailsScanner.ScanStudentDetails(randomStudents)).ToArray();
 
 		int charasInterestions = randomStudents.IntersectBy(scannedData.Select(scanned => scanned.charaName), s => s.charaName).Count();
 

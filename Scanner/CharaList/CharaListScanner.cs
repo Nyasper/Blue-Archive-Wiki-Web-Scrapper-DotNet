@@ -5,12 +5,12 @@ using Utils;
 
 public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 {
-	public async Task<CharaListStudent[]> ScanCharaList()
+	public async Task<StudentListItem[]> ScanCharaList()
 	{
 		var html = await htmlHandler.ScanHtml(Constants.CharaListPageUrl);
 		var tableNodes = html.DocumentNode.SelectNodes("//tbody[1]/tr").ToList();
 
-		CharaListStudent[] charaListItems = tableNodes.Skip(1).Select((item) =>
+		StudentListItem[] charaListItems = tableNodes.Skip(1).Select((item) =>
 		{
 			// the charaName is in an anchor: '<a title="charaName">'
 			var aElement = item.SelectSingleNode(".//a[@title]");
@@ -22,7 +22,7 @@ public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 			string skinSet = GetSkinSet(charaName);
 			string smallImgUrl = "https:" + imgElement.GetAttributeValue("src", "");
 
-			return new CharaListStudent()
+			return new StudentListItem()
 			{
 				CharaName = charaName,
 				School = school,
@@ -35,15 +35,13 @@ public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 		return charaListItems;
 	}
 
-	private static string GetCharaName(string url)
+	static private string GetCharaName(string url)
 	{
 		string charaName = url.Split("/wiki/")[1];
 
 		string[] excludedNames = ["Shiroko%EF%BC%8ATerror", "Shiroko_(Terror)"];
 		return excludedNames.Contains(charaName) ? "Shiroko" : charaName;
 	}
-
-
 	static private string GetSkinSet(string charaName)
 	{
 		if (!charaName.EndsWith(')') || !charaName.Contains("_(") || Student.ExcludeSkinSets.Contains(charaName)) return "default";

@@ -9,28 +9,9 @@ namespace Scanner.CharaDetails;
 
 using HtmlAgilityPack;
 
-/*
-
-
- TODO: What I need to scann from details page:
- - name
- - lastName
- - age
- - height
- - birthday
- - hobbies
- - designer
- - illustrator
- - voice
- - urls
- */
-
-public class Getter(HtmlDocument html, string studentCharaName) : IGetter
+public class DetailsGetter(HtmlDocument html, string studentCharaName) : IGetter
 {
 	private readonly string Nl = Environment.NewLine;
-
-	public string GetCharaName() => studentCharaName;
-
 	public string GetName()
 	{
 		static string ExtractName(string name) => name.Split(' ')[1].Split('(')[0];
@@ -53,7 +34,6 @@ public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 			throw new Exception("error in 'GetName()'" + Nl, ex);
 		}
 	}
-
 	public string GetLastName()
 	{
 		try
@@ -66,7 +46,6 @@ public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 			throw new Exception("error in 'GetLastName()'" + Nl);
 		}
 	}
-
 	public string GetSchool()
 	{
 		try
@@ -80,46 +59,6 @@ public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 			throw new Exception("error in 'GetSchool()'" + Nl);
 		}
 	}
-
-	public string GetRole()
-	{
-		try
-		{
-			var role = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[4]/td[2]").InnerText.Trim();
-			return role.Replace("/", "_");
-		}
-		catch (Exception)
-		{
-			throw new Exception("error in 'GetRole()'" + Nl);
-		}
-	}
-
-	public string GetCombatClass()
-	{
-		try
-		{
-			var combatClass = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[7]/td").InnerText;
-			return combatClass;
-		}
-		catch (Exception)
-		{
-			throw new Exception("error in 'GetCombatClass()'" + Nl);
-		}
-	}
-
-	public string GetWeaponType()
-	{
-		try
-		{
-			var weaponType = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[9]/td/table/tbody/tr/td[1]/div").InnerText;
-			return weaponType;
-		}
-		catch (Exception)
-		{
-			throw new Exception("error in 'GetWeaponType()'" + Nl);
-		}
-	}
-
 	public int? GetAge()
 	{
 		var AgeString = html.DocumentNode.SelectSingleNode("html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[12]/td").InnerText.Trim();
@@ -137,7 +76,6 @@ public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 			throw new Exception("error in 'GetAge()'" + Nl);
 		}
 	}
-
 	public string? GetBirthday()
 	{
 		try
@@ -150,7 +88,6 @@ public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 			throw new Exception("error in 'GetBirthday()'" + Nl);
 		}
 	}
-
 	public int? GetHeight()
 	{
 		try
@@ -165,7 +102,6 @@ public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 			throw new Exception("error in 'GetHeight()'" + Nl);
 		}
 	}
-
 	public string GetHobbies()
 	{
 		try
@@ -178,7 +114,6 @@ public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 			throw new Exception("error in 'GetHobbies()'" + Nl);
 		}
 	}
-
 	public string? GetDesigner()
 	{
 		try
@@ -191,7 +126,6 @@ public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 			throw new Exception("error in 'GetDesigner()'" + Nl);
 		}
 	}
-
 	public string? GetIllustrator()
 	{
 		try
@@ -204,7 +138,6 @@ public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 			throw new Exception("error in 'GetIllustrator()'" + Nl);
 		}
 	}
-
 	public string GetVoice()
 	{
 		try
@@ -217,41 +150,10 @@ public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 			throw new Exception("error in 'GetVoice()'" + Nl);
 		}
 	}
-
-	public string GetReleaseDate()
-	{
-		try
-		{
-			var releaseDateNode = html.DocumentNode.SelectSingleNode("//th[normalize-space(text()) = 'Release Date JP']/following-sibling::td[1]");
-			if (string.IsNullOrEmpty(releaseDateNode.InnerText)) throw new Exception("error in 'GetReleaseDate()'" + Nl);
-
-			var releaseDate = releaseDateNode.InnerText.Trim().Replace("/", "-");
-			return releaseDate;
-		}
-		catch (Exception)
-		{
-			throw new Exception("error in 'GetReleaseDate()'" + Nl);
-		}
-	}
-
-	public string GetSkinSet()
-	{
-		try
-		{
-			if (!studentCharaName.EndsWith(')') || !studentCharaName.Contains("_(") || Student.ExcludeSkinSets.Contains(studentCharaName)) return "default";
-			return studentCharaName.Split('(')[1].Split(')')[0].Trim().ToLower();
-		}
-		catch (Exception)
-		{
-			throw new Exception("error in 'GetSkinSet()'" + Nl);
-		}
-	}
-
 	public string GetPageUrl()
 	{
 		return Constants.BaseUrl + studentCharaName;
 	}
-
 	public string GetPageImageProfileUrl()
 	{
 		try
@@ -267,7 +169,6 @@ public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 			throw new Exception("error in 'GetImageProfileUrl()'" + Nl);
 		}
 	}
-
 	public async Task<string> GetPageImageFullUrl()
 	{
 		Console.WriteLine("scanning page image full url...");
@@ -291,7 +192,6 @@ public class Getter(HtmlDocument html, string studentCharaName) : IGetter
 			throw new Exception("error in 'GetImageFullUrl()'" + Nl);
 		}
 	}
-
 	public string GetAudioUrl()
 	{
 		try

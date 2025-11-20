@@ -6,8 +6,8 @@ using Model;
 
 public interface ICharaDetailsScanner
 {
-	Task<Student> ScanInfo(string charaNameParam);
-	Task<IEnumerable<Student>> ScanInfo(IEnumerable<CharaListStudent> charasItems);
-	Task<IEnumerable<Student>> ScanInfo(IEnumerable<Student> students);
+	Task<Student> ScanStudentDetails(string charaNameParam);
+	Task<IEnumerable<Student>> ScanStudentDetails(IEnumerable<StudentListItem> studentListItems);
+	Task<IEnumerable<Student>> ScanStudentDetails(IEnumerable<Student> students);
 
 }
