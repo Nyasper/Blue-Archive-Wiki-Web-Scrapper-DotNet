@@ -53,7 +53,7 @@ public record class StudentDetailsItem
 			field = string.IsNullOrEmpty(value) ? DefaultCharaDetailsFields.Hobbies : value;
 		}
 	} = DefaultCharaDetailsFields.Hobbies;
-	public string Designer
+	public string? Designer
 	{
 		get;
 		set
@@ -61,7 +61,7 @@ public record class StudentDetailsItem
 			field = string.IsNullOrEmpty(value) ? DefaultCharaDetailsFields.Designer : value;
 		}
 	} = DefaultCharaDetailsFields.Designer;
-	public string Illustrator
+	public string? Illustrator
 	{
 		get;
 		set

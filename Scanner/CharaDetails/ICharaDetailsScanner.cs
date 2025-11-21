@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Scanner.CharaDetails;
 using Model;
@@ -6,8 +8,8 @@ using Model;
 
 public interface ICharaDetailsScanner
 {
-	Task<Student> ScanStudentDetails(string charaNameParam);
-	Task<IEnumerable<Student>> ScanStudentDetails(IEnumerable<StudentListItem> studentListItems);
-	Task<IEnumerable<Student>> ScanStudentDetails(IEnumerable<Student> students);
+	Task<StudentDetailsItem> ScanStudentDetails(string charaNameParam);
+	Task<StudentDetailsItem[]> ScanStudentDetails(IEnumerable<StudentListItem> studentListItems);
+	Task<StudentDetailsItem[]> ScanStudentDetails(IEnumerable<Student> students);
 
 }

@@ -10,12 +10,12 @@ public class Repository(StudentContext context) : IRepository<Student>
 	//CREATE
 	public async Task SaveInDatabase(Student student)
 	{
-		Student? existStudent = await context.students.FindAsync(student.charaName);
+		Student? existStudent = await context.Students.FindAsync(student.CharaName);
 
 		if (existStudent is null)
 		{
-			await context.students.AddAsync(student);
-			Console.WriteLine($"{student.charaName} saved in Sqlite");
+			await context.Students.AddAsync(student);
+			Console.WriteLine($"{student.CharaName} saved in Sqlite");
 		}
 	}
 	public async Task SaveInDatabase(IEnumerable<Student> students)
@@ -34,7 +34,7 @@ public class Repository(StudentContext context) : IRepository<Student>
 		catch (Exception ex)
 		{
 			await transaction.RollbackAsync();
-			Console.WriteLine($"Error saving students: {ex.Message}");
+			Console.WriteLine($"Error saving Students: {ex.Message}");
 		}
 	}
 	public async Task SaveInDbFromJsonFile(string jsonFilePath)
@@ -62,11 +62,11 @@ public class Repository(StudentContext context) : IRepository<Student>
 	//READ
 	public async Task<Student?> Get(string charaName)
 	{
-		return await context.students.FindAsync(charaName);
+		return await context.Students.FindAsync(charaName);
 	}
 	public async Task<Student[]> GetAll()
 	{
-		return await context.students.AsNoTracking().OrderBy(s => s.school).ThenBy(s => s.charaName).ToArrayAsync();
+		return await context.Students.AsNoTracking().OrderBy(s => s.School).ThenBy(s => s.CharaName).ToArrayAsync();
 	}
 
 
@@ -74,7 +74,7 @@ public class Repository(StudentContext context) : IRepository<Student>
 	// public async Task DeleteSqlite(Student student)
 	// {
 	//   using var db = new StudentContext();
-	//   db.students.Remove(student);
+	//   db.Students.Remove(student);
 	//   await db.SaveChangesAsync();
 	// }
 

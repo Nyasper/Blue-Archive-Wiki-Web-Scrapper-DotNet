@@ -12,15 +12,15 @@ public class FileVerifier(IRepository<Student> repository) : IFileVerifier
 {
 	public FileVerification VerifyLocalFiles(Student student)
 	{
-		string outputDirectory = Path.Join(Constants.MediaPath, student.school, student.charaName);
+		string outputDirectory = Path.Join(Constants.MediaPath, student.School, student.CharaName);
 		string profileImageDirectory = outputDirectory + ".png";
 		string fullImageDirectory = outputDirectory + "_full.png";
 		string audioDirectory = outputDirectory + ".ogg";
 
 		return
 			new FileVerification(
-				CharaName: student.charaName,
-				School: student.school,
+				CharaName: student.CharaName,
+				School: student.School,
 				HasProfileImage: FileExists(profileImageDirectory),
 				HasFullImage: FileExists(fullImageDirectory),
 				HasAudio: FileExists(audioDirectory)

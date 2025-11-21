@@ -7,7 +7,7 @@ using Scanner.Model;
 
 public class StudentContext : DbContext
 {
-	public DbSet<Student> students { get; set; }
+	public DbSet<Student> Students { get; set; }
 	public string DbPath { get; }
 	public StudentContext()
 	{
@@ -19,8 +19,8 @@ public class StudentContext : DbContext
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		modelBuilder.Entity<Student>()
-			.HasKey(s => s.charaName);
-		modelBuilder.Entity<Student>().HasIndex(s => s.charaName);
+			.HasKey(s => s.CharaName);
+		modelBuilder.Entity<Student>().HasIndex(s => s.CharaName);
 
 		// change table names to camelCase
 		foreach (var entity in modelBuilder.Model.GetEntityTypes())

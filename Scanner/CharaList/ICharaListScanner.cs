@@ -1,4 +1,6 @@
-﻿namespace Scanner.CharaList;
+﻿using System.Threading.Tasks;
+
+namespace Scanner.CharaList;
 using Model;
 
 public interface ICharaListScanner

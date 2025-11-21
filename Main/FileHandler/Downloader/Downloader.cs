@@ -24,11 +24,11 @@ public class Downloader : IDownloader
 				Download(student, FileFormat.Audio)
 			];
 			await Task.WhenAll(fileQueue);
-			Notifier.MessageTaskCompleted($"updated files of '{student.charaName}'");
+			Notifier.MessageTaskCompleted($"updated files of '{student.CharaName}'");
 		}
 		catch (Exception)
 		{
-			Console.WriteLine($"Error on downloading files of: '{student.charaName}'");
+			Console.WriteLine($"Error on downloading files of: '{student.CharaName}'");
 			throw;
 		}
 	}
@@ -50,22 +50,22 @@ public class Downloader : IDownloader
 		try
 		{
 			byte[] fileToDownload;
-			string schoolPath = Path.Join(Constants.MediaPath, student.school);
+			string schoolPath = Path.Join(Constants.MediaPath, student.School);
 			CreateFolderIfNotExist(schoolPath);
-			string finalPath = Path.Join(schoolPath, student.charaName);
+			string finalPath = Path.Join(schoolPath, student.CharaName);
 			switch (fileFormat)
 			{
 				case FileFormat.ImageProfile:
-					fileToDownload = await GetByteArray(student.pageImageProfileUrl);
+					fileToDownload = await GetByteArray(student.ImageProfileUrl);
 					finalPath += ".png";
 					break;
 				case FileFormat.ImageFull:
-					Console.WriteLine($"Downloading image full of'{student.charaName}' from '{student.pageImageFullUrl}'");
-					fileToDownload = await GetByteArray(student.pageImageFullUrl);
+					Console.WriteLine($"Downloading image full of'{student.CharaName}' from '{student.ImageFullUrl}'");
+					fileToDownload = await GetByteArray(student.ImageFullUrl);
 					finalPath += "_full.png";
 					break;
 				case FileFormat.Audio:
-					fileToDownload = await GetByteArray(student.audioUrl);
+					fileToDownload = await GetByteArray(student.AudioUrl);
 					finalPath += ".ogg";
 					break;
 				default:
@@ -75,7 +75,7 @@ public class Downloader : IDownloader
 		}
 		catch (Exception)
 		{
-			Console.WriteLine($"Error on downloading {fileFormat} of {student.charaName}");
+			Console.WriteLine($"Error on downloading {fileFormat} of {student.CharaName}");
 			throw;
 		}
 	}

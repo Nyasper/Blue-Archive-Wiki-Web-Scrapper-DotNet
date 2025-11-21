@@ -1,4 +1,9 @@
-﻿using HtmlAgilityPack;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+using HtmlAgilityPack;
 
 namespace Scanner.CharaDetails;
 
@@ -10,32 +15,27 @@ using Utils;
 
 public class CharaDetailsScanner(IHtmlHandler htmlHandler) : ICharaDetailsScanner
 {
-	private HtmlDocument? _html = null;
-	public async Task<Student> ScanStudentDetails(string charaNameParam)
+	public async Task<StudentDetailsItem> ScanStudentDetails(string charaNameParam)
 	{
 		try
 		{
-			var html = await GetHtml(charaNameParam);
+			var html = await htmlHandler.ScanHtml(charaNameParam);
 			IGetter detailsGetter = new DetailsGetter(html, charaNameParam);
 
-			return new StudentDetailsItem()
+			return new StudentDetailsItem
 			{
 				Name = detailsGetter.GetName(),
 				LastName = detailsGetter.GetLastName(),
-				school = detailsGetter.GetSchool(),
-				age = detailsGetter.GetAge(),
-				birthday = detailsGetter.GetBirthday(),
-				height = detailsGetter.GetHeight(),
-				hobbies = detailsGetter.GetHobbies(),
-				designer = detailsGetter.GetDesigner(),
-				illustrator = detailsGetter.GetIllustrator(),
-				voice = detailsGetter.GetVoice(),
-				releaseDate = detailsGetter.GetReleaseDate(),
-				skinSet = detailsGetter.GetSkinSet(),
-				pageUrl = detailsGetter.GetPageUrl(),
-				pageImageProfileUrl = detailsGetter.GetPageImageProfileUrl(),
-				pageImageFullUrl = await detailsGetter.GetPageImageFullUrl(),
-				audioUrl = detailsGetter.GetAudioUrl(),
+				Age = detailsGetter.GetAge(),
+				Birthday = detailsGetter.GetBirthday(),
+				Height = detailsGetter.GetHeight(),
+				Hobbies = detailsGetter.GetHobbies(),
+				Designer = detailsGetter.GetDesigner(),
+				Illustrator = detailsGetter.GetIllustrator(),
+				Voice = detailsGetter.GetVoice(),
+				ImageProfileUrl = detailsGetter.GetPageImageProfileUrl(),
+				ImageFullUrl = await detailsGetter.GetPageImageFullUrl(),
+				AudioUrl = detailsGetter.GetAudioUrl(),
 			};
 		}
 		catch (Exception)
@@ -44,12 +44,12 @@ public class CharaDetailsScanner(IHtmlHandler htmlHandler) : ICharaDetailsScanne
 			throw;
 		}
 	}
-	public async Task<IEnumerable<Student>> ScanStudentDetails(IEnumerable<Student> students)
+	public async Task<StudentDetailsItem[]> ScanStudentDetails(IEnumerable<StudentListItem> students)
 	{
-		return await Task.WhenAll(students.Select(s => ScanInfo(s.charaName)));
+		return await Task.WhenAll(students.Select(s => ScanStudentDetails(s.CharaName)));
 	}
-	public async Task<IEnumerable<Student>> ScanStudentDetails(IEnumerable<StudentListItem> studentListItems)
+	public async Task<StudentDetailsItem[]> ScanStudentDetails(IEnumerable<Student> students)
 	{
-		return await Task.WhenAll(studentListItems.Select(s => ScanStudentDetails(s.CharaName)));
+		return await Task.WhenAll(students.Select(s => ScanStudentDetails(s.CharaName)));
 	}
 }

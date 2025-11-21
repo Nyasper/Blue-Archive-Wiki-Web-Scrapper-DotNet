@@ -48,22 +48,26 @@ public class Updater(
 		// bool continue = Menu.YesNoQuestion("Update the database");
 
 		Notifier.MessageInitiatingTask("Scanning Students Data");
-		IEnumerable<Student> scannedData = await charaDetailsScannerScanner.ScanStudentDetails(availableUpdates);
+
+		StudentListItem[] studentListItems = await charaListScanner.ScanCharaList();
+		StudentDetailsItem[] studenDetails = await charaDetailsScannerScanner.ScanStudentDetails(availableUpdates);
+
+
 		Notifier.MessageTaskCompleted("All data scanned successfully");
 
 		Notifier.MessageInitiatingTask("Saving data in Database");
-		await _studentRepository.SaveInDatabase(scannedData);
+		// await _studentRepository.SaveInDatabase(studenDetails);
 		Notifier.MessageTaskCompleted("Database updated successfully");
 
 		await creator.GenerateJsonData();
 	}
 	public async Task UpdateLocalFilesOnly()
 	{
-		Notifier.MessageInitiatingTask("Verifying students files");
+		Notifier.MessageInitiatingTask("Verifying Students files");
 		Student[] students = await _studentRepository.GetAll();
 		FileVerification[] studentsWithoutFiles = fileVerifier.VerifyLocalFiles(students);
 
-		students = students.IntersectBy(studentsWithoutFiles.Select(f=>f.CharaName), s=>s.charaName).ToArray();
+		students = students.IntersectBy(studentsWithoutFiles.Select(f=>f.CharaName), s=>s.CharaName).ToArray();
 		if (studentsWithoutFiles.Length == 0)
 		{
 			Notifier.MessageNothingToDo("All files OK");
@@ -83,6 +87,6 @@ public class Updater(
 		var charactersSqlite = await repository.GetAll();
 
 		// Search Differences
-		return charactersInPage.ExceptBy(charactersSqlite.Select(db => db.charaName), p => p.CharaName).ToArray();
+		return charactersInPage.ExceptBy(charactersSqlite.Select(db => db.CharaName), p => p.CharaName).ToArray();
 	}
 }

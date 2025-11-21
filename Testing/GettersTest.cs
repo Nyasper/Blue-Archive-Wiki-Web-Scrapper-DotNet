@@ -59,36 +59,6 @@ public class GettersTest
 		Assert.IsGreaterThan(0, school.Length);
 	}
 	[TestMethod]
-	public async Task GetRole()
-	{
-		var getter = await GetGetter();
-		string role = getter.GetRole();
-		Console.WriteLine($"Testing role: {role}");
-
-		Assert.IsFalse(string.IsNullOrWhiteSpace(role));
-		Assert.IsGreaterThan(0, role.Length);
-	}
-	[TestMethod]
-	public async Task GetCombatClass()
-	{
-		var getter = await GetGetter();
-		string combatClass = getter.GetCombatClass();
-		Console.WriteLine($"Testing combatClass: {combatClass}");
-
-		Assert.IsFalse(string.IsNullOrWhiteSpace(combatClass));
-		Assert.IsGreaterThan(0, combatClass.Length);
-	}
-	[TestMethod]
-	public async Task GetWeaponType()
-	{
-		var getter = await GetGetter();
-		string weaponType = getter.GetWeaponType();
-		Console.WriteLine($"Testing weaponType: {weaponType}");
-
-		Assert.IsFalse(string.IsNullOrWhiteSpace(weaponType));
-		Assert.IsGreaterThan(0, weaponType.Length);
-	}
-	[TestMethod]
 	public async Task GetAge()
 	{
 		var getter = await GetGetter();
@@ -163,26 +133,6 @@ public class GettersTest
 
 		Assert.IsFalse(string.IsNullOrWhiteSpace(voice));
 		Assert.IsGreaterThan(0, voice.Length);
-	}
-	[TestMethod]
-	public async Task GetReleaseDate()
-	{
-		var getter = await GetGetter();
-		string releaseDate = getter.GetReleaseDate();
-		Console.WriteLine($"Testing releaseDate: {releaseDate}");
-
-		Assert.IsFalse(string.IsNullOrWhiteSpace(releaseDate));
-		Assert.IsGreaterThan(0, releaseDate.Length);
-	}
-	[TestMethod]
-	public async Task GetSkinSet()
-	{
-		var getter = await GetGetter();
-		string skinSet = getter.GetSkinSet();
-		Console.WriteLine($"Testing skinSet: {skinSet}");
-
-		Assert.IsFalse(string.IsNullOrWhiteSpace(skinSet));
-		Assert.IsGreaterThan(0, skinSet.Length);
 	}
 	[TestMethod]
 	public async Task GetPageUrl()

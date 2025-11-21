@@ -36,7 +36,7 @@ public class Creator(IRepository<Student> repository) : ICreator
 	private static async Task<string> CreateHtmlImagesPreview(IEnumerable<Student> students)
 	{
 		const string fileName = "imagesPreview";
-		IGrouping<string, Student>[] allSchools = students.GroupBy((s) => s.school).ToArray();
+		IGrouping<string, Student>[] allSchools = students.GroupBy((s) => s.School).ToArray();
 
 		// Generar el contenido HTML
 		const string htmlHeader = "<html>\n<head>\n<link rel=\"stylesheet\" href=\"style.css\">\n<title>Students Images Preview</title>\n</head>\n<body>";
@@ -93,7 +93,7 @@ public class Creator(IRepository<Student> repository) : ICreator
 			}";
 		const string htmlFooter = $"\n<style>{stylesCss}\n</style>\n</body>\n</html>";
 		List<string> schoolContainer = allSchools.Select(school => string.Join("\n", [$"\n<h2 class=\"schoolTitle\">{school.Key}</h2>\n  <div class=\"schoolContainer\">\n ",string.Join("\n",school.Select((student, index) =>
-			$" <div class=\"studentContainer\">\n  <h2>{index + 1}: {student.charaName}</h2>\n  <div class=\"imageContainer\">\n   <img src=\"../media/{student.school}/{student.charaName}.png\" class=\"profileImage\" alt=\"profileImage of {student.charaName}\"></img>\n   <img src=\"../media/{student.school}/{student.charaName}_full.png\" class=\"fullImage\" alt=\"fullImage of {student.charaName}\">\n</div>\n\n<audio controls><source src=\"../media/{student.school}/{student.charaName}.ogg\" type=\"audio/ogg\"></audio></div>")),"</div>"])).ToList();
+			$" <div class=\"studentContainer\">\n  <h2>{index + 1}: {student.CharaName}</h2>\n  <div class=\"imageContainer\">\n   <img src=\"../media/{student.School}/{student.CharaName}.png\" class=\"profileImage\" alt=\"profileImage of {student.CharaName}\"></img>\n   <img src=\"../media/{student.School}/{student.CharaName}_full.png\" class=\"fullImage\" alt=\"fullImage of {student.CharaName}\">\n</div>\n\n<audio controls><source src=\"../media/{student.School}/{student.CharaName}.ogg\" type=\"audio/ogg\"></audio></div>")),"</div>"])).ToList();
 
 		string htmlContent = string.Join("\n", schoolContainer);
 

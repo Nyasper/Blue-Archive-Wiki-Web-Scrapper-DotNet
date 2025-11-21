@@ -47,7 +47,7 @@ public static class Notifier
 		Student[] students = studentsCollection.ToArray();
 		for (int i = 0; i < students.Length; i++)
 		{
-			Console.WriteLine($"{i + 1}: {students[i].charaName} 💙");
+			Console.WriteLine($"{i + 1}: {students[i].CharaName} 💙");
 		}
 	}
 	public static void LogStudentsList(string message, StudentListItem[] studentsCollection)

@@ -1,4 +1,7 @@
-﻿namespace Scanner.CharaList;
+﻿using System.Linq;
+using System.Threading.Tasks;
+
+namespace Scanner.CharaList;
 using Configuration;
 using Model;
 using Utils;

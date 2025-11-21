@@ -1,4 +1,7 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
 
 using Scanner.CharaList;
 using Scanner.Configuration;
@@ -22,12 +25,7 @@ public class DetailsGetter(HtmlDocument html, string studentCharaName) : IGetter
 
 			char asianChar = name.FirstOrDefault(Main.Utils.UtilsMethods.HasAsianCharacter);
 			// if it has an asian char split before.
-			if (asianChar != '\0')
-			{
-				return ExtractName(name).Split(asianChar)[0];
-			}
-
-			return ExtractName(name);
+			return asianChar != '\0' ? ExtractName(name).Split(asianChar)[0] : ExtractName(name);
 		}
 		catch (Exception ex)
 		{
