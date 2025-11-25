@@ -35,13 +35,17 @@ public class FileVerifier(IRepository<Student> repository) : IFileVerifier
 		Parallel.ForEach(students, student =>
 		{
 			FileVerification result = VerifyLocalFiles(student);
-			if (result.HasProfileImage && result.HasFullImage && result.HasAudio) return;
+			if (!result.HasProfileImage || !result.HasFullImage || !result.HasSmallImage || !result.HasAudio)
+			{
+				studentsWithoutAllFiles.Add(result);
+			};
 
-			studentsWithoutAllFiles.Add(result);
-			Notifier.LogMissingFiles(result);
+			if (!studentsWithoutAllFiles.IsEmpty)
+			{
+				Notifier.LogMissingFiles(result);
+			}
 		});
 
-		// return allStudents.IntersectBy(studentsWithoutAllFiles.Select((f) => f.CharaName), (s) => s.charaName);
 		return studentsWithoutAllFiles.ToArray();
 	}
 	private static bool FileExists (string filePath) {
