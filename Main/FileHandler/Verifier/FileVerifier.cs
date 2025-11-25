@@ -15,6 +15,7 @@ public class FileVerifier(IRepository<Student> repository) : IFileVerifier
 		string outputDirectory = Path.Join(Constants.MediaPath, student.School, student.CharaName);
 		string profileImageDirectory = outputDirectory + ".png";
 		string fullImageDirectory = outputDirectory + "_full.png";
+		string smallImageDirectory = outputDirectory + "_small.png";
 		string audioDirectory = outputDirectory + ".ogg";
 
 		return
@@ -23,6 +24,7 @@ public class FileVerifier(IRepository<Student> repository) : IFileVerifier
 				School: student.School,
 				HasProfileImage: FileExists(profileImageDirectory),
 				HasFullImage: FileExists(fullImageDirectory),
+				HasSmallImage: FileExists(smallImageDirectory),
 				HasAudio: FileExists(audioDirectory)
 			);
 	}

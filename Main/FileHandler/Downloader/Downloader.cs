@@ -11,7 +11,8 @@ public class Downloader : IDownloader
 	{
 		Audio,
 		ImageFull,
-		ImageProfile
+		ImageProfile,
+		SmallImage
 	}
 
 	public async Task DownloadFiles(Student student)
@@ -21,7 +22,8 @@ public class Downloader : IDownloader
 			Task[] fileQueue = [
 				Download(student, FileFormat.ImageProfile),
 				Download(student, FileFormat.ImageFull),
-				Download(student, FileFormat.Audio)
+				Download(student, FileFormat.Audio),
+				Download(student, FileFormat.SmallImage)
 			];
 			await Task.WhenAll(fileQueue);
 			Notifier.MessageTaskCompleted($"updated files of '{student.CharaName}'");
@@ -57,15 +59,22 @@ public class Downloader : IDownloader
 			{
 				case FileFormat.ImageProfile:
 					fileToDownload = await GetByteArray(student.ImageProfileUrl);
+					Notifier.MessageTaskCompleted($"Downloaded image profile of'{student.CharaName}' from '{student.ImageProfileUrl}'");
 					finalPath += ".png";
 					break;
 				case FileFormat.ImageFull:
-					Console.WriteLine($"Downloading image full of'{student.CharaName}' from '{student.ImageFullUrl}'");
 					fileToDownload = await GetByteArray(student.ImageFullUrl);
+					Notifier.MessageTaskCompleted($"Downloaded image full of'{student.CharaName}' from '{student.ImageFullUrl}'");
 					finalPath += "_full.png";
+					break;
+				case FileFormat.SmallImage:
+					fileToDownload = await GetByteArray(student.SmallImageUrl);
+					finalPath += "_small.png";
+					Notifier.MessageTaskCompleted($"Downloaded small image of'{student.CharaName}' from '{student.SmallImageUrl}' in {finalPath}");
 					break;
 				case FileFormat.Audio:
 					fileToDownload = await GetByteArray(student.AudioUrl);
+					Notifier.MessageTaskCompleted($"Downloaded audio of'{student.CharaName}' from '{student.AudioUrl}'");
 					finalPath += ".ogg";
 					break;
 				default:

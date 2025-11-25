@@ -13,15 +13,14 @@ public class GettersTest
 {
 	private IHtmlHandler _htmlHandler;
 	private HtmlDocument? _html;
-	private const string studentCharaName = "Yukari_(Swimsuit)";
+	private const string studentCharaName = "Ichika_(Swimsuit)";
+	// private const string studentCharaName = "Yukari_(Swimsuit)";
 
 	private async Task<HtmlDocument> GetHtml()
 	{
 		return _html ??= await _htmlHandler.ScanHtml(Constants.BaseUrl + studentCharaName);
 	}
-
 	private async Task<DetailsGetter> GetGetter() => new DetailsGetter(await GetHtml(), studentCharaName);
-
 	[TestInitialize]
 	public void Setup()
 	{
@@ -29,44 +28,31 @@ public class GettersTest
 	}
 
 	[TestMethod]
-	public async Task GetName()
+	public async Task GetFullNameTest()
 	{
 		var getter = await GetGetter();
-		string name = getter.GetName();
-		Console.WriteLine($"Testing name: {name}");
+		(string name, string lastName) = getter.GetFullName();
+		Console.WriteLine($"Testing name: {name}\nTesting lastName: {lastName}");
 
-		Assert.IsFalse(string.IsNullOrWhiteSpace(name));;
-		Assert.IsGreaterThan(0, name.Length);
-	}
-	[TestMethod]
-	public async Task GetLastName()
-	{
-		var getter = await GetGetter();
-		string lastName = getter.GetLastName();
-		Console.WriteLine($"Testing lastname: {lastName}");
-
+		Assert.IsFalse(string.IsNullOrWhiteSpace(name));
 		Assert.IsFalse(string.IsNullOrWhiteSpace(lastName));
-		Assert.IsGreaterThan(0, lastName.Length);
-	}
-	[TestMethod]
-	public async Task GetSchool()
-	{
-		var getter = await GetGetter();
-		string school = getter.GetSchool();
-		Console.WriteLine($"Testing school: {school}");
 
-		Assert.IsFalse(string.IsNullOrWhiteSpace(school));
-		Assert.IsGreaterThan(0, school.Length);
+		Assert.IsGreaterThan(0, name.Length);
+		Assert.IsGreaterThan(0, lastName.Length);
 	}
 	[TestMethod]
 	public async Task GetAge()
 	{
 		var getter = await GetGetter();
-		int age = getter.GetAge() ?? 0;
+		int? age = getter.GetAge();
 		Console.WriteLine($"Testing age: {age}");
 
-		Assert.IsInstanceOfType<int>(age);
-		Assert.IsInRange(0, 50, age);
+		if (age is not null)
+		{
+			int ageInt = (int)age;
+			Assert.IsInstanceOfType<int>(ageInt);
+			Assert.IsInRange(0, 50, ageInt);
+		}
 	}
 	[TestMethod]
 	public async Task GetBirthDate()
@@ -149,7 +135,7 @@ public class GettersTest
 	public async Task GetImageProfileUrl()
 	{
 		var getter = await GetGetter();
-		string imageProfileUrl = getter.GetPageImageProfileUrl();
+		string imageProfileUrl = getter.GetImageProfileUrl();
 		Console.WriteLine($"Testing imageProfileUrl: {imageProfileUrl}");
 
 		Assert.IsFalse(string.IsNullOrWhiteSpace(imageProfileUrl));
@@ -161,7 +147,7 @@ public class GettersTest
 	public async Task GetImageFullUrl()
 	{
 		var getter = await GetGetter();
-		string imageFullUrl = getter.GetPageImageProfileUrl();
+		string imageFullUrl = await getter.GetImageFullUrl();
 		Console.WriteLine($"Testing imageFullUrl: {imageFullUrl}");
 
 		Assert.IsFalse(string.IsNullOrWhiteSpace(imageFullUrl));

@@ -19,13 +19,16 @@ public class CharaDetailsScanner(IHtmlHandler htmlHandler) : ICharaDetailsScanne
 	{
 		try
 		{
-			var html = await htmlHandler.ScanHtml(charaNameParam);
-			IGetter detailsGetter = new DetailsGetter(html, charaNameParam);
+			var url = Constants.BaseUrl + charaNameParam;
+			var html = await htmlHandler.ScanHtml(url);
+			IDetailsGetter detailsGetter = new DetailsGetter(html, charaNameParam);
+			(string name, string lastName) = detailsGetter.GetFullName();
+
 
 			return new StudentDetailsItem
 			{
-				Name = detailsGetter.GetName(),
-				LastName = detailsGetter.GetLastName(),
+				Name = name,
+				LastName = lastName,
 				Age = detailsGetter.GetAge(),
 				Birthday = detailsGetter.GetBirthday(),
 				Height = detailsGetter.GetHeight(),
@@ -33,8 +36,8 @@ public class CharaDetailsScanner(IHtmlHandler htmlHandler) : ICharaDetailsScanne
 				Designer = detailsGetter.GetDesigner(),
 				Illustrator = detailsGetter.GetIllustrator(),
 				Voice = detailsGetter.GetVoice(),
-				ImageProfileUrl = detailsGetter.GetPageImageProfileUrl(),
-				ImageFullUrl = await detailsGetter.GetPageImageFullUrl(),
+				ImageProfileUrl = detailsGetter.GetImageProfileUrl(),
+				ImageFullUrl = await detailsGetter.GetImageFullUrl(),
 				AudioUrl = detailsGetter.GetAudioUrl(),
 			};
 		}

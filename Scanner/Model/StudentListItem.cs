@@ -1,5 +1,5 @@
-﻿namespace Scanner.Model;
-using static Scanner.Utils.Constants;
+﻿using static Scanner.Utils.Constants;
+namespace Scanner.Model;
 
 public record class StudentListItem
 {
@@ -12,7 +12,7 @@ public record class StudentListItem
 		}
 	} = DefaultCharaListStudentFields.CharaName;
 
-	public string School
+	public required string School
 	{
 		get;
 		set
@@ -21,7 +21,7 @@ public record class StudentListItem
 		}
 	} = DefaultCharaListStudentFields.School;
 
-	public string ReleaseDate
+	public required string ReleaseDate
 	{
 		get;
 		set
@@ -30,7 +30,7 @@ public record class StudentListItem
 		}
 	} = DefaultCharaListStudentFields.ReleaseDate;
 
-	public string SkinSet
+	public required string SkinSet
 	{
 		get;
 		set
@@ -39,7 +39,7 @@ public record class StudentListItem
 		}
 	} = DefaultCharaListStudentFields.SkinSet;
 
-	public string SmallImgUrl
+	public required string SmallImgUrl
 	{
 		get;
 		set
@@ -47,7 +47,7 @@ public record class StudentListItem
 			field = string.IsNullOrEmpty(value) ? DefaultCharaListStudentFields.SmallImgUrl : value;
 		}
 	} = DefaultCharaListStudentFields.SmallImgUrl;
-	public string PageUrl
+	public required string PageUrl
 	{
 		get;
 		set

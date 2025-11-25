@@ -1,4 +1,6 @@
-﻿namespace Main;
+﻿using Scanner;
+
+namespace Main;
 
 using FileHandler.Creator;
 using FileHandler.Downloader;
@@ -29,6 +31,7 @@ public static class Program
 			.AddSingleton<IFileVerifier, FileVerifier>()
 			.AddSingleton<ICreator, Creator>()
 			.AddSingleton<IUpdater, Updater>()
+			.AddSingleton<IScanner<Student>, Scanner.Scanner>()
 			.BuildServiceProvider();
 
 		await Run(services);

@@ -1,9 +1,8 @@
 ﻿namespace Scanner.CharaDetails;
 
-public interface IGetter
+public interface IDetailsGetter
 {
-	string GetName();
-	string GetLastName();
+	(string name, string lastName) GetFullName();
 	int? GetAge();
 	string? GetBirthday();
 	int? GetHeight();
@@ -11,8 +10,7 @@ public interface IGetter
 	string? GetDesigner();
 	string? GetIllustrator();
 	string GetVoice();
-	string GetPageUrl();
-	string GetPageImageProfileUrl();
-	Task<string> GetPageImageFullUrl();
+	string GetImageProfileUrl();
+	Task<string> GetImageFullUrl();
 	string GetAudioUrl();
 }

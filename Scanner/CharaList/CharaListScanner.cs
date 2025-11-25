@@ -1,6 +1,8 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
 
+using HtmlAgilityPack;
+
 namespace Scanner.CharaList;
 using Configuration;
 using Model;
@@ -19,11 +21,12 @@ public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 			var aElement = item.SelectSingleNode(".//a[@title]");
 			var imgElement = aElement.SelectSingleNode(".//img[@src]");
 
-			string charaName = aElement.GetAttributeValue("title", "");
-			string school = item.GetAttributeValue("data-school", "");
-			string releaseDate = item.GetAttributeValue("data-releasedate-jp", "");
+			string charaName = GetCharaName(aElement);
+			string school = GetSchool(item.GetAttributeValue("data-school", "").Trim());
+			string releaseDate = item.GetAttributeValue("data-releasedate-jp", "").Trim();
 			string skinSet = GetSkinSet(charaName);
-			string smallImgUrl = "https:" + imgElement.GetAttributeValue("src", "");
+			string smallImgUrl = "https:" + imgElement.GetAttributeValue("src", "").Trim();
+
 
 			return new StudentListItem()
 			{
@@ -31,23 +34,50 @@ public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 				School = school,
 				ReleaseDate = releaseDate,
 				SkinSet = skinSet,
-				SmallImgUrl =  smallImgUrl
+				SmallImgUrl =  smallImgUrl,
+				PageUrl = Constants.BaseUrl + charaName
 			};
-		}).ToArray();
+		}).Where(students=>!ExcludedStudents.Contains(students.CharaName)).OrderBy(s=>s.School).ThenBy(s=>s.CharaName).ToArray();
 
 		return charaListItems;
 	}
-
-	static private string GetCharaName(string url)
+	static private string GetCharaName(HtmlNode elementNode)
 	{
-		string charaName = url.Split("/wiki/")[1];
+		var charaName = elementNode.GetAttributeValue("title", "").Replace(" ", "_");
+		if (charaName.Contains('＊', StringComparison.OrdinalIgnoreCase))
+		{
+			return charaName.Replace("＊", "*", StringComparison.OrdinalIgnoreCase);
+		}
 
-		string[] excludedNames = ["Shiroko%EF%BC%8ATerror", "Shiroko_(Terror)"];
-		return excludedNames.Contains(charaName) ? "Shiroko" : charaName;
+		return charaName;
+	}
+	static private string GetSchool(string schoolParam)
+	{
+		string[] schools = [
+			"Abydos",
+			"Arius",
+			"Gehenna",
+			"Highlander",
+			"Hyakkiyako",
+			"Millennium",
+			"Red Winter",
+			"SRT",
+			"Shanhaijing",
+			"Trinity",
+			"Valkyrie",
+			"Wildhunt"
+		];
+		string schoolFound = schools.Contains(schoolParam, StringComparer.OrdinalIgnoreCase) ? schoolParam : "other";
+		return schoolFound.ToLower();
 	}
 	static private string GetSkinSet(string charaName)
 	{
-		if (!charaName.EndsWith(')') || !charaName.Contains("_(") || Student.ExcludeSkinSets.Contains(charaName)) return "default";
-		return charaName.Split('(')[1].Split(')')[0].Trim().ToLower();
+		string[] excludeSkinSets = [
+			"kid"
+		];
+		if (!charaName.EndsWith(')') || !charaName.Contains("_(") || excludeSkinSets.Contains(charaName)) return "default";
+		return charaName.Split('(')[1].Split(')')[0].Trim().ToLower().Replace("-", "_");
 	}
+
+	static private readonly string[] ExcludedStudents = ["Shiroko＊Terror", "Shiroko*Terror", "Shiroko * Terror"];
 }

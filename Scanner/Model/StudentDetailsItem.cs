@@ -3,7 +3,7 @@ using static Utils.Constants;
 
 public record class StudentDetailsItem
 {
-	public string Name
+	public required string Name
 	{
 		get;
 		set
@@ -12,7 +12,7 @@ public record class StudentDetailsItem
 		}
 	} = DefaultCharaDetailsFields.Name;
 
-	public string LastName
+	public required string LastName
 	{
 		get;
 		set
@@ -20,7 +20,7 @@ public record class StudentDetailsItem
 			field = string.IsNullOrEmpty(value) ? DefaultCharaDetailsFields.LastName : value;
 		}
 	} = DefaultCharaDetailsFields.LastName;
-	public int? Age
+	public required int? Age
 	{
 		get;
 		set
@@ -28,7 +28,7 @@ public record class StudentDetailsItem
 			field = value  ?? DefaultCharaDetailsFields.Age;
 		}
 	} = DefaultCharaDetailsFields.Age;
-	public int? Height
+	public required int? Height
 	{
 		get;
 		set
@@ -37,7 +37,7 @@ public record class StudentDetailsItem
 
 		}
 	} = DefaultCharaDetailsFields.Height;
-	public string? Birthday
+	public required string? Birthday
 	{
 		get;
 		set
@@ -45,7 +45,7 @@ public record class StudentDetailsItem
 			field = string.IsNullOrEmpty(value) ? DefaultCharaDetailsFields.Birthday : value;
 		}
 	} = DefaultCharaDetailsFields.Birthday;
-	public string Hobbies
+	public required string Hobbies
 	{
 		get;
 		set
@@ -53,7 +53,7 @@ public record class StudentDetailsItem
 			field = string.IsNullOrEmpty(value) ? DefaultCharaDetailsFields.Hobbies : value;
 		}
 	} = DefaultCharaDetailsFields.Hobbies;
-	public string? Designer
+	public required string? Designer
 	{
 		get;
 		set
@@ -61,7 +61,7 @@ public record class StudentDetailsItem
 			field = string.IsNullOrEmpty(value) ? DefaultCharaDetailsFields.Designer : value;
 		}
 	} = DefaultCharaDetailsFields.Designer;
-	public string? Illustrator
+	public required string? Illustrator
 	{
 		get;
 		set
@@ -69,7 +69,7 @@ public record class StudentDetailsItem
 			field = string.IsNullOrEmpty(value) ? DefaultCharaDetailsFields.Illustrator : value;
 		}
 	} = DefaultCharaDetailsFields.Illustrator;
-	public string Voice
+	public required string Voice
 	{
 		get;
 		set
@@ -77,7 +77,7 @@ public record class StudentDetailsItem
 			field = string.IsNullOrEmpty(value) ? DefaultCharaDetailsFields.Voice : value;
 		}
 	} = DefaultCharaDetailsFields.Voice;
-	public string ImageProfileUrl
+	public required string ImageProfileUrl
 	{
 		get;
 		set
@@ -86,7 +86,7 @@ public record class StudentDetailsItem
 		}
 	} = DefaultCharaDetailsFields.ImageProfileUrl;
 
-	public string ImageFullUrl
+	public required string ImageFullUrl
 	{
 		get;
 		set
@@ -94,7 +94,7 @@ public record class StudentDetailsItem
 			field = string.IsNullOrEmpty(value) ? DefaultCharaDetailsFields.ImageFullUrl : value;
 		}
 	} = DefaultCharaDetailsFields.ImageFullUrl;
-	public string AudioUrl
+	public required string AudioUrl
 	{
 		get;
 		set

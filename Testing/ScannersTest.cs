@@ -1,4 +1,6 @@
-﻿namespace Testing;
+﻿using Scanner;
+
+namespace Testing;
 using Main.Repository;
 
 using Scanner.CharaDetails;
@@ -7,13 +9,14 @@ using Scanner.Configuration;
 using Scanner.Model;
 
 [TestClass]
-public sealed class Scanners
+public sealed class ScannersTest
 {
 	private StudentContext _context;
 	private Repository _repository;
 	private IHtmlHandler _htmlHandler;
 	private CharaListScanner _charaListScanner;
 	private ICharaDetailsScanner _charaDetailsScanner;
+	private IScanner<Student> _scanner;
 
 	[TestInitialize]
 	public void Setup()
@@ -30,13 +33,25 @@ public sealed class Scanners
 
 		// chara details
 		_charaDetailsScanner = new CharaDetailsScanner(_htmlHandler);
+
+		// main scanner
+		_scanner = new Scanner.Scanner(_charaListScanner, _charaDetailsScanner);
 	}
 
 	[TestMethod]
 	public async Task CharaList()
 	{
 		var studentsOnDb = await _repository.GetAll();
-		var studentsOnPage = (await _charaListScanner.ScanCharaList()).ToArray();
+		var studentsOnPage = await _charaListScanner.ScanCharaList();
+		var s = studentsOnPage.FirstOrDefault(s => s.CharaName == "Shiroko*Terror");
+		if (s is null)
+		{
+			Console.WriteLine("Shiroko terror no encontrada.");
+		}
+		else
+		{
+			Console.WriteLine(s);
+		}
 
 		Assert.IsInstanceOfType<IEnumerable<StudentListItem>>(studentsOnPage, "Should return CharaListItem Collection");
 		Assert.IsGreaterThanOrEqualTo(studentsOnDb.Length, studentsOnPage.Length, "The number of characters in the page should be at least the number of Students");
@@ -46,23 +61,23 @@ public sealed class Scanners
 	[TestMethod]
 	public async Task CharaDetails()
 	{
-		const int maxScanned = 5;
-		Random random = new();
+		const string studentToScan = "Eimi_(Swimsuit)";
 
-		string[] excludeCharas = ["Shiroko_(Terror)"];
-		var allStudents = (await _repository.GetAll()).Where(s => !excludeCharas.Contains(s.CharaName)).ToArray();
-		var randomStudents = allStudents.OrderBy(x => random.Next()).Take(maxScanned).ToArray();
-		var scannedData = (await _charaDetailsScanner.ScanStudentDetails(randomStudents)).ToArray();
+		StudentDetailsItem studentDetailsItem = await _charaDetailsScanner.ScanStudentDetails(studentToScan);
 
-		// int charasInterestions = randomStudents.IntersectBy(scannedData.Select(scanned => scanned.Ch), s => s.CharaName).Count();
+		Console.WriteLine(studentDetailsItem.ToString());
+		Assert.IsNotNull(studentDetailsItem);
+		Assert.IsInstanceOfType<StudentDetailsItem>(studentDetailsItem);
+	}
+	[TestMethod]
+	public async Task MainScanner()
+	{
+		const string studentToScan = "Ichika_(Swimsuit)";
+		Student student = await _scanner.Scan(studentToScan);
+		Console.WriteLine("Student Scanned:\n"+student);
 
-		Assert.HasCount(maxScanned, randomStudents);
-		Assert.HasCount(maxScanned, scannedData);
-		// Assert.AreEqual(maxScanned, charasInterestions, $"Should have {charasInterestions}/{maxScanned} intersections");
-		// Console.WriteLine($"characters in database/page intersections {charasInterestions}/{maxScanned}");
-		foreach (var result in scannedData)
-		{
-			Console.WriteLine(result.ToString());
-		}
+
+		Assert.IsNotNull(student);
+		Assert.IsInstanceOfType<Student>(student);
 	}
 }

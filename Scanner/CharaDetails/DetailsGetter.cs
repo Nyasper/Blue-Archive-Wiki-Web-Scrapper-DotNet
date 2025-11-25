@@ -12,57 +12,42 @@ namespace Scanner.CharaDetails;
 
 using HtmlAgilityPack;
 
-public class DetailsGetter(HtmlDocument html, string studentCharaName) : IGetter
+public class DetailsGetter(HtmlDocument html, string studentCharaName) : IDetailsGetter
 {
 	private readonly string Nl = Environment.NewLine;
-	public string GetName()
+	public (string, string) GetFullName()
 	{
-		static string ExtractName(string name) => name.Split(' ')[1].Split('(')[0];
-
 		try
 		{
-			var name = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[11]/td").InnerText.Trim();
+			var thFullNameNode = html.DocumentNode.SelectSingleNode("//th[text()='Full Name']");
+			string fullName = thFullNameNode.NextSibling.InnerText.Trim();
 
-			char asianChar = name.FirstOrDefault(Main.Utils.UtilsMethods.HasAsianCharacter);
+			if (string.IsNullOrEmpty(fullName))
+			{
+				throw new Exception("error in 'GetFullName()'" + Nl);
+			}
+
+			char asianChar = fullName.FirstOrDefault(Main.Utils.UtilsMethods.HasAsianCharacter);
 			// if it has an asian char split before.
-			return asianChar != '\0' ? ExtractName(name).Split(asianChar)[0] : ExtractName(name);
+			fullName = asianChar != '\0' ? fullName.Split(asianChar)[0] : fullName;
+
+			string lastName = fullName.Split(' ')[0];
+			string name = fullName.Split(' ')[1];
+
+			return (name, lastName);
 		}
 		catch (Exception ex)
 		{
-			throw new Exception("error in 'GetName()'" + Nl, ex);
-		}
-	}
-	public string GetLastName()
-	{
-		try
-		{
-			var lastName = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[11]/td").InnerText;
-			return lastName.Split(' ')[0].Trim();
-		}
-		catch (Exception)
-		{
-			throw new Exception("error in 'GetLastName()'" + Nl);
-		}
-	}
-	public string GetSchool()
-	{
-		try
-		{
-			var school = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[4]/td[1]").InnerText.Trim();
-
-			return Student.Schools.Contains(school) ? school : "other";
-		}
-		catch (Exception)
-		{
-			throw new Exception("error in 'GetSchool()'" + Nl);
+			throw new Exception("error in 'GetFullName()'" + Nl, ex);
 		}
 	}
 	public int? GetAge()
 	{
-		var AgeString = html.DocumentNode.SelectSingleNode("html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[12]/td").InnerText.Trim();
+		var thAgeNode = html.DocumentNode.SelectSingleNode("//th[text()='Age']");
+		var ageString = thAgeNode.NextSibling.InnerText.Trim();
 		try
 		{
-			int age = int.Parse(AgeString);
+			int age = int.Parse(ageString);
 			return age;
 		}
 		catch (FormatException)
@@ -78,7 +63,8 @@ public class DetailsGetter(HtmlDocument html, string studentCharaName) : IGetter
 	{
 		try
 		{
-			var birthday = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[13]/td").InnerText.Trim();
+			var thBirthdayNode = html.DocumentNode.SelectSingleNode("//th[text()='Birthday']");
+			var birthday = thBirthdayNode.NextSibling.InnerText.Trim();
 			return birthday == "-" ? null : birthday;
 		}
 		catch (Exception)
@@ -90,10 +76,16 @@ public class DetailsGetter(HtmlDocument html, string studentCharaName) : IGetter
 	{
 		try
 		{
-			string heightString = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[14]/td").InnerText.Trim();
+			var thHeightNode = html.DocumentNode.SelectSingleNode("//th[text()='Height']");
+			var heightString = thHeightNode.NextSibling.InnerText.Trim();
+
 			if (!heightString.Contains("cm")) return null;
 			int height = int.Parse(heightString.Split("cm")[0]);
 			return height;
+		}
+		catch (FormatException)
+		{
+			return null;
 		}
 		catch (Exception)
 		{
@@ -104,7 +96,14 @@ public class DetailsGetter(HtmlDocument html, string studentCharaName) : IGetter
 	{
 		try
 		{
-			var hobbies = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[15]/td").InnerText.Trim();
+			var thHobbiesNode = html.DocumentNode.SelectSingleNode("//th[text()='Hobbies']");
+			var hobbies = thHobbiesNode.NextSibling.InnerText.Trim();
+
+			if (string.IsNullOrEmpty(hobbies))
+			{
+				throw new Exception("error in 'GetHobbies()'" + Nl);
+			}
+
 			return hobbies;
 		}
 		catch (Exception)
@@ -116,7 +115,9 @@ public class DetailsGetter(HtmlDocument html, string studentCharaName) : IGetter
 	{
 		try
 		{
-			var designer = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[16]/td").InnerText.Trim().Replace(" ", "_");
+			var thDesignerNode = html.DocumentNode.SelectSingleNode("//th[text()='Designer']");
+			var designer = thDesignerNode.NextSibling.InnerText.Trim().Replace(" ", "_");
+
 			return designer.Contains('-') ? null : designer;
 		}
 		catch (Exception)
@@ -128,8 +129,10 @@ public class DetailsGetter(HtmlDocument html, string studentCharaName) : IGetter
 	{
 		try
 		{
-			var illustrator = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[17]/td").InnerText.Trim().Replace(" ", "_");
-			return illustrator.Contains('-') ? null : illustrator;
+			var thIllustratorNode = html.DocumentNode.SelectSingleNode("//th[text()='Illustrator']");
+			var illustrator = thIllustratorNode.NextSibling.InnerText.Trim().Replace(" ", "_");
+
+			return illustrator;
 		}
 		catch (Exception)
 		{
@@ -140,8 +143,15 @@ public class DetailsGetter(HtmlDocument html, string studentCharaName) : IGetter
 	{
 		try
 		{
-			var voice = html.DocumentNode.SelectSingleNode("/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[18]/td").InnerHtml.Trim();
-			return voice.Replace(" ", "_");
+			var thVoiceNode = html.DocumentNode.SelectSingleNode("//th[text()='Voice']");
+			var voice = thVoiceNode.NextSibling.InnerText.Trim().Replace(" ", "_");
+
+			if (string.IsNullOrEmpty(voice))
+			{
+				throw new Exception("error in 'GetVoice()'" + Nl);
+			}
+
+			return voice;
 		}
 		catch (Exception)
 		{
@@ -152,38 +162,38 @@ public class DetailsGetter(HtmlDocument html, string studentCharaName) : IGetter
 	{
 		return Constants.BaseUrl + studentCharaName;
 	}
-	public string GetPageImageProfileUrl()
+	public string GetImageProfileUrl()
 	{
 		try
 		{
-			var imageProfileUrl = html.DocumentNode.SelectSingleNode("html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[2]/td/div[2]/div/section/article[1]/figure/a/img");
-			var srcAttr = imageProfileUrl.GetAttributes("src").First().Value;
-			if (string.IsNullOrEmpty(srcAttr)) throw new Exception("error in 'GetImageFullUrl()'" + Nl);
+			var allImages = html.DocumentNode.SelectSingleNode($"//img[@alt='{studentCharaName.Replace("_", " ")}']");
+			var imageProfileUrl = allImages.GetAttributeValue("src", "")?.Trim() ?? "";
 
-			return "https:" + srcAttr;
+			if (string.IsNullOrEmpty(imageProfileUrl)) throw new Exception("error in 'GetImageProfileUrl()'" + Nl);
+
+			return "https:" + imageProfileUrl;
 		}
 		catch (Exception)
 		{
 			throw new Exception("error in 'GetImageProfileUrl()'" + Nl);
 		}
 	}
-	public async Task<string> GetPageImageFullUrl()
+	public async Task<string> GetImageFullUrl()
 	{
-		Console.WriteLine("scanning page image full url...");
 		try
 		{
-			const string aElementXPath = "/html/body/div[3]/div[3]/div[5]/div[1]/table[1]/tbody/tr[2]/td/div[2]/div/section/article[2]/figure/a";
-			string toOriginalImageHrefAttr = html.DocumentNode.SelectSingleNode(aElementXPath).GetAttributes("href").First().Value;
-			if (String.IsNullOrEmpty(toOriginalImageHrefAttr)) throw new Exception("error in 'GetImageFullUrl()'" + Nl);
+			var toOriginalImageFullPageANode = html.DocumentNode.SelectNodes($"//img[@alt='{studentCharaName.Replace("_", " ")}']")[1].ParentNode;
+			var toOriginalImageFullPage = Constants.Domain + toOriginalImageFullPageANode.GetAttributeValue("href", "");
 
-			string toOriginalImageUrl = $"{Constants.Domain}{toOriginalImageHrefAttr}";
+			var pageImgFull = await new HtmlHandler().ScanHtml(toOriginalImageFullPage);
+			var imageUrlNode = pageImgFull.DocumentNode.SelectSingleNode("//a[text()='Original file']").GetAttributeValue("href", "");
 
-			var imgFull_html = await new HtmlHandler().ScanHtml(toOriginalImageUrl);
-			const string originalImageUrlXpath = "/html/body/div[3]/div[3]/div[5]/div[2]/p/bdi/a";
-			string originalImageHref = imgFull_html.DocumentNode.SelectSingleNode(originalImageUrlXpath).GetAttributes("href").First().Value;
-			if (String.IsNullOrEmpty(originalImageHref)) throw new Exception("error in 'GetImageFullUrl()'" + Nl);
-			string result = "https:" + originalImageHref;
-			return result;
+			if (string.IsNullOrEmpty(imageUrlNode))
+			{
+				throw new Exception("error in 'GetImageFullUrl()'" + Nl);
+			}
+
+			return "https:" + imageUrlNode;
 		}
 		catch (Exception)
 		{
@@ -194,8 +204,7 @@ public class DetailsGetter(HtmlDocument html, string studentCharaName) : IGetter
 	{
 		try
 		{
-			// este es el audioElement original
-			var elementWithDataVoiceAttribute =  html.DocumentNode.SelectSingleNode("//*[@data-voice]");
+			var elementWithDataVoiceAttribute =  html.DocumentNode.SelectSingleNode("//td[@data-voice]");
 			string audioUrl = elementWithDataVoiceAttribute.GetAttributeValue("data-voice", "");
 
 			if (string.IsNullOrEmpty(audioUrl))

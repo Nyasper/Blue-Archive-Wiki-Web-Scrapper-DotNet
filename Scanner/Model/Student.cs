@@ -19,14 +19,15 @@ public record class Student
 	public required string PageUrl { get; set; }
 	public required string ImageProfileUrl { get; set; }
 	public required string ImageFullUrl { get; set; }
+	public required string SmallImageUrl { get; set; }
 	public required string AudioUrl { get; set; }
 
-	public DateTime CreatedAt { get; set; }
+	public DateTime CreatedAt { get; set; } = DateTime.Now;
 	public override string ToString()
 	{
 		var nl = Environment.NewLine;
 		const string separetor = "-----------------------------------------------------------------------------------------------------------------";
-		string[] valuesToPrintConstants = ["charaName", "school", "age", "releaseDate", "skinSet", "pageUrl", "pageImageProfileUrl", "pageImageFullUrl", "audioUrl", "createdAt"];
+		string[] valuesToPrintConstants = ["CharaName", "School", "Age", "ReleaseDate", "SkinSet", "PageUrl", "ImageProfileUrl", "ImageFullUrl", "AudioUrl", "CreatedAt"];
 
 		string result = nl + separetor;
 		PropertyInfo[] properties = GetType().GetProperties();
@@ -38,21 +39,4 @@ public record class Student
 		result += nl + separetor;
 		return result;
 	}
-	public static readonly string[] Schools = [
-		"Abydos",
-		"Arius",
-		"Gehenna",
-		"Highlander",
-		"Hyakkiyako",
-		"Millennium",
-		"Red Winter",
-		"SRT",
-		"Shanhaijing",
-		"Trinity",
-		"Valkyrie",
-		"Wildhunt"
-	];
-	public static readonly string[] ExcludeSkinSets = [
-		"kid"
-	];
 }

@@ -1,4 +1,6 @@
-﻿namespace Main.Repository;
+﻿using Main.Utils;
+
+namespace Main.Repository;
 using System.Text.Json;
 
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +22,7 @@ public class Repository(StudentContext context) : IRepository<Student>
 	}
 	public async Task SaveInDatabase(IEnumerable<Student> students)
 	{
+		Notifier.MessageInitiatingTask("Saving data in Database");
 		await using var transaction = await context.Database.BeginTransactionAsync();
 
 		try
@@ -30,6 +33,8 @@ public class Repository(StudentContext context) : IRepository<Student>
 			}
 			await context.SaveChangesAsync();
 			await transaction.CommitAsync();
+
+			Notifier.MessageTaskCompleted("Database updated successfully");
 		}
 		catch (Exception ex)
 		{
