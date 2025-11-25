@@ -36,18 +36,18 @@ public class Creator(IRepository<Student> repository) : ICreator
 	}
 
 	private static async Task<string> CreateHtmlImagesPreview(IEnumerable<Student> students)
-	{
-	    const string fileName = "imagesPreview";
-	    var allSchools = students.GroupBy(s => s.School).ToArray();
+{
+    const string fileName = "imagesPreview";
+    var allSchools = students.GroupBy(s => s.School).ToArray();
 
-	    string htmlContent = GenerateHtmlContent(allSchools);
-	    string finalHtml = $"{GetHtmlHeader()}\n{htmlContent}\n{GetHtmlFooter()}";
+    string htmlContent = GenerateHtmlContent(allSchools);
+    string finalHtml = $"{GetHtmlHeader()}\n{htmlContent}\n{GetHtmlFooter()}";
 
-	    string filePath = Path.Join(Constants.DataPath, $"{fileName}.html");
-	    await File.WriteAllTextAsync(filePath, finalHtml);
+    string filePath = Path.Join(Constants.DataPath, $"{fileName}.html");
+    await File.WriteAllTextAsync(filePath, finalHtml);
 
-	    return filePath;
-	}
+    return filePath;
+}
 
 	private static string GetJavaScript()
 	{
@@ -104,7 +104,7 @@ public class Creator(IRepository<Student> repository) : ICreator
 	private static string GetHtmlHeader()
 	{
 	    return @"<!DOCTYPE html>
-	<html lang=""es"">
+	<html lang=""en"">
 	<head>
 	    <meta charset=""UTF-8"">
 	    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
@@ -126,7 +126,7 @@ public class Creator(IRepository<Student> repository) : ICreator
 	    </div>
 	    <div id=""imageModal"" class=""modal"">
 	        <span class=""modal-close"">&times;</span>
-	        <img class=""modal-content"" id=""modalImage"" alt=""zoomed image"" />
+	        <img class=""modal-content"" id=""modalImage"" alt=""Enlarged image"" />
 	        <div class=""modal-caption""></div>
 	    </div>
 	<style>{GetStylesCss()}</style>
@@ -440,12 +440,12 @@ public class Creator(IRepository<Student> repository) : ICreator
 	    string schoolId = school.Key.Replace(" ", "-").ToLower();
 
 	    return $@"
-	<section id=""{schoolId}"" class=""school-section"">
-	    <h2 class=""schoolTitle"">{school.Key}</h2>
-	    <div class=""schoolContainer"">
-	        {string.Join("\n        ", studentsHtml)}
-	    </div>
-	</section>";
+			<section id=""{schoolId}"" class=""school-section"">
+			    <h2 class=""schoolTitle"">{school.Key}</h2>
+			    <div class=""schoolContainer"">
+			        {string.Join("\n        ", studentsHtml)}
+			    </div>
+			</section>";
 	}
 
 	private static string GenerateStudentCard(Student student, int position)
@@ -464,24 +464,16 @@ public class Creator(IRepository<Student> repository) : ICreator
 	            <img src=""{schoolPath}/{studentName}.png"" 
 	                 class=""profileImage zoomable"" 
 	                 alt=""{studentName} profile"" 
-	                 data-caption=""{studentName} - Imagen de perfil"" />
+	                 data-caption=""{studentName} - Profile image"" />
 	            <img src=""{schoolPath}/{studentName}_full.png"" 
 	                 class=""fullImage zoomable"" 
 	                 alt=""{studentName} full"" 
-	                 data-caption=""{studentName} - Imagen completa"" />
+	                 data-caption=""{studentName} - Full image"" />
 	        </div>
 	        <audio controls>
 	            <source src=""{schoolPath}/{studentName}.ogg"" type=""audio/ogg"" />
+	            Your browser does not support the audio element.
 	        </audio>
 	    </div>";
 	}
-
-
-
-
-
-
-
-
-
 }
