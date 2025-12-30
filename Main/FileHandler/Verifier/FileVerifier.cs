@@ -1,14 +1,14 @@
 ﻿namespace Main.FileHandler.Verifier;
+
 using System.Collections.Concurrent;
 
 using Repository;
 
-using Scanner.CharaList;
 using Scanner.Model;
 
 using Utils;
 
-public class FileVerifier(IRepository<Student> repository) : IFileVerifier
+public class FileVerifier() : IFileVerifier
 {
 	public FileVerification VerifyLocalFiles(Student student)
 	{
@@ -30,25 +30,26 @@ public class FileVerifier(IRepository<Student> repository) : IFileVerifier
 	}
 	public FileVerification[] VerifyLocalFiles(Student[] students)
 	{
-		ConcurrentBag<FileVerification> studentsWithoutAllFiles = []; //ConcurrentBag<> = List<> but for Parallelism.
+		ConcurrentBag<FileVerification> studentsWithoutFiles = []; //ConcurrentBag<> = List<> but for Parallelism.
 
 		Parallel.ForEach(students, student =>
 		{
 			FileVerification result = VerifyLocalFiles(student);
 			if (!result.HasProfileImage || !result.HasFullImage || !result.HasSmallImage || !result.HasAudio)
 			{
-				studentsWithoutAllFiles.Add(result);
-			};
-
-			if (!studentsWithoutAllFiles.IsEmpty)
-			{
-				Notifier.LogMissingFiles(result);
+				studentsWithoutFiles.Add(result);
+				if (!result.HasProfileImage)
+				{
+					Notifier.LogMissingFiles(result);
+				}
 			}
+			;
 		});
 
-		return studentsWithoutAllFiles.ToArray();
+		return studentsWithoutFiles.ToArray();
 	}
-	private static bool FileExists (string filePath) {
+	private static bool FileExists(string filePath)
+	{
 		var fileInfo = new FileInfo(filePath);
 		return fileInfo.Exists && fileInfo.Length > 0;
 	}

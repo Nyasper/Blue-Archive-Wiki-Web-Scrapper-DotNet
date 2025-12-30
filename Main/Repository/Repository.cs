@@ -1,6 +1,7 @@
 ﻿using Main.Utils;
 
 namespace Main.Repository;
+
 using System.Text.Json;
 
 using Microsoft.EntityFrameworkCore;
@@ -12,12 +13,19 @@ public class Repository(StudentContext context) : IRepository<Student>
 	//CREATE
 	public async Task SaveInDatabase(Student student)
 	{
-		Student? existStudent = await context.Students.FindAsync(student.CharaName);
-
-		if (existStudent is null)
+		try
 		{
-			await context.Students.AddAsync(student);
-			Console.WriteLine($"{student.CharaName} saved in Sqlite");
+			Student? existStudent = await context.Students.FindAsync(student.CharaName);
+
+			if (existStudent is null)
+			{
+				await context.Students.AddAsync(student);
+			}
+		}
+		catch (Exception)
+		{
+			Console.WriteLine($"Error on saving Student: '{student.CharaName}'");
+			throw;
 		}
 	}
 	public async Task SaveInDatabase(IEnumerable<Student> students)

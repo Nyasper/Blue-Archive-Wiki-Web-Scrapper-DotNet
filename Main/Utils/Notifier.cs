@@ -1,4 +1,5 @@
 namespace Main.Utils;
+
 using System;
 
 using Scanner.Model;
@@ -34,10 +35,12 @@ public static class Notifier
 	public static void LogMissingFiles(FileVerification file)
 	{
 		string message = $"'{file.CharaName}' doesn't have: ";
-		List<string> missingFiles = [];
-		if (!file.HasProfileImage) missingFiles.Add("profile image");
-		if (!file.HasFullImage) missingFiles.Add("full image");
-		if (!file.HasAudio) missingFiles.Add("audio");
+		var missingFiles = new List<string>(3);
+		if (!file.HasProfileImage) missingFiles.Add("'profile image'");
+		if (!file.HasFullImage) missingFiles.Add("'full image'");
+		if (!file.HasAudio) missingFiles.Add("'audio'");
+		missingFiles[^1] = "and " + missingFiles[^1] + ".";
+
 		Console.WriteLine(message + String.Join(", ", missingFiles));
 	}
 	public static void LogStudentsList(string message, IEnumerable<Student> studentsCollection)

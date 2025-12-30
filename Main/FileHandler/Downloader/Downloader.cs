@@ -1,8 +1,11 @@
 ﻿using Main.Repository;
 
 namespace Main.FileHandler.Downloader;
+
 using Scanner.Model;
+
 using Repository;
+
 using Utils;
 
 public class Downloader : IDownloader
@@ -26,7 +29,6 @@ public class Downloader : IDownloader
 				Download(student, FileFormat.SmallImage)
 			];
 			await Task.WhenAll(fileQueue);
-			Notifier.MessageTaskCompleted($"updated files of '{student.CharaName}'");
 		}
 		catch (Exception)
 		{

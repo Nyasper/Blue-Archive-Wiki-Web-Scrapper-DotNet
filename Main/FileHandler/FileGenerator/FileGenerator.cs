@@ -1,6 +1,5 @@
-﻿using System.Text;
+﻿namespace Main.FileHandler.FileGenerator;
 
-namespace Main.FileHandler.Creator;
 using System.Text.Json;
 
 using Repository;
@@ -10,7 +9,7 @@ using Scanner.Model;
 using Utils;
 
 
-public class Creator(IRepository<Student> repository) : ICreator
+public class FileGenerator(IRepository<Student> repository) : IFileGenerator
 {
 	public async Task<string> GenerateJsonData()
 	{
@@ -36,22 +35,22 @@ public class Creator(IRepository<Student> repository) : ICreator
 	}
 
 	private static async Task<string> CreateHtmlImagesPreview(IEnumerable<Student> students)
-{
-    const string fileName = "imagesPreview";
-    var allSchools = students.GroupBy(s => s.School).ToArray();
+	{
+		const string fileName = "imagesPreview";
+		var allSchools = students.GroupBy(s => s.School).ToArray();
 
-    string htmlContent = GenerateHtmlContent(allSchools);
-    string finalHtml = $"{GetHtmlHeader()}\n{htmlContent}\n{GetHtmlFooter()}";
+		string htmlContent = GenerateHtmlContent(allSchools);
+		string finalHtml = $"{GetHtmlHeader()}\n{htmlContent}\n{GetHtmlFooter()}";
 
-    string filePath = Path.Join(Constants.DataPath, $"{fileName}.html");
-    await File.WriteAllTextAsync(filePath, finalHtml);
+		string filePath = Path.Join(Constants.DataPath, $"{fileName}.html");
+		await File.WriteAllTextAsync(filePath, finalHtml);
 
-    return filePath;
-}
+		return filePath;
+	}
 
 	private static string GetJavaScript()
 	{
-	    return @"
+		return @"
 	const modal = document.getElementById('imageModal');
 	const modalImg = document.getElementById('modalImage');
 	const modalCaption = document.querySelector('.modal-caption');
@@ -103,7 +102,7 @@ public class Creator(IRepository<Student> repository) : ICreator
 
 	private static string GetHtmlHeader()
 	{
-	    return @"<!DOCTYPE html>
+		return @"<!DOCTYPE html>
 	<html lang=""en"">
 	<head>
 	    <meta charset=""UTF-8"">
@@ -122,7 +121,7 @@ public class Creator(IRepository<Student> repository) : ICreator
 
 	private static string GetHtmlFooter()
 	{
-	    return $@"
+		return $@"
 	    </div>
 	    <div id=""imageModal"" class=""modal"">
 	        <span class=""modal-close"">&times;</span>
@@ -137,7 +136,7 @@ public class Creator(IRepository<Student> repository) : ICreator
 
 	private static string GetStylesCss()
 	{
-	    return @"
+		return @"
 	:root {
 	    --bg-primary: #0f0f0f;
 	    --bg-secondary: #1a1a1a;
@@ -428,18 +427,18 @@ public class Creator(IRepository<Student> repository) : ICreator
 
 	private static string GenerateHtmlContent(IGrouping<string, Student>[] allSchools)
 	{
-	    var schoolsHtml = allSchools.Select(school => GenerateSchoolSection(school));
-	    return string.Join("\n", schoolsHtml);
+		var schoolsHtml = allSchools.Select(school => GenerateSchoolSection(school));
+		return string.Join("\n", schoolsHtml);
 	}
 
 	private static string GenerateSchoolSection(IGrouping<string, Student> school)
 	{
-	    var studentsHtml = school.Select((student, index) =>
-	        GenerateStudentCard(student, index + 1));
+		var studentsHtml = school.Select((student, index) =>
+				GenerateStudentCard(student, index + 1));
 
-	    string schoolId = school.Key.Replace(" ", "-").ToLower();
+		string schoolId = school.Key.Replace(" ", "-").ToLower();
 
-	    return $@"
+		return $@"
 			<section id=""{schoolId}"" class=""school-section"">
 			    <h2 class=""schoolTitle"">{school.Key}</h2>
 			    <div class=""schoolContainer"">
@@ -450,10 +449,10 @@ public class Creator(IRepository<Student> repository) : ICreator
 
 	private static string GenerateStudentCard(Student student, int position)
 	{
-	    string schoolPath = $"../media/{student.School}";
-	    string studentName = student.CharaName;
+		string schoolPath = $"../media/{student.School}";
+		string studentName = student.CharaName;
 
-	    return $@"<div class=""studentContainer"">
+		return $@"<div class=""studentContainer"">
 	        <div class=""studentSubtitleContainer"">
 	            <img src=""{schoolPath}/{studentName}_small.png"" 
 	                 class=""smallImage"" 

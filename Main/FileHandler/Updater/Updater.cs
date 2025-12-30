@@ -1,7 +1,7 @@
 ﻿namespace Main.FileHandler.Updater;
 
 using Scanner.CharaList;
-using Creator;
+using FileGenerator;
 using Downloader;
 using Repository;
 using Scanner.CharaDetails;
@@ -9,65 +9,94 @@ using Scanner.Model;
 using Utils;
 using Verifier;
 using Extensions;
+using System.Diagnostics;
 
 public class Updater(
-	IRepository<Student> repository,
+	IRepository<Student> studentRepository,
 	IFileVerifier fileVerifier,
-	ICreator creator,
+	IFileGenerator fileGenerator,
 	IDownloader downloader,
 	ICharaDetailsScanner charaDetailsScanner,
 	ICharaListScanner charaListScanner) : IUpdater
 {
-	private readonly IRepository<Student> _studentRepository = repository;
-
-	public async Task UpdateAll()
+	public async Task Update()
 	{
-		Func<Task>[] toUpdate = [UpdateDatabase, UpdateLocalFiles];
-		foreach (var task in toUpdate) await task();
+		int selectedOption = Menu.LogMenu(["Update All", "Update only Database", "Update only Local Files", "Exit"]);
+		switch (selectedOption)
+		{
+			case 1:
+				await UpdateDatabase();
+				await UpdateLocalFiles();
+				Console.WriteLine("Updating All...");
+				break;
+			case 2:
+				await UpdateDatabase();
+				Console.WriteLine("Database Updated.");
+				break;
+			case 3:
+				await UpdateLocalFiles();
+				Console.WriteLine("Local Files Updated.");
+				break;
+			default:
+				Notifier.MessageTaskCancelled("Invalid Option selected, cancelling update.");
+				return;
+		}
 	}
 
 	public async Task UpdateDatabase()
 	{
-		Notifier.MessageInitiatingTask("Searching for Updates");
+		Notifier.MessageInitiatingTask("Scanning for Updates");
 
 		Student[] availableUpdates = await SearchDatabaseUpdates();
-		Notifier.MessageTaskCompleted("All data scanned successfully");
-		Notifier.LogStudentsList($"{availableUpdates.Length} New Students to Save:", availableUpdates);
-
 		if (availableUpdates.Length == 0)
 		{
-			Notifier.MessageNothingToDo("Database OK");
+			Notifier.MessageNothingToDo("Database is already updated, nothing to do.");
 			return;
 		}
 
-		// bool continue = Menu.YesNoQuestion("Update the database");
+		Notifier.LogStudentsList($"{availableUpdates.Length} New Students to Save:", availableUpdates);
 
-		await _studentRepository.SaveInDatabase(availableUpdates);
-		await creator.GenerateJsonData();
+
+		bool shouldUpdate = Menu.YesNoQuestion("Update the database?");
+		if (!shouldUpdate)
+		{
+			Notifier.MessageTaskCancelled("Database update cancelled by user.");
+			Environment.Exit(0);
+		}
+
+		await studentRepository.SaveInDatabase(availableUpdates);
+		await fileGenerator.GenerateJsonData();
 	}
 	public async Task UpdateLocalFiles()
 	{
-		Notifier.MessageInitiatingTask("Verifying Students files");
-		Student[] students = await _studentRepository.GetAll();
+		Notifier.MessageInitiatingTask("Scanning Students files");
+		Student[] students = await studentRepository.GetAll();
 		FileVerification[] studentsWithoutFiles = fileVerifier.VerifyLocalFiles(students);
 
-		students = students.IntersectBy(studentsWithoutFiles.Select(f=>f.CharaName), s=>s.CharaName).ToArray();
+		students = students.IntersectBy(studentsWithoutFiles.Select(f => f.CharaName), s => s.CharaName).ToArray();
 		if (studentsWithoutFiles.Length == 0)
 		{
-			Notifier.MessageNothingToDo("All files OK");
+			Notifier.MessageNothingToDo("All files are already downloaded, nothing to do.");
 			return;
 		}
-		// bool continue = Menu.YesNoQuestion("Proceed to download the files");
+
+		bool shouldDownload = Menu.YesNoQuestion("Proceed to download the files?");
+		if (!shouldDownload)
+		{
+			Notifier.MessageTaskCancelled("File download cancelled by user.");
+			Environment.Exit(0);
+		}
+
 		Notifier.MessageInitiatingTask("Downloading missing files");
 		await downloader.DownloadFiles(students);
 		Notifier.MessageTaskCompleted("All files updated successfully");
 
-		await creator.GenerateHtmlImagePreview();
+		// await fileGenerator.GenerateHtmlImagePreview();
 	}
 
 	public async Task<Student[]> SearchDatabaseUpdates()
 	{
-		Student[] studentsOnDb = await repository.GetAll();
+		Student[] studentsOnDb = await studentRepository.GetAll();
 		StudentListItem[] studentsOnPage = await charaListScanner.ScanCharaList();
 
 		// Search Differences

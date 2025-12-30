@@ -2,7 +2,7 @@
 
 namespace Main;
 
-using FileHandler.Creator;
+using FileHandler.FileGenerator;
 using FileHandler.Downloader;
 using FileHandler.Updater;
 using FileHandler.Verifier;
@@ -29,7 +29,7 @@ public static class Program
 			.AddSingleton<ICharaDetailsScanner, CharaDetailsScanner>()
 			.AddSingleton<IDownloader, Downloader>()
 			.AddSingleton<IFileVerifier, FileVerifier>()
-			.AddSingleton<ICreator, Creator>()
+			.AddSingleton<IFileGenerator, FileGenerator>()
 			.AddSingleton<IUpdater, Updater>()
 			.AddSingleton<IScanner<Student>, Scanner.Scanner>()
 			.BuildServiceProvider();
@@ -41,7 +41,7 @@ public static class Program
 	private static async Task Run(IServiceProvider services)
 	{
 		IUpdater updater = services.GetRequiredService<IUpdater>();
-		await updater.UpdateAll();
+		await updater.Update();
 
 		Console.WriteLine("Press any key to finish");
 		Console.ReadKey();
