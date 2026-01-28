@@ -27,7 +27,7 @@ public class Updater(
 			case 1:
 				await UpdateDatabase();
 				await UpdateLocalFiles();
-				Console.WriteLine("Updating All...");
+				Console.WriteLine("All files Updated Successfully...");
 				break;
 			case 2:
 				await UpdateDatabase();
