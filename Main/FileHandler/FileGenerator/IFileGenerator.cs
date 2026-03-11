@@ -1,7 +1,9 @@
-﻿namespace Main.FileHandler.FileGenerator;
+﻿using System.Threading.Tasks;
+
+namespace Main.FileHandler.FileGenerator;
 
 public interface IFileGenerator
 {
 	Task<string> GenerateJsonData();
-	Task<string> GenerateHtmlImagePreview();
+	Task<string> GenerateHtmlDataPreview();
 }

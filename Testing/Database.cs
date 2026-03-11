@@ -8,7 +8,7 @@ using Main.Repository;
 public class Database
 {
 	private StudentContext _context;
-	private Repository _repository;
+	private IRepository<Student> _repository;
 
 	[TestInitialize]
 	public void Setup()

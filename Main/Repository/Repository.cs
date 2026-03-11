@@ -1,12 +1,9 @@
 ﻿using Main.Utils;
+using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using Scanner.Model;
 
 namespace Main.Repository;
-
-using System.Text.Json;
-
-using Microsoft.EntityFrameworkCore;
-
-using Scanner.Model;
 
 public class Repository(StudentContext context) : IRepository<Student>
 {
@@ -81,8 +78,6 @@ public class Repository(StudentContext context) : IRepository<Student>
 	{
 		return await context.Students.AsNoTracking().OrderBy(s => s.School).ThenBy(s => s.CharaName).ToArrayAsync();
 	}
-
-
 	//DELETE
 	// public async Task DeleteSqlite(Student student)
 	// {

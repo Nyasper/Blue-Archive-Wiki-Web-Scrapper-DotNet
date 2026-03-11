@@ -1,4 +1,6 @@
-﻿namespace Main.FileHandler.FileGenerator;
+﻿using System.Threading.Tasks;
+
+namespace Main.FileHandler.FileGenerator;
 
 using System.Text.Json;
 
@@ -25,27 +27,24 @@ public class FileGenerator(IRepository<Student> repository) : IFileGenerator
 		return finalPath;
 	}
 
-	public async Task<string> GenerateHtmlImagePreview()
+	public async Task<string> GenerateHtmlDataPreview()
 	{
 		var students = await repository.GetAll();
-		string htmlPath = await CreateHtmlImagesPreview(students);
-
-		Notifier.MessageTaskCompleted($"Images preview HTML generated in: {htmlPath}");
-		return htmlPath;
-	}
-
-	private static async Task<string> CreateHtmlImagesPreview(IEnumerable<Student> students)
-	{
-		const string fileName = "imagesPreview";
 		var allSchools = students.GroupBy(s => s.School).ToArray();
+		
+		const string fileName = "imagesPreview";
+		string htmlFinalPath = Path.Join(Constants.DataPath, $"{fileName}.html");
+		
 
 		string htmlContent = GenerateHtmlContent(allSchools);
 		string finalHtml = $"{GetHtmlHeader()}\n{htmlContent}\n{GetHtmlFooter()}";
 
-		string filePath = Path.Join(Constants.DataPath, $"{fileName}.html");
-		await File.WriteAllTextAsync(filePath, finalHtml);
-
-		return filePath;
+		await File.WriteAllTextAsync(htmlFinalPath, finalHtml);
+		
+		//TODO: delete side effects
+		Notifier.MessageTaskCompleted($"Images preview HTML generated in: {htmlFinalPath}");
+		
+		return htmlFinalPath;
 	}
 
 	private static string GetJavaScript()

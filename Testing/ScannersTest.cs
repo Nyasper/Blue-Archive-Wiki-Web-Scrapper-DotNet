@@ -12,7 +12,7 @@ using Scanner.Model;
 public sealed class ScannersTest
 {
 	private StudentContext _context;
-	private Repository _repository;
+	private IRepository<Student> _repository;
 	private IHtmlHandler _htmlHandler;
 	private CharaListScanner _charaListScanner;
 	private ICharaDetailsScanner _charaDetailsScanner;

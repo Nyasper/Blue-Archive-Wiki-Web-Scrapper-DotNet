@@ -9,7 +9,6 @@ using Scanner.Model;
 using Utils;
 using Verifier;
 using Extensions;
-using System.Diagnostics;
 
 public class Updater(
 	IRepository<Student> studentRepository,
@@ -94,6 +93,7 @@ public class Updater(
 		// await fileGenerator.GenerateHtmlImagePreview();
 	}
 
+	// TODO: derive this method to -> IDataVerifier 
 	public async Task<Student[]> SearchDatabaseUpdates()
 	{
 		Student[] studentsOnDb = await studentRepository.GetAll();

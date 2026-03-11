@@ -1,11 +1,6 @@
-﻿using Main.Repository;
-
-namespace Main.FileHandler.Downloader;
+﻿namespace Main.FileHandler.Downloader;
 
 using Scanner.Model;
-
-using Repository;
-
 using Utils;
 
 public class Downloader : IDownloader

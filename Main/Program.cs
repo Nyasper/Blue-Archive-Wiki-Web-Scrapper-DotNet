@@ -1,4 +1,7 @@
-﻿using Scanner;
+﻿using System;
+using System.Threading.Tasks;
+
+using Scanner;
 
 namespace Main;
 
@@ -47,3 +50,7 @@ public static class Program
 		Console.ReadKey();
 	}
 }
+
+// TODO for this branch:
+// - Fix the download image bug
+// - AutoOption: Automate the updates optionts
