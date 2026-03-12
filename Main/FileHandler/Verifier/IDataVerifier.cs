@@ -1,7 +1,8 @@
 ﻿namespace Main.FileHandler.Verifier;
+using Scanner.Model;
 
-public interface IDataVerifier
+
+public interface IDataVerifier<T>
 {
-	Task<bool> VerifyDataAsync(string filePath);
-	Task VerifyData(string filePath);
+	Task<T[]> VerifyDataInDatabase(T[] entity);
 }

@@ -11,26 +11,23 @@ using Scanner.Model;
 using Utils;
 
 
-public class FileGenerator(IRepository<Student> repository) : IFileGenerator
+public class FileGenerator : IFileGenerator<Student>
 {
-	public async Task<string> GenerateJsonData()
+	public async Task<string> GenerateJsonData(Student[] studentData)
 	{
-		var students = await repository.GetAll();
-
 		const string fileName = "data";
 		string finalPath = Path.Join(Constants.DataPath, fileName + ".json");
 
-		string jsonData = JsonSerializer.Serialize<IEnumerable<Student>>(students);
+		string jsonData = JsonSerializer.Serialize<IEnumerable<Student>>(studentData);
 		await File.WriteAllTextAsync(finalPath, jsonData);
 
-		Notifier.MessageTaskCompleted($"data json generated in: {finalPath}");
+		Notifier.MessageTaskCompleted($"data json generated: {finalPath}");
 		return finalPath;
 	}
 
-	public async Task<string> GenerateHtmlDataPreview()
+	public async Task<string> GenerateHtmlDataPreview(Student[] studentData)
 	{
-		var students = await repository.GetAll();
-		var allSchools = students.GroupBy(s => s.School).ToArray();
+		var allSchools = studentData.GroupBy(s => s.School).ToArray();
 		
 		const string fileName = "imagesPreview";
 		string htmlFinalPath = Path.Join(Constants.DataPath, $"{fileName}.html");
@@ -41,9 +38,7 @@ public class FileGenerator(IRepository<Student> repository) : IFileGenerator
 
 		await File.WriteAllTextAsync(htmlFinalPath, finalHtml);
 		
-		//TODO: delete side effects
-		Notifier.MessageTaskCompleted($"Images preview HTML generated in: {htmlFinalPath}");
-		
+		Notifier.MessageTaskCompleted($"HTML data preview generated: {htmlFinalPath}");
 		return htmlFinalPath;
 	}
 

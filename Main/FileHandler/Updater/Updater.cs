@@ -1,26 +1,21 @@
 ﻿namespace Main.FileHandler.Updater;
 
-using Scanner.CharaList;
 using FileGenerator;
 using Downloader;
 using Repository;
-using Scanner.CharaDetails;
 using Scanner.Model;
 using Utils;
 using Verifier;
-using Extensions;
 
 public class Updater(
 	IRepository<Student> studentRepository,
-	IFileVerifier fileVerifier,
-	IFileGenerator fileGenerator,
-	IDownloader downloader,
-	ICharaDetailsScanner charaDetailsScanner,
-	ICharaListScanner charaListScanner) : IUpdater
+	IVerifier<Student> verifier,
+	IFileGenerator<Student> fileGenerator,
+	IDownloader downloader) : IUpdater
 {
 	public async Task Update()
 	{
-		int selectedOption = Menu.LogMenu(["Update All", "Update only Database", "Update only Local Files", "Exit"]);
+		/*int selectedOption = Menu.LogMenu(["Update All", "Update only Database", "Update only Local Files", "Exit"]);
 		switch (selectedOption)
 		{
 			case 1:
@@ -39,72 +34,56 @@ public class Updater(
 			default:
 				Notifier.MessageTaskCancelled("Invalid Option selected, cancelling update.");
 				return;
-		}
+		}*/
+		Notifier.MessageInitiatingTask("Searching for updates");
+		
+		Student[] students = await studentRepository.GetAll();
+		var missingStudentData = await verifier.VerifyStudentDataInDatabase(students);
+		var missingStudentFiles = verifier.VerifyStudentLocalFiles(students);
+
+		await UpdateDatabase(missingStudentData, students);
+		await UpdateLocalFiles(missingStudentFiles, students);
+		
+		Notifier.MessageTaskCompleted("Update complete successfully");
 	}
 
-	public async Task UpdateDatabase()
+	private async Task UpdateDatabase(Student[] missingStudentData, Student[] allStudents)
 	{
-		Notifier.MessageInitiatingTask("Scanning for Updates");
-
-		Student[] availableUpdates = await SearchDatabaseUpdates();
-		if (availableUpdates.Length == 0)
-		{
-			Notifier.MessageNothingToDo("Database is already updated, nothing to do.");
-			return;
-		}
-
-		Notifier.LogStudentsList($"{availableUpdates.Length} New Students to Save:", availableUpdates);
-
-
+		if (missingStudentData.Length == 0) return;
+		
+		Notifier.LogStudentsList("New Students to save In Database found", missingStudentData);
+		
 		bool shouldUpdate = Menu.YesNoQuestion("Update the database?");
 		if (!shouldUpdate)
 		{
-			Notifier.MessageTaskCancelled("Database update cancelled by user.");
-			Environment.Exit(0);
-		}
-
-		await studentRepository.SaveInDatabase(availableUpdates);
-		await fileGenerator.GenerateJsonData();
-	}
-	public async Task UpdateLocalFiles()
-	{
-		Notifier.MessageInitiatingTask("Scanning Students files");
-		Student[] students = await studentRepository.GetAll();
-		FileVerification[] studentsWithoutFiles = fileVerifier.VerifyLocalFiles(students);
-
-		students = students.IntersectBy(studentsWithoutFiles.Select(f => f.CharaName), s => s.CharaName).ToArray();
-		if (studentsWithoutFiles.Length == 0)
-		{
-			Notifier.MessageNothingToDo("All files are already downloaded, nothing to do.");
+			Notifier.MessageTaskCancelled("Database update cancelled by the user.");
 			return;
 		}
 
+		await studentRepository.SaveInDatabase(missingStudentData);
+		await fileGenerator.GenerateJsonData(allStudents);
+		
+		Notifier.MessageTaskCompleted("Data updated successfully");
+	}
+	private async Task UpdateLocalFiles(StudentFileVerification[] missingStudentFiles, Student[] allStudents)
+	{
+		Notifier.MessageInitiatingTask("Scanning Students files");
+
+		Student[] studentsWithoutFiles = allStudents.IntersectBy(missingStudentFiles.Select(f => f.CharaName), s => s.CharaName).ToArray();
+		if (studentsWithoutFiles.Length == 0) return;
+		
+		Notifier.LogStudentsList("New Students files to download", missingStudentFiles);
+		
 		bool shouldDownload = Menu.YesNoQuestion("Proceed to download the files?");
 		if (!shouldDownload)
 		{
-			Notifier.MessageTaskCancelled("File download cancelled by user.");
-			Environment.Exit(0);
+			Notifier.MessageTaskCancelled("File download cancelled by the user.");
+			return;
 		}
-
-		Notifier.MessageInitiatingTask("Downloading missing files");
-		await downloader.DownloadFiles(students);
-		Notifier.MessageTaskCompleted("All files updated successfully");
-
-		// await fileGenerator.GenerateHtmlImagePreview();
-	}
-
-	// TODO: derive this method to -> IDataVerifier 
-	public async Task<Student[]> SearchDatabaseUpdates()
-	{
-		Student[] studentsOnDb = await studentRepository.GetAll();
-		StudentListItem[] studentsOnPage = await charaListScanner.ScanCharaList();
-
-		// Search Differences
-		StudentListItem[] differences = studentsOnPage.ExceptBy(studentsOnDb.Select(db => db.CharaName), p => p.CharaName).ToArray();
-
-		StudentDetailsItem[] studenDetails = await charaDetailsScanner.ScanStudentDetails(differences);
-		Student[] studentsScanned = differences + studenDetails;
-
-		return studentsScanned;
+		
+		await downloader.DownloadFiles(studentsWithoutFiles);
+		await fileGenerator.GenerateHtmlDataPreview(allStudents);
+		
+		Notifier.MessageTaskCompleted("All local files downloaded successfully");
 	}
 }

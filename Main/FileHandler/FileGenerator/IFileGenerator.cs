@@ -2,8 +2,8 @@
 
 namespace Main.FileHandler.FileGenerator;
 
-public interface IFileGenerator
+public interface IFileGenerator<in T>
 {
-	Task<string> GenerateJsonData();
-	Task<string> GenerateHtmlDataPreview();
+	Task<string> GenerateJsonData(T[] entity);
+	Task<string> GenerateHtmlDataPreview(T[] entity);
 }

@@ -1,16 +1,14 @@
-﻿namespace Main.FileHandler.Verifier;
+﻿using Main.Repository;
+
+namespace Main.FileHandler.Verifier;
 
 using System.Collections.Concurrent;
-
-using Repository;
-
 using Scanner.Model;
-
 using Utils;
 
-public class FileVerifier() : IFileVerifier
+public class StudentFileVerifier : IStudentFileVerifier
 {
-	public FileVerification VerifyLocalFiles(Student student)
+	public StudentFileVerification VerifyStudentLocalFiles(Student student)
 	{
 		string outputDirectory = Path.Join(Constants.MediaPath, student.School, student.CharaName);
 		string profileImageDirectory = outputDirectory + ".png";
@@ -19,7 +17,7 @@ public class FileVerifier() : IFileVerifier
 		string audioDirectory = outputDirectory + ".ogg";
 
 		return
-			new FileVerification(
+			new StudentFileVerification(
 				CharaName: student.CharaName,
 				School: student.School,
 				HasProfileImage: FileExists(profileImageDirectory),
@@ -28,13 +26,13 @@ public class FileVerifier() : IFileVerifier
 				HasAudio: FileExists(audioDirectory)
 			);
 	}
-	public FileVerification[] VerifyLocalFiles(Student[] students)
+	public StudentFileVerification[] VerifyStudentLocalFiles(Student[] students)
 	{
-		ConcurrentBag<FileVerification> studentsWithoutFiles = []; //ConcurrentBag<> = List<> but for Parallelism.
+		ConcurrentBag<StudentFileVerification> studentsWithoutFiles = []; //ConcurrentBag<> = List<> but for Parallelism.
 
 		Parallel.ForEach(students, student =>
 		{
-			FileVerification result = VerifyLocalFiles(student);
+			StudentFileVerification result = VerifyStudentLocalFiles(student);
 			if (!result.HasProfileImage || !result.HasFullImage || !result.HasSmallImage || !result.HasAudio)
 			{
 				studentsWithoutFiles.Add(result);

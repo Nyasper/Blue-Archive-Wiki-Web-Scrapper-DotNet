@@ -1,5 +1,6 @@
-﻿namespace Main.Extensions;
-using Scanner.Model;
+﻿using Scanner.Model;
+
+namespace Main.Extensions;
 
 public static class StudentExtensions
 {

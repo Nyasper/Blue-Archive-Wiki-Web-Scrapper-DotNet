@@ -1,3 +1,5 @@
+using Main.FileHandler.Verifier;
+
 namespace Main.Utils;
 
 using System;
@@ -32,13 +34,13 @@ public static class Notifier
 	{
 		Console.WriteLine(Nl + message + " ❌");
 	}
-	public static void LogMissingFiles(FileVerification file)
+	public static void LogMissingFiles(StudentFileVerification studentFile)
 	{
-		string message = $"'{file.CharaName}' doesn't have: ";
+		string message = $"'{studentFile.CharaName}' doesn't have: ";
 		var missingFiles = new List<string>(3);
-		if (!file.HasProfileImage) missingFiles.Add("'profile image'");
-		if (!file.HasFullImage) missingFiles.Add("'full image'");
-		if (!file.HasAudio) missingFiles.Add("'audio'");
+		if (!studentFile.HasProfileImage) missingFiles.Add("'profile image'");
+		if (!studentFile.HasFullImage) missingFiles.Add("'full image'");
+		if (!studentFile.HasAudio) missingFiles.Add("'audio'");
 		missingFiles[^1] = "and " + missingFiles[^1] + ".";
 
 		Console.WriteLine(message + String.Join(", ", missingFiles));
@@ -62,6 +64,15 @@ public static class Notifier
 			Console.WriteLine($"{i + 1}: {studentsCollection[i].CharaName} 💙");
 		}
 		Console.WriteLine(Nl);
+	}
+	public static void LogStudentsList(string message, StudentFileVerification[] studentsCollection)
+	{
+		NormalMessage(message);
+		
+		for (int i = 0; i < studentsCollection.Length; i++)
+		{
+			Console.WriteLine($"{i + 1}: {studentsCollection[i].CharaName} 💙");
+		}
 	}
 
 }

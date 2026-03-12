@@ -31,8 +31,10 @@ public static class Program
 			.AddSingleton<ICharaListScanner, CharaListScanner>()
 			.AddSingleton<ICharaDetailsScanner, CharaDetailsScanner>()
 			.AddSingleton<IDownloader, Downloader>()
-			.AddSingleton<IFileVerifier, FileVerifier>()
-			.AddSingleton<IFileGenerator, FileGenerator>()
+			.AddSingleton<IDataVerifier<Student>, DataVerifier>()
+			.AddSingleton<IStudentFileVerifier, StudentFileVerifier>()
+			.AddSingleton<IVerifier<Student>, Verifier>()
+			.AddSingleton<IFileGenerator<Student>, FileGenerator>()
 			.AddSingleton<IUpdater, Updater>()
 			.AddSingleton<IScanner<Student>, Scanner.Scanner>()
 			.BuildServiceProvider();
