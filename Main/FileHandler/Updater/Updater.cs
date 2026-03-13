@@ -39,18 +39,25 @@ public class Updater(
 		
 		Student[] students = await studentRepository.GetAll();
 		var missingStudentData = await verifier.VerifyStudentDataInDatabase(students);
-		await UpdateDatabase(missingStudentData, students); 
+		bool hasDatabaseBeenUpdated = await UpdateDatabase(missingStudentData, students); 
 		
 		students = await studentRepository.GetAll();
 		var missingStudentFiles = verifier.VerifyStudentLocalFiles(students);
-		await UpdateLocalFiles(missingStudentFiles, students);
+		bool hasLocalFilesBeenUpdated = await UpdateLocalFiles(missingStudentFiles, students);
 
-		Notifier.MessageTaskCompleted("Update complete");
+		if (hasDatabaseBeenUpdated || hasLocalFilesBeenUpdated)
+		{
+			Notifier.MessageTaskCompleted("Update complete");
+		}
+		else
+		{
+			Notifier.MessageTaskCompleted("Nothing to Update");
+		}
 	}
 
-	private async Task UpdateDatabase(Student[] missingStudentData, Student[] allStudents)
+	private async Task<bool> UpdateDatabase(Student[] missingStudentData, Student[] allStudents)
 	{
-		if (missingStudentData.Length == 0) return;
+		if (missingStudentData.Length == 0) return false;
 		
 		Notifier.LogStudentsList("New Students to save In Database found", missingStudentData);
 		
@@ -58,18 +65,19 @@ public class Updater(
 		if (!shouldUpdate)
 		{
 			Notifier.MessageTaskCancelled("Database update cancelled by the user.");
-			return;
+			return false;
 		}
 
 		await studentRepository.SaveInDatabase(missingStudentData);
 		await fileGenerator.GenerateJsonData(allStudents);
 		
 		Notifier.MessageTaskCompleted("all data updated successfully");
+		return true;
 	}
-	private async Task UpdateLocalFiles(StudentFileVerification[] missingStudentFiles, Student[] allStudents)
+	private async Task<bool> UpdateLocalFiles(StudentFileVerification[] missingStudentFiles, Student[] allStudents)
 	{
 		Student[] studentsWithoutFiles = allStudents.IntersectBy(missingStudentFiles.Select(f => f.CharaName), s => s.CharaName).ToArray();
-		if (studentsWithoutFiles.Length == 0) return;
+		if (studentsWithoutFiles.Length == 0) return false;
 		
 		Notifier.LogStudentsList("New Students files to download", missingStudentFiles);
 		
@@ -77,12 +85,13 @@ public class Updater(
 		if (!shouldDownload)
 		{
 			Notifier.MessageTaskCancelled("File download cancelled by the user.");
-			return;
+			return false;
 		}
 		
 		await downloader.DownloadFiles(studentsWithoutFiles);
 		await fileGenerator.GenerateHtmlDataPreview(allStudents);
 		
 		Notifier.MessageTaskCompleted($"all files downloaded successfully");
+		return true;
 	}
 }
