@@ -52,7 +52,3 @@ public static class Program
 		Console.ReadKey();
 	}
 }
-
-// TODO for this branch:
-// - Fix the download image bug
-// - AutoOption: Automate the updates optionts

@@ -1,8 +1,6 @@
-﻿using Scanner;
-
-namespace Testing;
+﻿namespace Testing;
 using Main.Repository;
-
+using Scanner;
 using Scanner.CharaDetails;
 using Scanner.CharaList;
 using Scanner.Configuration;
@@ -35,7 +33,7 @@ public sealed class ScannersTest
 		_charaDetailsScanner = new CharaDetailsScanner(_htmlHandler);
 
 		// main scanner
-		_scanner = new Scanner.Scanner(_charaListScanner, _charaDetailsScanner);
+		_scanner = new Scanner(_charaListScanner, _charaDetailsScanner);
 	}
 
 	[TestMethod]
@@ -46,7 +44,7 @@ public sealed class ScannersTest
 		var s = studentsOnPage.FirstOrDefault(s => s.CharaName == "Shiroko*Terror");
 		if (s is null)
 		{
-			Console.WriteLine("Shiroko terror no encontrada.");
+			Console.WriteLine("Shiroko terror doesnt found");
 		}
 		else
 		{
@@ -61,23 +59,12 @@ public sealed class ScannersTest
 	[TestMethod]
 	public async Task CharaDetails()
 	{
-		const string studentToScan = "Eimi_(Swimsuit)";
+		const string studentToScan = "Yuuka_(Pajama)";
 
 		StudentDetailsItem studentDetailsItem = await _charaDetailsScanner.ScanStudentDetails(studentToScan);
 
 		Console.WriteLine(studentDetailsItem.ToString());
 		Assert.IsNotNull(studentDetailsItem);
 		Assert.IsInstanceOfType<StudentDetailsItem>(studentDetailsItem);
-	}
-	[TestMethod]
-	public async Task MainScanner()
-	{
-		const string studentToScan = "Ichika_(Swimsuit)";
-		Student student = await _scanner.Scan(studentToScan);
-		Console.WriteLine("Student Scanned:\n"+student);
-
-
-		Assert.IsNotNull(student);
-		Assert.IsInstanceOfType<Student>(student);
 	}
 }

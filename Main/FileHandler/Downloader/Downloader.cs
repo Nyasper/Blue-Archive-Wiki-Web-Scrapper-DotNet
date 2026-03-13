@@ -1,4 +1,6 @@
-﻿namespace Main.FileHandler.Downloader;
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
+namespace Main.FileHandler.Downloader;
 
 using Scanner.Model;
 using Utils;
@@ -35,12 +37,10 @@ public class Downloader : IDownloader
 	{
 		try
 		{
-			Task[] toDownload = students.Select(DownloadFiles).ToArray();
-			await Task.WhenAll(toDownload);
+			await Task.WhenAll(students.Select(DownloadFiles));
 		}
 		catch (Exception)
 		{
-			Console.WriteLine($"Error on downloading many files.");
 			throw;
 		}
 	}
@@ -61,17 +61,17 @@ public class Downloader : IDownloader
 					break;
 				case FileFormat.ImageFull:
 					fileToDownload = await GetByteArray(student.ImageFullUrl);
-					Notifier.MessageTaskCompleted($"Downloaded image full of'{student.CharaName}' from '{student.ImageFullUrl}'");
+					// Notifier.MessageTaskCompleted($"Downloaded image full of'{student.CharaName}' from '{student.ImageFullUrl}'");
 					finalPath += "_full.png";
 					break;
 				case FileFormat.SmallImage:
 					fileToDownload = await GetByteArray(student.SmallImageUrl);
 					finalPath += "_small.png";
-					Notifier.MessageTaskCompleted($"Downloaded small image of'{student.CharaName}' from '{student.SmallImageUrl}' in {finalPath}");
+					// Notifier.MessageTaskCompleted($"Downloaded small image of'{student.CharaName}' from '{student.SmallImageUrl}' in {finalPath}");
 					break;
 				case FileFormat.Audio:
 					fileToDownload = await GetByteArray(student.AudioUrl);
-					Notifier.MessageTaskCompleted($"Downloaded audio of'{student.CharaName}' from '{student.AudioUrl}'");
+					// Notifier.MessageTaskCompleted($"Downloaded audio of'{student.CharaName}' from '{student.AudioUrl}'");
 					finalPath += ".ogg";
 					break;
 				default:
@@ -98,9 +98,15 @@ public class Downloader : IDownloader
 		try
 		{
 			using var client = new HttpClient();
-			client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0");
+			client.DefaultRequestHeaders.Add("User-Agent",
+				"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (HTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0");
 			byte[] res = await client.GetByteArrayAsync(fileUrl);
 			return res;
+		}
+		catch (HttpRequestException httpRequestException)
+		{
+			Console.WriteLine($"Error {httpRequestException.StatusCode} on from URL: '{fileUrl}'");
+			throw;
 		}
 		catch (Exception)
 		{

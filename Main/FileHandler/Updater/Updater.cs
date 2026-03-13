@@ -39,12 +39,13 @@ public class Updater(
 		
 		Student[] students = await studentRepository.GetAll();
 		var missingStudentData = await verifier.VerifyStudentDataInDatabase(students);
-		var missingStudentFiles = verifier.VerifyStudentLocalFiles(students);
-
-		await UpdateDatabase(missingStudentData, students);
-		await UpdateLocalFiles(missingStudentFiles, students);
+		await UpdateDatabase(missingStudentData, students); 
 		
-		Notifier.MessageTaskCompleted("Update complete successfully");
+		students = await studentRepository.GetAll();
+		var missingStudentFiles = verifier.VerifyStudentLocalFiles(students);
+		await UpdateLocalFiles(missingStudentFiles, students);
+
+		Notifier.MessageTaskCompleted("Update complete");
 	}
 
 	private async Task UpdateDatabase(Student[] missingStudentData, Student[] allStudents)
@@ -63,12 +64,10 @@ public class Updater(
 		await studentRepository.SaveInDatabase(missingStudentData);
 		await fileGenerator.GenerateJsonData(allStudents);
 		
-		Notifier.MessageTaskCompleted("Data updated successfully");
+		Notifier.MessageTaskCompleted("all data updated successfully");
 	}
 	private async Task UpdateLocalFiles(StudentFileVerification[] missingStudentFiles, Student[] allStudents)
 	{
-		Notifier.MessageInitiatingTask("Scanning Students files");
-
 		Student[] studentsWithoutFiles = allStudents.IntersectBy(missingStudentFiles.Select(f => f.CharaName), s => s.CharaName).ToArray();
 		if (studentsWithoutFiles.Length == 0) return;
 		
@@ -84,6 +83,6 @@ public class Updater(
 		await downloader.DownloadFiles(studentsWithoutFiles);
 		await fileGenerator.GenerateHtmlDataPreview(allStudents);
 		
-		Notifier.MessageTaskCompleted("All local files downloaded successfully");
+		Notifier.MessageTaskCompleted($"all files downloaded successfully");
 	}
 }

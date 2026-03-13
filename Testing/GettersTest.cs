@@ -13,7 +13,11 @@ public class GettersTest
 {
 	private IHtmlHandler _htmlHandler;
 	private HtmlDocument? _html;
-	private const string studentCharaName = "Ichika_(Swimsuit)";
+	private const string studentCharaName = "Koyuki_(Pajama)";
+	private const string expectedImageContentType = "image/png";
+	private const string expectedAudioContentType = "application/ogg";
+
+	private HttpClient _httpClient;
 	// private const string studentCharaName = "Yukari_(Swimsuit)";
 
 	private async Task<HtmlDocument> GetHtml()
@@ -25,6 +29,9 @@ public class GettersTest
 	public void Setup()
 	{
 		_htmlHandler = new HtmlHandler();
+		_httpClient = new HttpClient();
+		_httpClient.DefaultRequestHeaders.Add("User-Agent",
+			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (HTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0");
 	}
 
 	[TestMethod]
@@ -142,6 +149,15 @@ public class GettersTest
 		Assert.IsGreaterThan(0, imageProfileUrl.Length);
 		Assert.StartsWith("https://static.", imageProfileUrl);
 		Assert.EndsWith(".png", imageProfileUrl);
+		
+		var request = new HttpRequestMessage(HttpMethod.Head, imageProfileUrl);
+		var response = await _httpClient.SendAsync(request);
+		Assert.IsTrue(response.IsSuccessStatusCode, 
+			$"Invalid URL: {response.StatusCode}");
+		
+		string contentType = response.Content.Headers.ContentType?.MediaType ?? string.Empty; 
+		
+		Assert.AreEqual(expectedImageContentType, contentType);
 	}
 	[TestMethod]
 	public async Task GetImageFullUrl()
@@ -154,6 +170,15 @@ public class GettersTest
 		Assert.IsGreaterThan(0, imageFullUrl.Length);
 		Assert.StartsWith("https://static.", imageFullUrl);
 		Assert.EndsWith(".png", imageFullUrl);
+		
+		var request = new HttpRequestMessage(HttpMethod.Head, imageFullUrl);
+		var response = await _httpClient.SendAsync(request);
+		Assert.IsTrue(response.IsSuccessStatusCode, 
+			$"Invalid URL: {response.StatusCode}");
+		
+		string contentType = response.Content.Headers.ContentType?.MediaType ?? string.Empty; 
+		
+		Assert.AreEqual(expectedImageContentType, contentType);
 	}
 	[TestMethod]
 	public async Task GetAudioUrl()
@@ -167,5 +192,17 @@ public class GettersTest
 		Assert.IsGreaterThan(0, audioUrl.Length);
 		Assert.StartsWith("https://static.", audioUrl);
 		Assert.EndsWith(".ogg", audioUrl);
+		
+
+		var request = new HttpRequestMessage(HttpMethod.Head, audioUrl);
+		var response = await _httpClient.SendAsync(request);
+		Assert.IsTrue(response.IsSuccessStatusCode, 
+			$"Invalid URL Status: {response.StatusCode}");
+		
+		var contentType = response.Content.Headers.ContentType?.MediaType ?? string.Empty;
+		Console.WriteLine("Content-Type: " + contentType);
+		
+
+		Assert.AreEqual(expectedAudioContentType, contentType);
 	}
 }

@@ -167,7 +167,7 @@ public class DetailsGetter(HtmlDocument html, string studentCharaName) : IDetail
 		try
 		{
 			var allImages = html.DocumentNode.SelectSingleNode($"//img[@alt='{studentCharaName.Replace("_", " ")}']");
-			var imageProfileUrl = allImages.GetAttributeValue("src", "")?.Trim() ?? "";
+			var imageProfileUrl = HtmlEntity.DeEntitize((allImages.GetAttributeValue("src", "")))?.Trim() ?? "";
 
 			if (string.IsNullOrEmpty(imageProfileUrl)) throw new Exception("error in 'GetImageProfileUrl()'" + Nl);
 
@@ -186,7 +186,7 @@ public class DetailsGetter(HtmlDocument html, string studentCharaName) : IDetail
 			var toOriginalImageFullPage = Constants.Domain + toOriginalImageFullPageANode.GetAttributeValue("href", "");
 
 			var pageImgFull = await new HtmlHandler().ScanHtml(toOriginalImageFullPage);
-			var imageUrlNode = pageImgFull.DocumentNode.SelectSingleNode("//a[text()='Original file']").GetAttributeValue("href", "");
+			var imageUrlNode = HtmlEntity.DeEntitize((pageImgFull.DocumentNode.SelectSingleNode("//a[text()='Original file']").GetAttributeValue("href", "")));
 
 			if (string.IsNullOrEmpty(imageUrlNode))
 			{
@@ -205,7 +205,7 @@ public class DetailsGetter(HtmlDocument html, string studentCharaName) : IDetail
 		try
 		{
 			var elementWithDataVoiceAttribute =  html.DocumentNode.SelectSingleNode("//td[@data-voice]");
-			string audioUrl = elementWithDataVoiceAttribute.GetAttributeValue("data-voice", "");
+			string audioUrl = HtmlEntity.DeEntitize(elementWithDataVoiceAttribute.GetAttributeValue("data-voice", ""));
 
 			if (string.IsNullOrEmpty(audioUrl))
 			{
