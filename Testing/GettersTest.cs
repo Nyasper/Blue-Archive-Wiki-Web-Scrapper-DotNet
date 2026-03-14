@@ -14,11 +14,7 @@ public class GettersTest
 	private HtmlDocument? _html;
 	private HttpClient _httpClient;
 	private readonly IHtmlHandler _htmlHandler;
-
-	private const string StudentCharaName = "Eimi_(Swimsuit)";
-	private const string ExpectedImageContentType = "image/png";
-	private const string ExpectedAudioContentType = "application/ogg";
-
+	
 	public GettersTest()
 	{
 		_htmlHandler = new HtmlHandler();
@@ -29,9 +25,9 @@ public class GettersTest
 	
 	private async Task<HtmlDocument> GetHtml()
 	{
-		return _html ??= await _htmlHandler.ScanHtml(Constants.BaseUrl + StudentCharaName);
+		return _html ??= await _htmlHandler.ScanHtml(Scanner.Utils.Constants.BaseUrl + Constants.StudentToScan.CharaName);
 	}
-	private async Task<DetailsGetter> GetGetter() => new(await GetHtml(), StudentCharaName);
+	private async Task<DetailsGetter> GetGetter() => new(await GetHtml(), Constants.StudentToScan.CharaName);
 	
 
 	[Fact]
@@ -151,7 +147,7 @@ public class GettersTest
 		
 		string contentType = response.Content.Headers.ContentType?.MediaType ?? string.Empty; 
 		
-		contentType.Should().Be(ExpectedImageContentType);
+		contentType.Should().Be(Constants.ExpectedImageContentType);
 	}
 	[Fact]
 	public async Task GetImageFullUrl()
@@ -171,7 +167,7 @@ public class GettersTest
 		
 		string contentType = response.Content.Headers.ContentType?.MediaType ?? string.Empty; 
 		
-		contentType.Should().Be(ExpectedImageContentType);
+		contentType.Should().Be(Constants.ExpectedImageContentType);
 	}
 	[Fact]
 	public async Task GetAudioUrl()
@@ -195,6 +191,6 @@ public class GettersTest
 		Console.WriteLine("Content-Type: " + contentType);
 		
 
-		contentType.Should().Be(ExpectedAudioContentType);
+		contentType.Should().Be(Constants.ExpectedAudioContentType);
 	}
 }
