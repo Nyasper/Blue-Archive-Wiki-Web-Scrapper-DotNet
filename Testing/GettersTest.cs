@@ -1,53 +1,50 @@
-﻿using HtmlAgilityPack;
-
-using Scanner.CharaDetails;
-using Scanner.Utils;
-
-using Scanner.Configuration;
-using Scanner.Model;
+using FluentAssertions;
 
 namespace Testing;
 
-[TestClass]
+using Xunit;
+using HtmlAgilityPack;
+using Scanner.CharaDetails;
+using Scanner.Utils;
+using Scanner.Configuration;
+
+
 public class GettersTest
 {
-	private IHtmlHandler _htmlHandler;
 	private HtmlDocument? _html;
-	private const string studentCharaName = "Koyuki_(Pajama)";
-	private const string expectedImageContentType = "image/png";
-	private const string expectedAudioContentType = "application/ogg";
-
 	private HttpClient _httpClient;
-	// private const string studentCharaName = "Yukari_(Swimsuit)";
+	private readonly IHtmlHandler _htmlHandler;
 
-	private async Task<HtmlDocument> GetHtml()
-	{
-		return _html ??= await _htmlHandler.ScanHtml(Constants.BaseUrl + studentCharaName);
-	}
-	private async Task<DetailsGetter> GetGetter() => new DetailsGetter(await GetHtml(), studentCharaName);
-	[TestInitialize]
-	public void Setup()
+	private const string StudentCharaName = "Eimi_(Swimsuit)";
+	private const string ExpectedImageContentType = "image/png";
+	private const string ExpectedAudioContentType = "application/ogg";
+
+	public GettersTest()
 	{
 		_htmlHandler = new HtmlHandler();
 		_httpClient = new HttpClient();
 		_httpClient.DefaultRequestHeaders.Add("User-Agent",
 			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (HTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0");
 	}
+	
+	private async Task<HtmlDocument> GetHtml()
+	{
+		return _html ??= await _htmlHandler.ScanHtml(Constants.BaseUrl + StudentCharaName);
+	}
+	private async Task<DetailsGetter> GetGetter() => new(await GetHtml(), StudentCharaName);
+	
 
-	[TestMethod]
+	[Fact]
 	public async Task GetFullNameTest()
 	{
 		var getter = await GetGetter();
 		(string name, string lastName) = getter.GetFullName();
 		Console.WriteLine($"Testing name: {name}\nTesting lastName: {lastName}");
 
-		Assert.IsFalse(string.IsNullOrWhiteSpace(name));
-		Assert.IsFalse(string.IsNullOrWhiteSpace(lastName));
-
-		Assert.IsGreaterThan(0, name.Length);
-		Assert.IsGreaterThan(0, lastName.Length);
+		name.Should().NotBeNullOrEmpty().And.NotBeNullOrWhiteSpace();
+		lastName.Should().NotBeNullOrEmpty().And.NotBeNullOrWhiteSpace();
 	}
-	[TestMethod]
+	[Fact]
 	public async Task GetAge()
 	{
 		var getter = await GetGetter();
@@ -57,43 +54,41 @@ public class GettersTest
 		if (age is not null)
 		{
 			int ageInt = (int)age;
-			Assert.IsInstanceOfType<int>(ageInt);
-			Assert.IsInRange(0, 50, ageInt);
+			
+			ageInt.Should().BeOfType(typeof(int));
+			ageInt.Should().BeInRange(0, 50);
 		}
 	}
-	[TestMethod]
+	[Fact]
 	public async Task GetBirthDate()
 	{
 		var getter = await GetGetter();
 		string? birthday = getter.GetBirthday();
 		Console.WriteLine($"Testing birthday: {birthday}");
 
-		if (birthday is not null)
-		{
-			Assert.IsGreaterThan(0, birthday.Length);
-		}
+		birthday?.Length.Should().BeGreaterThan(0);
 	}
-	[TestMethod]
+	[Fact]
 	public async Task GetHeight()
 	{
 		var getter = await GetGetter();
 		int height = getter.GetHeight() ?? 0;
 		Console.WriteLine($"Testing height: {height}");
 
-		Assert.IsInstanceOfType<int>(height);
-		Assert.IsInRange(100, 200, height, "height should be between 100 and 200");
+		height.Should().BeOfType(typeof(int));
+		height.Should().BeInRange(100, 200, "height should be between 100 and 200");
 	}
-	[TestMethod]
+	[Fact]
 	public async Task GetHobbies()
 	{
 		var getter = await GetGetter();
 		string hobbies = getter.GetHobbies();
 		Console.WriteLine($"Testing hobbies: {hobbies}");
 
-		Assert.IsFalse(string.IsNullOrWhiteSpace(hobbies));
-		Assert.IsGreaterThan(0, hobbies.Length);
+		hobbies.Should().NotBeNullOrWhiteSpace();
+		hobbies.Length.Should().BeGreaterThan(0);
 	}
-	[TestMethod]
+	[Fact]
 	public async Task GetDesigner()
 	{
 		var getter = await GetGetter();
@@ -102,10 +97,10 @@ public class GettersTest
 
 		if (designer is not null)
 		{
-			Assert.IsGreaterThan(0, designer.Length);
+			designer.Length.Should().BeGreaterThan(0);
 		}
 	}
-	[TestMethod]
+	[Fact]
 	public async Task GetIllustrator()
 	{
 		var getter = await GetGetter();
@@ -114,73 +109,71 @@ public class GettersTest
 
 		if (illustrator is not null)
 		{
-			Assert.IsGreaterThan(0, illustrator.Length);
+			illustrator.Length.Should().BeGreaterThan(0);
 		}
 	}
-	[TestMethod]
+	[Fact]
 	public async Task GetVoice()
 	{
 		var getter = await GetGetter();
 		string voice = getter.GetVoice();
 		Console.WriteLine($"Testing voice: {voice}");
 
-		Assert.IsFalse(string.IsNullOrWhiteSpace(voice));
-		Assert.IsGreaterThan(0, voice.Length);
+		voice.Should().NotBeNullOrWhiteSpace();
+		voice.Length.Should().BeGreaterThan(0);
 	}
-	[TestMethod]
+	[Fact]
 	public async Task GetPageUrl()
 	{
 		var getter = await GetGetter();
 		string pageUrl = getter.GetPageUrl();
 		Console.WriteLine($"Testing pageUrl: {pageUrl}");
 
-		Assert.IsFalse(string.IsNullOrWhiteSpace(pageUrl));
-		Assert.IsGreaterThan(0, pageUrl.Length);
-		Assert.StartsWith("https://bluearchive.wiki/wiki/", pageUrl);
+		pageUrl.Should().NotBeNullOrWhiteSpace();
+		pageUrl.Length.Should().BeGreaterThan(0);
+		pageUrl.Should().StartWith("https://bluearchive.wiki/wiki/");
 	}
-	[TestMethod]
+	[Fact]
 	public async Task GetImageProfileUrl()
 	{
 		var getter = await GetGetter();
 		string imageProfileUrl = getter.GetImageProfileUrl();
 		Console.WriteLine($"Testing imageProfileUrl: {imageProfileUrl}");
 
-		Assert.IsFalse(string.IsNullOrWhiteSpace(imageProfileUrl));
-		Assert.IsGreaterThan(0, imageProfileUrl.Length);
-		Assert.StartsWith("https://static.", imageProfileUrl);
-		Assert.EndsWith(".png", imageProfileUrl);
+		imageProfileUrl.Should().NotBeNullOrWhiteSpace();
+		imageProfileUrl.Length.Should().BeGreaterThan(0);
+		imageProfileUrl.Should().StartWith("https://static.");
+		imageProfileUrl.Should().EndWith(".png");
 		
 		var request = new HttpRequestMessage(HttpMethod.Head, imageProfileUrl);
 		var response = await _httpClient.SendAsync(request);
-		Assert.IsTrue(response.IsSuccessStatusCode, 
-			$"Invalid URL: {response.StatusCode}");
+		response.IsSuccessStatusCode.Should().BeTrue($"Invalid URL: {response.StatusCode}");
 		
 		string contentType = response.Content.Headers.ContentType?.MediaType ?? string.Empty; 
 		
-		Assert.AreEqual(expectedImageContentType, contentType);
+		contentType.Should().Be(ExpectedImageContentType);
 	}
-	[TestMethod]
+	[Fact]
 	public async Task GetImageFullUrl()
 	{
 		var getter = await GetGetter();
 		string imageFullUrl = await getter.GetImageFullUrl();
 		Console.WriteLine($"Testing imageFullUrl: {imageFullUrl}");
 
-		Assert.IsFalse(string.IsNullOrWhiteSpace(imageFullUrl));
-		Assert.IsGreaterThan(0, imageFullUrl.Length);
-		Assert.StartsWith("https://static.", imageFullUrl);
-		Assert.EndsWith(".png", imageFullUrl);
+		imageFullUrl.Should().NotBeNullOrWhiteSpace();
+		imageFullUrl.Length.Should().BeGreaterThan(0);
+		imageFullUrl.Should().StartWith("https://static.");
+		imageFullUrl.Should().EndWith(".png");
 		
 		var request = new HttpRequestMessage(HttpMethod.Head, imageFullUrl);
-		var response = await _httpClient.SendAsync(request);
-		Assert.IsTrue(response.IsSuccessStatusCode, 
-			$"Invalid URL: {response.StatusCode}");
+		var response = await _httpClient.SendAsync(request, TestContext.Current.CancellationToken);
+		response.IsSuccessStatusCode.Should().BeTrue($"Invalid URL: {response.StatusCode}");
 		
 		string contentType = response.Content.Headers.ContentType?.MediaType ?? string.Empty; 
 		
-		Assert.AreEqual(expectedImageContentType, contentType);
+		contentType.Should().Be(ExpectedImageContentType);
 	}
-	[TestMethod]
+	[Fact]
 	public async Task GetAudioUrl()
 	{
 		var getter = await GetGetter();
@@ -188,21 +181,20 @@ public class GettersTest
 		string audioUrl = getter.GetAudioUrl();
 		Console.WriteLine("Testing audioUrl: " + audioUrl);
 
-		Assert.IsFalse(string.IsNullOrWhiteSpace(audioUrl));
-		Assert.IsGreaterThan(0, audioUrl.Length);
-		Assert.StartsWith("https://static.", audioUrl);
-		Assert.EndsWith(".ogg", audioUrl);
+		audioUrl.Should().NotBeNullOrWhiteSpace();
+		audioUrl.Length.Should().BeGreaterThan(0);
+		audioUrl.Should().StartWith("https://static.");
+		audioUrl.Should().EndWith(".ogg");
 		
 
 		var request = new HttpRequestMessage(HttpMethod.Head, audioUrl);
-		var response = await _httpClient.SendAsync(request);
-		Assert.IsTrue(response.IsSuccessStatusCode, 
-			$"Invalid URL Status: {response.StatusCode}");
+		var response = await _httpClient.SendAsync(request, TestContext.Current.CancellationToken);
+		response.IsSuccessStatusCode.Should().BeTrue($"Invalid URL Status: {response.StatusCode}");
 		
 		var contentType = response.Content.Headers.ContentType?.MediaType ?? string.Empty;
 		Console.WriteLine("Content-Type: " + contentType);
 		
 
-		Assert.AreEqual(expectedAudioContentType, contentType);
+		contentType.Should().Be(ExpectedAudioContentType);
 	}
 }

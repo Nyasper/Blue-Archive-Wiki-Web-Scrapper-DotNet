@@ -22,14 +22,10 @@
 	
 	
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=ab2fd130_002Df506_002D49ae_002D859c_002D3fee43a955f3/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GetImageProfileUrl" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;Or&gt;&#xD;
-    &lt;TestAncestor&gt;&#xD;
-      &lt;TestId&gt;MSTest::2E3FCC2F-E99A-430D-B19C-9A98C6373707::net10.0::Testing.GettersTest.GetImageProfileUrl&lt;/TestId&gt;&#xD;
-      &lt;TestId&gt;MSTest::2E3FCC2F-E99A-430D-B19C-9A98C6373707::net10.0::Testing.ScannersTest.CharaDetails&lt;/TestId&gt;&#xD;
-      &lt;TestId&gt;MSTest::2E3FCC2F-E99A-430D-B19C-9A98C6373707::net10.0::Testing.GettersTest&lt;/TestId&gt;&#xD;
-    &lt;/TestAncestor&gt;&#xD;
-    &lt;ProjectFile&gt;2E3FCC2F-E99A-430D-B19C-9A98C6373707/f:ScannersTest.cs&lt;/ProjectFile&gt;&#xD;
-  &lt;/Or&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;xUnit::2E3FCC2F-E99A-430D-B19C-9A98C6373707::net10.0::Testing.ScannersTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::2E3FCC2F-E99A-430D-B19C-9A98C6373707::net10.0::Testing.GettersTest&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	
 	

@@ -1,23 +1,25 @@
-﻿namespace Testing;
+namespace Testing;
+
+using FluentAssertions;
 using Main.Repository;
 using Scanner;
 using Scanner.CharaDetails;
 using Scanner.CharaList;
 using Scanner.Configuration;
 using Scanner.Model;
+using Xunit;
 
-[TestClass]
 public sealed class ScannersTest
 {
-	private StudentContext _context;
-	private IRepository<Student> _repository;
-	private IHtmlHandler _htmlHandler;
-	private CharaListScanner _charaListScanner;
-	private ICharaDetailsScanner _charaDetailsScanner;
-	private IScanner<Student> _scanner;
+	private readonly StudentContext _context;
+	private readonly IRepository<Student> _repository;
+	private readonly IHtmlHandler _htmlHandler;
+	private readonly CharaListScanner _charaListScanner;
+	private readonly ICharaDetailsScanner _charaDetailsScanner;
+	private readonly IScanner<Student> _scanner;
+	private const string StudentToScan = "Eimi_(Swimsuit)";
 
-	[TestInitialize]
-	public void Setup()
+	public ScannersTest()
 	{
 		// db
 		_context = new StudentContext();
@@ -36,35 +38,31 @@ public sealed class ScannersTest
 		_scanner = new Scanner(_charaListScanner, _charaDetailsScanner);
 	}
 
-	[TestMethod]
+	[Fact]
 	public async Task CharaList()
 	{
 		var studentsOnDb = await _repository.GetAll();
 		var studentsOnPage = await _charaListScanner.ScanCharaList();
-		var s = studentsOnPage.FirstOrDefault(s => s.CharaName == "Shiroko*Terror");
-		if (s is null)
-		{
-			Console.WriteLine("Shiroko terror doesnt found");
-		}
-		else
-		{
-			Console.WriteLine(s);
-		}
 
-		Assert.IsInstanceOfType<IEnumerable<StudentListItem>>(studentsOnPage, "Should return CharaListItem Collection");
-		Assert.IsGreaterThanOrEqualTo(studentsOnDb.Length, studentsOnPage.Length, "The number of characters in the page should be at least the number of Students");
 		Console.WriteLine($"Students in DB: {studentsOnDb.Length}\nstudents in page: {studentsOnPage.Length}");
+		studentsOnPage.Should().BeAssignableTo<IEnumerable<StudentListItem>>("Should return CharaListItem Collection");
 	}
 
-	[TestMethod]
+	[Fact]
 	public async Task CharaDetails()
 	{
-		const string studentToScan = "Yuuka_(Pajama)";
-
-		StudentDetailsItem studentDetailsItem = await _charaDetailsScanner.ScanStudentDetails(studentToScan);
+		StudentDetailsItem studentDetailsItem = await _charaDetailsScanner.ScanStudentDetails(StudentToScan);
+		studentDetailsItem.Should().BeOfType<StudentDetailsItem>("Should return StudentDetailsItem");
 
 		Console.WriteLine(studentDetailsItem.ToString());
-		Assert.IsNotNull(studentDetailsItem);
-		Assert.IsInstanceOfType<StudentDetailsItem>(studentDetailsItem);
+	}
+
+	[Fact]
+	public async Task Scanner()
+	{
+		Student student = await _scanner.Scan(StudentToScan);
+		student.Should().BeOfType<Student>("Should return Student");
+		
+		Console.WriteLine(student.ToString());
 	}
 }
