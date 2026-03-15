@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace Main.FileHandler.FileGenerator;
 
@@ -18,7 +18,7 @@ public class FileGenerator : IFileGenerator<Student>
 		const string fileName = "data";
 		string finalPath = Path.Join(Constants.DataPath, fileName + ".json");
 
-		string jsonData = JsonSerializer.Serialize<IEnumerable<Student>>(studentData);
+		string jsonData = JsonSerializer.Serialize<IEnumerable<Student>>(studentData, Constants.JsonOptions);
 		await File.WriteAllTextAsync(finalPath, jsonData);
 
 		Notifier.MessageTaskCompleted($"data json generated: {finalPath}");

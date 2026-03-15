@@ -1,4 +1,4 @@
-﻿using Main.Utils;
+using Main.Utils;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Scanner.Model;
@@ -59,7 +59,7 @@ public class Repository(StudentContext context) : IRepository<Student>
 			Console.WriteLine($"{jsonFile} does not exist.");
 			return;
 		}
-		var students = JsonSerializer.Deserialize<Student[]>(jsonFile);
+		var students = JsonSerializer.Deserialize<Student[]>(jsonFile, Constants.JsonOptions);
 
 		if (students != null)
 		{

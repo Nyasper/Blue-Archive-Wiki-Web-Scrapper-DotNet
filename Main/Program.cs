@@ -46,8 +46,12 @@ public static class Program
 	private static async Task Run(IServiceProvider services)
 	{
 		IUpdater updater = services.GetRequiredService<IUpdater>();
-		await updater.Update();
-
+		// await updater.Update();
+		IFileGenerator<Student> fileGenerator = services.GetRequiredService<IFileGenerator<Student>>();
+		var repository = services.GetRequiredService<IRepository<Student>>();
+		var finalpath = await fileGenerator.GenerateJsonData(await repository.GetAll());
+		Console.WriteLine("file generaterd: " + finalpath);
+		
 		Console.WriteLine("Press any key to finish");
 		Console.ReadKey();
 	}

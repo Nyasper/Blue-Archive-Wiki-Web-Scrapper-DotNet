@@ -1,28 +1,28 @@
-﻿using System.Reflection;
+using System.Reflection;
 
 namespace Scanner.Model;
 public record class Student
 {
-	public required string CharaName { get; set; }
-	public required string Name { get; set; }
-	public required string LastName { get; set; }
-	public required string School { get; set; }
-	public required int? Age { get; set; }
-	public required int? Height { get; set; }
-	public required string? Birthday { get; set; }
-	public required string? Hobbies { get; set; }
-	public required string? Designer { get; set; }
-	public required string? Illustrator { get; set; }
-	public required string Voice { get; set; }
-	public required string ReleaseDate { get; set; }
-	public required string SkinSet { get; set; }
-	public required string PageUrl { get; set; }
-	public required string ImageProfileUrl { get; set; }
-	public required string ImageFullUrl { get; set; }
-	public required string SmallImageUrl { get; set; }
-	public required string AudioUrl { get; set; }
+	public required string CharaName { get; init; }
+	public required string Name { get; init; }
+	public required string LastName { get; init; }
+	public required string School { get; init; }
+	public required int? Age { get; init; }
+	public required int? Height { get; init; }
+	public required string? Birthday { get; init; }
+	public required string? Hobbies { get; init; }
+	public required string? Designer { get; init; }
+	public required string? Illustrator { get; init; }
+	public required string Voice { get; init; }
+	public required string ReleaseDate { get; init; }
+	public required string SkinSet { get; init; }
+	public required string PageUrl { get; init; }
+	public required string ImageProfileUrl { get; init; }
+	public required string ImageFullUrl { get; init; }
+	public required string SmallImageUrl { get; init; }
+	public required string AudioUrl { get; init; }
 
-	public DateTime CreatedAt { get; set; } = DateTime.Now;
+	public DateTime CreatedAt { get; init; } = DateTime.Now;
 	public override string ToString()
 	{
 		var nl = Environment.NewLine;

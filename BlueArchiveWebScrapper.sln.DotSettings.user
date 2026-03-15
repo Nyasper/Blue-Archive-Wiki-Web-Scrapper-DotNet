@@ -17,16 +17,14 @@
 	<s:String x:Key="/Default/CodeInspection/Highlighting/SweaWarningsMode/@EntryValue">ShowAndRun</s:String>
 	
 	<s:String x:Key="/Default/Environment/Highlighting/HighlightingMode/@EntryValue">MarkersAndFullLine</s:String>
-	
-	
-	
-	
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=ab2fd130_002Df506_002D49ae_002D859c_002D3fee43a955f3/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GetImageProfileUrl" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::2E3FCC2F-E99A-430D-B19C-9A98C6373707::net10.0::Testing.ScannersTest&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::2E3FCC2F-E99A-430D-B19C-9A98C6373707::net10.0::Testing.GettersTest&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=36d7ecfa_002D595f_002D49a1_002Da8b8_002D54960078bd7b/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Solution /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	
+	
+	
+	
+	
 	
 	
 	
