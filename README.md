@@ -1,27 +1,75 @@
-# Blue Archive Wiki Web Scrapper
+# Blue Archive Wiki Scraper
 
-## English
-Console application created in C# with dotnet 9, 
-I made it for extract images and character data from the page: [Blue Archive Wiki](https://bluearchive.wiki/wiki/Characters), 
-which is a free wiki of the gacha video game 'Blue Archive'.  
-The Files and database are saved in the folder called "BlueArchiveWS" located in the "Documents" folder.  
-The files and data extracted with this program are used in this other front end [project](https://github.com/Nyasper/Proyecto-2-Blue-Archive-Database-react.git).
-  
-## Español
-Programa de Consola hecho con C# en .net 9, 
-lo hice para extraer datos e Imágenes de la página: [Blue Archive Wiki](https://bluearchive.wiki/wiki/Characters), 
-la cuál es una wiki gratis del videojuego gacha Blue Archive. Los archivos y la base de datos se guardan en el directorio "BlueArchiveWS" dentro de "Documentos".
-Los Archivos y la base de datos se guardan en la carpeta llamada "BlueArchiveWS" ubicada dentro de la carpeta "Documents".  
-Los datos y archivos extraídos con este programa son utilizados in este otro [proyecto](https://github.com/Nyasper/Proyecto-2-Blue-Archive-Database-react.git) front end.
+A C# console application that scrapes and structures character and game data from the Blue Archive Wiki.
 
-## How to run this program
+## Features
 
-1. [Install .NET 10](https://dotnet.microsoft.com/es-es/download) (if you don't have it)
-2. Download this project, then in the project folder run the following commands:
-3. Install Entity Framework tool: `dotnet tool install --global dotnet-ef`
-4. Install Entity Framework.Sqlite: `dotnet add package Microsoft.EntityFrameworkCore.Sqlite`
-5. Install Entity Framework.Desing: `dotnet add package Microsoft.EntityFrameworkCore.Design`
-6. Generate Database Migration: `dotnet ef Migrations add InitialCreate`
-7. Update the database with migration: `dotnet ef database update`
-8.  build with: `dotnet build`
-9. run with: `dotnet run`
+- Crawls the Blue Archive Wiki to extract character data
+- Parses HTML content using HtmlAgilityPack with XPath expressions
+- Persists scraped data to a local SQLite database via Entity Framework
+- Uses dependency injection for service management
+- Outputs structured data from unstructured wiki markup
+
+## Tech Stack
+
+- **C#** - Programming language
+- **.NET** - Runtime platform
+- **Entity Framework Core** - ORM for database access
+- **SQLite** - Local database for data persistence
+- **HtmlAgilityPack** - HTML parsing library
+- **XPath** - Query language for navigating HTML documents
+- **Dependency Injection** - Built-in .NET DI container
+
+## Prerequisites
+
+- [.NET 8 SDK](https://dotnet.microsoft.com/download) (or later)
+
+## Getting Started
+
+```bash
+# Clone the repository
+git clone https://github.com/Nyasper/Blue-Archive-Wiki-Web-Scrapper-DotNet.git
+cd Blue-Archive-Wiki-Web-Scrapper-DotNet
+
+# Restore dependencies
+dotnet restore
+
+# Build the project
+dotnet build
+
+# Run the application
+dotnet run
+```
+
+On first run, Entity Framework will create the SQLite database and apply any pending migrations automatically.
+
+## Project Architecture
+
+```
+Blue-Archive-Wiki-Web-Scrapper-DotNet/
+├── Program.cs                  # Entry point and DI configuration
+├── Services/
+│   ├── ScraperService.cs       # HTTP requests and HTML fetching
+│   ├── ParserService.cs        # HtmlAgilityPack + XPath extraction
+│   └── DataService.cs          # Entity Framework database operations
+├── Models/
+│   └── Character.cs            # Data model for scraped characters
+├── Data/
+│   └── AppDbContext.cs         # EF Core DbContext with SQLite
+└── appsettings.json            # Configuration
+```
+
+### How It Works
+
+1. **ScraperService** uses `HttpClient` to fetch raw HTML from the Blue Archive Wiki
+2. **ParserService** loads the HTML into HtmlAgilityPack and extracts structured data using XPath queries
+3. **DataService** persists the extracted data to a SQLite database via Entity Framework Core
+4. All services are registered through .NET's built-in dependency injection container
+
+## Output
+
+The scraper produces structured character data including names, roles, stats, and other metadata extracted from the wiki pages. Data is stored in a local `bluearchive.db` SQLite file.
+
+## License
+
+This project is for educational purposes only. I do not own any of the materials, including images, data, trademarks, or other related content used in this project. All rights belong to their respective owners.
