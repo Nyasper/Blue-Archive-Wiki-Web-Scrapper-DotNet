@@ -1,4 +1,4 @@
-﻿namespace Main.FileHandler.Updater;
+namespace Main.FileHandler.Updater;
 
 using FileGenerator;
 using Downloader;
@@ -15,35 +15,14 @@ public class Updater(
 {
 	public async Task Update()
 	{
-		/*int selectedOption = Menu.LogMenu(["Update All", "Update only Database", "Update only Local Files", "Exit"]);
-		switch (selectedOption)
-		{
-			case 1:
-				await UpdateDatabase();
-				await UpdateLocalFiles();
-				Console.WriteLine("All files Updated Successfully...");
-				break;
-			case 2:
-				await UpdateDatabase();
-				Console.WriteLine("Database Updated.");
-				break;
-			case 3:
-				await UpdateLocalFiles();
-				Console.WriteLine("Local Files Updated.");
-				break;
-			default:
-				Notifier.MessageTaskCancelled("Invalid Option selected, cancelling update.");
-				return;
-		}*/
 		Notifier.MessageInitiatingTask("Searching for updates");
 		
 		Student[] students = await studentRepository.GetAll();
 		var missingStudentData = await verifier.VerifyStudentDataInDatabase(students);
-		bool hasDatabaseBeenUpdated = await UpdateDatabase(missingStudentData, students); 
+		(bool hasDatabaseBeenUpdated, Student[] updatedStudents) = await UpdateDatabase(missingStudentData, students); 
 		
-		students = await studentRepository.GetAll();
-		var missingStudentFiles = verifier.VerifyStudentLocalFiles(students);
-		bool hasLocalFilesBeenUpdated = await UpdateLocalFiles(missingStudentFiles, students);
+		var missingStudentFiles = verifier.VerifyStudentLocalFiles(updatedStudents);
+		bool hasLocalFilesBeenUpdated = await UpdateLocalFiles(missingStudentFiles, updatedStudents);
 
 		if (hasDatabaseBeenUpdated || hasLocalFilesBeenUpdated)
 		{
@@ -55,24 +34,31 @@ public class Updater(
 		}
 	}
 
-	private async Task<bool> UpdateDatabase(Student[] missingStudentData, Student[] allStudents)
+	private async Task<(bool Updated, Student[] Students)> UpdateDatabase(Student[] missingStudentData, Student[] allStudents)
 	{
-		if (missingStudentData.Length == 0) return false;
+		if (missingStudentData.Length == 0) return (false, allStudents);
 		
 		Notifier.LogStudentsList("New Students to save In Database found", missingStudentData);
 		
-		bool shouldUpdate = Menu.YesNoQuestion("Update the database?");
+		bool shouldUpdate = YesNoQuestion("Update the database?");
 		if (!shouldUpdate)
 		{
 			Notifier.MessageTaskCancelled("Database update cancelled by the user.");
-			return false;
+			return (false, allStudents);
 		}
 
 		await studentRepository.SaveInDatabase(missingStudentData);
-		await fileGenerator.GenerateJsonData(allStudents);
+
+		var updatedStudents = allStudents
+			.Concat(missingStudentData)
+			.OrderBy(s => s.School)
+			.ThenBy(s => s.CharaName)
+			.ToArray();
+
+		await fileGenerator.GenerateJsonData(updatedStudents);
 		
 		Notifier.MessageTaskCompleted("all data updated successfully");
-		return true;
+		return (true, updatedStudents);
 	}
 	private async Task<bool> UpdateLocalFiles(StudentFileVerification[] missingStudentFiles, Student[] allStudents)
 	{
@@ -81,7 +67,7 @@ public class Updater(
 		
 		Notifier.LogStudentsList("New Students files to download", missingStudentFiles);
 		
-		bool shouldDownload = Menu.YesNoQuestion("Proceed to download the files?");
+		bool shouldDownload = YesNoQuestion("Proceed to download the files?");
 		if (!shouldDownload)
 		{
 			Notifier.MessageTaskCancelled("File download cancelled by the user.");
@@ -93,5 +79,13 @@ public class Updater(
 		
 		Notifier.MessageTaskCompleted($"all files downloaded successfully");
 		return true;
+	}
+
+	private static bool YesNoQuestion(string questionMessage)
+	{
+		Console.WriteLine(Environment.NewLine + questionMessage + " (y/n)" + Environment.NewLine);
+		char key = char.ToLower(Console.ReadKey(intercept: true).KeyChar);
+		bool response = key == 'y';
+		return response;
 	}
 }

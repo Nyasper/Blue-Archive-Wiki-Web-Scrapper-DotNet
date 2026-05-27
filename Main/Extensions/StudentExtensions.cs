@@ -1,4 +1,5 @@
-﻿using Scanner.Model;
+using Scanner.Model;
+using static Scanner.Utils.Constants;
 
 namespace Main.Extensions;
 
@@ -10,6 +11,30 @@ public static class StudentExtensions
 		{
 			return listItems.Select((s, i) =>
 			{
+				if (i >= studentDetails.Length)
+				{
+					return new Student()
+					{
+						CharaName = s.CharaName,
+						Name = DefaultCharaDetailsFields.Name,
+						LastName = DefaultCharaDetailsFields.LastName,
+						School = s.School,
+						Age = DefaultCharaDetailsFields.Age,
+						Height = DefaultCharaDetailsFields.Height,
+						Birthday = DefaultCharaDetailsFields.Birthday,
+						Hobbies = DefaultCharaDetailsFields.Hobbies,
+						Designer = DefaultCharaDetailsFields.Designer,
+						Illustrator = DefaultCharaDetailsFields.Illustrator,
+						Voice = DefaultCharaDetailsFields.Voice,
+						ReleaseDate = s.ReleaseDate,
+						SkinSet = s.SkinSet,
+						PageUrl = s.PageUrl,
+						ImageProfileUrl = DefaultCharaDetailsFields.ImageProfileUrl,
+						ImageFullUrl = DefaultCharaDetailsFields.ImageFullUrl,
+						SmallImageUrl =  s.SmallImgUrl,
+						AudioUrl = DefaultCharaDetailsFields.AudioUrl,
+					};
+				}
 				StudentDetailsItem details = studentDetails[i];
 				return new Student()
 				{
@@ -38,6 +63,30 @@ public static class StudentExtensions
 		{
 			return studentList.Select((s, i) =>
 			{
+				if (i >= studentDetails.Length)
+				{
+					return new Student()
+					{
+						CharaName = s.CharaName,
+						Name = DefaultCharaDetailsFields.Name,
+						LastName = DefaultCharaDetailsFields.LastName,
+						School = s.School,
+						Age = DefaultCharaDetailsFields.Age,
+						Height = DefaultCharaDetailsFields.Height,
+						Birthday = DefaultCharaDetailsFields.Birthday,
+						Hobbies = DefaultCharaDetailsFields.Hobbies,
+						Designer = DefaultCharaDetailsFields.Designer,
+						Illustrator = DefaultCharaDetailsFields.Illustrator,
+						Voice = DefaultCharaDetailsFields.Voice,
+						ReleaseDate = s.ReleaseDate,
+						SkinSet = s.SkinSet,
+						PageUrl = s.PageUrl,
+						ImageProfileUrl = DefaultCharaDetailsFields.ImageProfileUrl,
+						ImageFullUrl = DefaultCharaDetailsFields.ImageFullUrl,
+						SmallImageUrl = s.SmallImgUrl,
+						AudioUrl = DefaultCharaDetailsFields.AudioUrl,
+					};
+				}
 				StudentDetailsItem details = studentDetails[i];
 				return new Student()
 				{

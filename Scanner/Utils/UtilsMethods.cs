@@ -1,4 +1,4 @@
-﻿namespace Main.Utils;
+namespace Scanner.Utils;
 
 public static class UtilsMethods
 {

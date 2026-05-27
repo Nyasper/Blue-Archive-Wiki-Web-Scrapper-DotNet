@@ -37,13 +37,23 @@ public static class Notifier
 	public static void LogMissingFiles(StudentFileVerification studentFile)
 	{
 		string message = $"'{studentFile.CharaName}' doesn't have: ";
-		var missingFiles = new List<string>(3);
+		var missingFiles = new List<string>(4);
 		if (!studentFile.HasProfileImage) missingFiles.Add("'profile image'");
 		if (!studentFile.HasFullImage) missingFiles.Add("'full image'");
+		if (!studentFile.HasSmallImage) missingFiles.Add("'small image'");
 		if (!studentFile.HasAudio) missingFiles.Add("'audio'");
-		missingFiles[^1] = "and " + missingFiles[^1] + ".";
 
-		Console.WriteLine(message + String.Join(", ", missingFiles));
+		if (missingFiles.Count == 0) return;
+
+		if (missingFiles.Count == 1)
+		{
+			Console.WriteLine(message + missingFiles[0] + ".");
+		}
+		else
+		{
+			missingFiles[^1] = "and " + missingFiles[^1] + ".";
+			Console.WriteLine(message + String.Join(", ", missingFiles));
+		}
 	}
 	public static void LogStudentsList(string message, IEnumerable<Student> studentsCollection)
 	{

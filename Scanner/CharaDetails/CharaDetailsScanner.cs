@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +21,7 @@ public class CharaDetailsScanner(IHtmlHandler htmlHandler) : ICharaDetailsScanne
 		{
 			var url = Constants.BaseUrl + charaNameParam;
 			var html = await htmlHandler.ScanHtml(url);
-			IDetailsGetter detailsGetter = new DetailsGetter(html, charaNameParam);
+			IDetailsGetter detailsGetter = new DetailsGetter(html, charaNameParam, htmlHandler);
 			(string name, string lastName) = detailsGetter.GetFullName();
 
 
@@ -48,10 +48,6 @@ public class CharaDetailsScanner(IHtmlHandler htmlHandler) : ICharaDetailsScanne
 		}
 	}
 	public async Task<StudentDetailsItem[]> ScanStudentDetails(IEnumerable<StudentListItem> students)
-	{
-		return await Task.WhenAll(students.Select(s => ScanStudentDetails(s.CharaName)));
-	}
-	public async Task<StudentDetailsItem[]> ScanStudentDetails(IEnumerable<Student> students)
 	{
 		return await Task.WhenAll(students.Select(s => ScanStudentDetails(s.CharaName)));
 	}

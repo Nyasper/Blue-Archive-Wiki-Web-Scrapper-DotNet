@@ -45,28 +45,27 @@ public class Repository(StudentContext context) : IRepository<Student>
 		{
 			await transaction.RollbackAsync();
 			Console.WriteLine($"Error saving Students: {ex.Message}");
+			throw;
 		}
 	}
 	public async Task SaveInDbFromJsonFile(string jsonFilePath)
 	{
-		string jsonFile = await File.ReadAllTextAsync(jsonFilePath);
 		try
 		{
+			string jsonFile = await File.ReadAllTextAsync(jsonFilePath);
+			var students = JsonSerializer.Deserialize<Student[]>(jsonFile, Constants.JsonOptions);
 
+			if (students != null)
+			{
+				await SaveInDatabase(students);
+			}
+
+			Console.WriteLine($"Database Updated with {jsonFilePath}");
 		}
 		catch (FileNotFoundException)
 		{
-			Console.WriteLine($"{jsonFile} does not exist.");
-			return;
+			Console.WriteLine($"{jsonFilePath} does not exist.");
 		}
-		var students = JsonSerializer.Deserialize<Student[]>(jsonFile, Constants.JsonOptions);
-
-		if (students != null)
-		{
-			await SaveInDatabase(students);
-		}
-
-		Console.WriteLine($"Database Updated with {jsonFile}");
 	}
 
 	//READ

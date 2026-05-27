@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 
 using HtmlAgilityPack;
@@ -13,13 +13,19 @@ public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 	public async Task<StudentListItem[]> ScanCharaList()
 	{
 		var html = await htmlHandler.ScanHtml(Constants.CharaListPageUrl);
-		var tableNodes = html.DocumentNode.SelectNodes("//tbody[1]/tr").ToList();
+		var trNodes = html.DocumentNode.SelectNodes("//tbody[1]/tr");
+		if (trNodes is null) return [];
+
+		var tableNodes = trNodes.ToList();
 
 		StudentListItem[] charaListItems = tableNodes.Skip(1).Select((item) =>
 		{
 			// the charaName is in an anchor: '<a title="charaName">'
 			var aElement = item.SelectSingleNode(".//a[@title]");
+			if (aElement is null) return null;
+
 			var imgElement = aElement.SelectSingleNode(".//img[@src]");
+			if (imgElement is null) return null;
 
 			string charaName = GetCharaName(aElement);
 			string school = GetSchool(item.GetAttributeValue("data-school", "").Trim());
@@ -37,7 +43,12 @@ public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 				SmallImgUrl =  smallImgUrl,
 				PageUrl = Constants.BaseUrl + charaName
 			};
-		}).Where(students=>!ExcludedStudents.Contains(students.CharaName)).OrderBy(s=>s.School).ThenBy(s=>s.CharaName).ToArray();
+		})
+		.Where(students => students != null && !ExcludedStudents.Contains(students.CharaName))
+		.Select(s => s!)
+		.OrderBy(s => s.School)
+		.ThenBy(s => s.CharaName)
+		.ToArray();
 
 		return charaListItems;
 	}
@@ -75,8 +86,10 @@ public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 		string[] excludeSkinSets = [
 			"kid"
 		];
-		if (!charaName.EndsWith(')') || !charaName.Contains("_(") || excludeSkinSets.Contains(charaName)) return "default";
-		return charaName.Split('(')[1].Split(')')[0].Trim().ToLower().Replace("-", "_");
+		if (!charaName.EndsWith(')') || !charaName.Contains("_(")) return "default";
+		string skinSet = charaName.Split('(')[1].Split(')')[0].Trim().ToLower().Replace("-", "_");
+		if (excludeSkinSets.Contains(skinSet)) return "default";
+		return skinSet;
 	}
 
 	static private readonly string[] ExcludedStudents = ["Shiroko＊Terror", "Shiroko*Terror", "Shiroko * Terror"];

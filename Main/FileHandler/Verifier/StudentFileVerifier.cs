@@ -1,4 +1,4 @@
-﻿using Main.Repository;
+using Main.Repository;
 
 namespace Main.FileHandler.Verifier;
 
@@ -36,10 +36,7 @@ public class StudentFileVerifier : IStudentFileVerifier
 			if (!result.HasProfileImage || !result.HasFullImage || !result.HasSmallImage || !result.HasAudio)
 			{
 				studentsWithoutFiles.Add(result);
-				if (!result.HasProfileImage)
-				{
-					Notifier.LogMissingFiles(result);
-				}
+				Notifier.LogMissingFiles(result);
 			}
 			;
 		});

@@ -1,4 +1,4 @@
-﻿using static Scanner.Utils.Constants;
+using static Scanner.Utils.Constants;
 namespace Scanner.Model;
 
 public record class StudentListItem
@@ -17,7 +17,7 @@ public record class StudentListItem
 		get;
 		set
 		{
-			field = string.IsNullOrEmpty(value) ? DefaultCharaListStudentFields.CharaName : value;
+			field = string.IsNullOrEmpty(value) ? DefaultCharaListStudentFields.School : value;
 		}
 	} = DefaultCharaListStudentFields.School;
 
@@ -26,7 +26,7 @@ public record class StudentListItem
 		get;
 		set
 		{
-			field = string.IsNullOrEmpty(value) ? DefaultCharaListStudentFields.CharaName : value;
+			field = string.IsNullOrEmpty(value) ? DefaultCharaListStudentFields.ReleaseDate : value;
 		}
 	} = DefaultCharaListStudentFields.ReleaseDate;
 
@@ -35,7 +35,7 @@ public record class StudentListItem
 		get;
 		set
 		{
-			field = string.IsNullOrEmpty(value) ? DefaultCharaListStudentFields.CharaName : value;
+			field = string.IsNullOrEmpty(value) ? DefaultCharaListStudentFields.SkinSet : value;
 		}
 	} = DefaultCharaListStudentFields.SkinSet;
 

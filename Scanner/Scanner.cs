@@ -1,4 +1,4 @@
-﻿using Scanner.CharaDetails;
+using Scanner.CharaDetails;
 using Scanner.CharaList;
 using Scanner.Model;
 
@@ -37,37 +37,4 @@ public class Scanner(ICharaListScanner charaListScanner, ICharaDetailsScanner ch
 			CreatedAt = DateTime.UtcNow
 		};
 	}
-	// public async Task<Student[]> ScanAll()
-	// {
-	// 	StudentListItem[] studentsListItems = await charaListScanner.ScanCharaList();
-	// 	StudentDetailsItem[] studentDetailsItems = await charaDetailsScanner.ScanStudentDetails(studentsListItems);
-	//
-	//
-	//
-	// 	return studentsListItems.Select((s, i) =>
-	// 	{
-	// 		StudentDetailsItem details = studentDetailsItems[i];
-	// 		return new Student()
-	// 		{
-	// 			CharaName = s.CharaName,
-	// 			Name = details.Name,
-	// 			LastName = details.LastName,
-	// 			School = s.School,
-	// 			Age = details.Age,
-	// 			Height = details.Height,
-	// 			Birthday = details.Birthday,
-	// 			Hobbies = details.Hobbies,
-	// 			Designer = details.Designer,
-	// 			Illustrator = details.Illustrator,
-	// 			Voice = details.Voice,
-	// 			ReleaseDate = s.ReleaseDate,
-	// 			SkinSet = s.SkinSet,
-	// 			PageUrl = s.PageUrl,
-	// 			ImageProfileUrl = details.ImageProfileUrl,
-	// 			ImageFullUrl = details.ImageFullUrl,
-	// 			AudioUrl = details.AudioUrl,
-	// 		};
-	// 	}).ToArray();
-	//
-	// }
 }
