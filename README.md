@@ -22,7 +22,24 @@ A C# console application that scrapes and structures character and game data fro
 
 ## Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download) (or later)
+- [.NET 10 SDK](https://dotnet.microsoft.com/download) (or later)
+
+## DB Setup
+
+To configure the local SQLite database, you need to download and install the Entity Framework global tool (`ef`):
+
+```bash
+dotnet tool install --global dotnet-ef
+```
+
+Subsequently, run the following commands to generate the initial migration and create the SQLite database:
+
+```bash
+dotnet ef migrations add Initial
+dotnet ef database update
+```
+
+Once the database has been created, run `dotnet build` to compile the application and prepare it for execution.
 
 ## Getting Started
 
@@ -40,8 +57,6 @@ dotnet build
 # Run the application
 dotnet run
 ```
-
-On first run, Entity Framework will create the SQLite database and apply any pending migrations automatically.
 
 ## Project Architecture
 
