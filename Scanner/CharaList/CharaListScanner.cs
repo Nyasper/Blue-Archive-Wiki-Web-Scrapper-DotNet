@@ -64,22 +64,14 @@ public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 	}
 	static private string GetSchool(string schoolParam)
 	{
-		string[] schools = [
-			"Abydos",
-			"Arius",
-			"Gehenna",
-			"Highlander",
-			"Hyakkiyako",
-			"Millennium",
-			"Red Winter",
-			"SRT",
-			"Shanhaijing",
-			"Trinity",
-			"Valkyrie",
-			"Wildhunt"
-		];
-		string schoolFound = schools.Contains(schoolParam, StringComparer.OrdinalIgnoreCase) ? schoolParam : "other";
-		return schoolFound.ToLower();
+		string[] includeInOther = ["other", "ETC", "Sakugawa", "Tokiwadai"];
+		
+		if (includeInOther.Contains(schoolParam, StringComparer.OrdinalIgnoreCase))
+		{
+			return "other";
+		}
+		
+		return schoolParam.ToLower();
 	}
 	static private string GetSkinSet(string charaName)
 	{

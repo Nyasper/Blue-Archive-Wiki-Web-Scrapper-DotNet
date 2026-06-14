@@ -1,54 +1,59 @@
-﻿using Main.Utils;
+using System.IO;
+using Microsoft.Data.Sqlite;
+using Main.Utils;
+using Dapper;
 
 namespace Main.Repository;
-using Microsoft.EntityFrameworkCore;
 
-using Scanner.Model;
-
-public class StudentContext : DbContext
+public class StudentContext
 {
-	public DbSet<Student> Students { get; set; }
 	public string DbPath { get; }
+	private readonly string _connectionString;
+
 	public StudentContext()
 	{
 		if (!Directory.Exists(Constants.DataPath)) Directory.CreateDirectory(Constants.DataPath);
 		DbPath = Path.Join(Constants.DataPath, "BlueArchive.db");
-	}
-	protected override void OnConfiguring(DbContextOptionsBuilder options)
-		=> options.UseSqlite($"Data Source={DbPath}");
-	protected override void OnModelCreating(ModelBuilder modelBuilder)
-	{
-		modelBuilder.Entity<Student>()
-			.HasKey(s => s.CharaName);
-		modelBuilder.Entity<Student>().HasIndex(s => s.CharaName);
-
-		// change table names to camelCase
-		foreach (var entity in modelBuilder.Model.GetEntityTypes())
-		{
-			var tableName = entity.GetTableName();
-			if (!string.IsNullOrEmpty(tableName))
-			{
-				entity.SetTableName(ToCamelCase(tableName));
-			}
-
-			// change column names to camelCase
-			foreach (var property in entity.GetProperties())
-			{
-				var columnName = property.GetColumnName();
-				property.SetColumnName(ToCamelCase(columnName));
-			}
-		}
+		_connectionString = $"Data Source={DbPath}";
+		InitializeDatabase();
 	}
 
-	private static string ToCamelCase(string name)
+	public SqliteConnection CreateConnection()
 	{
-		if (string.IsNullOrEmpty(name) || name.Length < 2)
-			return name;
+		return new SqliteConnection(_connectionString);
+	}
 
-		// Si ya empieza con minúscula lo dejamos
-		if (char.IsLower(name[0]))
-			return name;
+	private void InitializeDatabase()
+	{
+		using var connection = CreateConnection();
+		connection.Open();
 
-		return char.ToLowerInvariant(name[0]) + name.Substring(1);
+		const string createTableSql = @"
+			CREATE TABLE IF NOT EXISTS students (
+				charaName TEXT PRIMARY KEY,
+				name TEXT NOT NULL,
+				lastName TEXT NOT NULL,
+				school TEXT NOT NULL,
+				age INTEGER,
+				height INTEGER,
+				birthday TEXT,
+				hobbies TEXT,
+				designer TEXT,
+				illustrator TEXT,
+				voice TEXT NOT NULL,
+				releaseDate TEXT NOT NULL,
+				skinSet TEXT NOT NULL,
+				pageUrl TEXT NOT NULL,
+				imageProfileUrl TEXT NOT NULL,
+				imageFullUrl TEXT NOT NULL,
+				smallImageUrl TEXT NOT NULL,
+				audioUrl TEXT NOT NULL,
+				createdAt TEXT NOT NULL
+			);
+
+			CREATE INDEX IF NOT EXISTS IX_students_charaName ON students (charaName);
+		";
+
+		connection.Execute(createTableSql);
 	}
 }

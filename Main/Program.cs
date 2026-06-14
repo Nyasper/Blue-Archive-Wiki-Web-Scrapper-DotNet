@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 
 using Scanner;
@@ -25,7 +25,7 @@ public static class Program
 	public static async Task Main()
 	{
 		IServiceProvider services = new ServiceCollection()
-			.AddDbContext<StudentContext>()
+			.AddSingleton<StudentContext>()
 			.AddSingleton<IRepository<Student>, Repository.Repository>()
 			.AddSingleton<IHtmlHandler, HtmlHandler>()
 			.AddSingleton<ICharaListScanner, CharaListScanner>()

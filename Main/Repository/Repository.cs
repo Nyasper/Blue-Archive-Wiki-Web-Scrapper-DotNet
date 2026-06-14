@@ -1,6 +1,11 @@
 using Main.Utils;
 using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
+using System.IO;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
+using System.Data;
+using Dapper;
 using Scanner.Model;
 
 namespace Main.Repository;
@@ -12,12 +17,16 @@ public class Repository(StudentContext context) : IRepository<Student>
 	{
 		try
 		{
-			Student? existStudent = await context.Students.FindAsync(student.CharaName);
-
-			if (existStudent is null)
-			{
-				await context.Students.AddAsync(student);
-			}
+			using var connection = context.CreateConnection();
+			const string sql = @"
+				INSERT OR IGNORE INTO students (
+					charaName, name, lastName, school, age, height, birthday, hobbies, designer, illustrator,
+					voice, releaseDate, skinSet, pageUrl, imageProfileUrl, imageFullUrl, smallImageUrl, audioUrl, createdAt
+				) VALUES (
+					@CharaName, @Name, @LastName, @School, @Age, @Height, @Birthday, @Hobbies, @Designer, @Illustrator,
+					@Voice, @ReleaseDate, @SkinSet, @PageUrl, @ImageProfileUrl, @ImageFullUrl, @SmallImageUrl, @AudioUrl, @CreatedAt
+				);";
+			await connection.ExecuteAsync(sql, student);
 		}
 		catch (Exception)
 		{
@@ -25,18 +34,26 @@ public class Repository(StudentContext context) : IRepository<Student>
 			throw;
 		}
 	}
+
 	public async Task SaveInDatabase(IEnumerable<Student> students)
 	{
 		Notifier.MessageInitiatingTask("Saving data in Database");
-		await using var transaction = await context.Database.BeginTransactionAsync();
+		using var connection = context.CreateConnection();
+		await connection.OpenAsync();
+		using var transaction = await connection.BeginTransactionAsync();
 
 		try
 		{
-			foreach (var student in students)
-			{
-				await SaveInDatabase(student);
-			}
-			await context.SaveChangesAsync();
+			const string sql = @"
+				INSERT OR IGNORE INTO students (
+					charaName, name, lastName, school, age, height, birthday, hobbies, designer, illustrator,
+					voice, releaseDate, skinSet, pageUrl, imageProfileUrl, imageFullUrl, smallImageUrl, audioUrl, createdAt
+				) VALUES (
+					@CharaName, @Name, @LastName, @School, @Age, @Height, @Birthday, @Hobbies, @Designer, @Illustrator,
+					@Voice, @ReleaseDate, @SkinSet, @PageUrl, @ImageProfileUrl, @ImageFullUrl, @SmallImageUrl, @AudioUrl, @CreatedAt
+				);";
+
+			await connection.ExecuteAsync(sql, students, transaction);
 			await transaction.CommitAsync();
 
 			Notifier.MessageTaskCompleted("Database updated successfully");
@@ -48,6 +65,7 @@ public class Repository(StudentContext context) : IRepository<Student>
 			throw;
 		}
 	}
+
 	public async Task SaveInDbFromJsonFile(string jsonFilePath)
 	{
 		try
@@ -71,18 +89,16 @@ public class Repository(StudentContext context) : IRepository<Student>
 	//READ
 	public async Task<Student?> Get(string charaName)
 	{
-		return await context.Students.FindAsync(charaName);
+		using var connection = context.CreateConnection();
+		const string sql = "SELECT * FROM students WHERE charaName = @CharaName;";
+		return await connection.QueryFirstOrDefaultAsync<Student>(sql, new { CharaName = charaName });
 	}
+
 	public async Task<Student[]> GetAll()
 	{
-		return await context.Students.AsNoTracking().OrderBy(s => s.School).ThenBy(s => s.CharaName).ToArrayAsync();
+		using var connection = context.CreateConnection();
+		const string sql = "SELECT * FROM students ORDER BY school, charaName;";
+		var result = await connection.QueryAsync<Student>(sql);
+		return result.ToArray();
 	}
-	//DELETE
-	// public async Task DeleteSqlite(Student student)
-	// {
-	//   using var db = new StudentContext();
-	//   db.Students.Remove(student);
-	//   await db.SaveChangesAsync();
-	// }
-
 }
