@@ -142,7 +142,7 @@ public class GettersTest
 		imageProfileUrl.Should().EndWith(".png");
 		
 		var request = new HttpRequestMessage(HttpMethod.Head, imageProfileUrl);
-		var response = await _httpClient.SendAsync(request);
+		var response = await _httpClient.SendAsync(request, TestContext.Current.CancellationToken);
 		response.IsSuccessStatusCode.Should().BeTrue($"Invalid URL: {response.StatusCode}");
 		
 		string contentType = response.Content.Headers.ContentType?.MediaType ?? string.Empty; 

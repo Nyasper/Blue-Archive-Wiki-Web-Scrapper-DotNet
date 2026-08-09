@@ -84,5 +84,5 @@ public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 		return skinSet;
 	}
 
-	static private readonly string[] ExcludedStudents = ["Shiroko＊Terror", "Shiroko*Terror", "Shiroko * Terror"];
+	static private readonly string[] ExcludedStudents = ["Shiroko*Terror", "Hoshino_(Battle)_Attacker"];
 }
