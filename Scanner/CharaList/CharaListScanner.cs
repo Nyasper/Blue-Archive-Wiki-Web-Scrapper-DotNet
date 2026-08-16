@@ -64,9 +64,7 @@ public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 	}
 	static private string GetSchool(string schoolParam)
 	{
-		string[] includeInOther = ["other", "ETC", "Sakugawa", "Tokiwadai"];
-		
-		if (includeInOther.Contains(schoolParam, StringComparer.OrdinalIgnoreCase))
+		if (ExcludeSchools.Contains(schoolParam, StringComparer.OrdinalIgnoreCase))
 		{
 			return "other";
 		}
@@ -85,4 +83,5 @@ public class CharaListScanner(IHtmlHandler htmlHandler) : ICharaListScanner
 	}
 
 	static private readonly string[] ExcludedStudents = ["Shiroko*Terror", "Hoshino_(Battle)_Attacker"];
+	static private readonly string[] ExcludeSchools = ["ETC", "Tokiwadai", "Sakugawa"];
 }
