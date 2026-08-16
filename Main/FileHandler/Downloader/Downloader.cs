@@ -6,6 +6,7 @@ using System.IO;
 namespace Main.FileHandler.Downloader;
 
 using Scanner.Model;
+using Retry = Scanner.Utils.Retry;
 using Utils;
 
 public class Downloader : IDownloader
@@ -23,7 +24,7 @@ public class Downloader : IDownloader
 
 	static Downloader()
 	{
-		HttpClient = new HttpClient();
+		HttpClient = new HttpClient { Timeout = TimeSpan.FromMinutes(5) };
 		HttpClient.DefaultRequestHeaders.Add("User-Agent",
 			"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (HTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0");
 	}
@@ -66,33 +67,36 @@ public class Downloader : IDownloader
 	{
 		try
 		{
-			byte[] fileToDownload;
-			string schoolPath = Path.Join(Constants.MediaPath, student.School);
-			CreateFolderIfNotExist(schoolPath);
-			string finalPath = Path.Join(schoolPath, student.CharaName);
-			switch (fileFormat)
+			await Retry.WithRetryAsync(async () =>
 			{
-				case FileFormat.ImageProfile:
-					fileToDownload = await GetByteArray(student.ImageProfileUrl);
-					Notifier.MessageTaskCompleted($"Downloaded image profile of'{student.CharaName}' from '{student.ImageProfileUrl}'");
-					finalPath += ".png";
-					break;
-				case FileFormat.ImageFull:
-					fileToDownload = await GetByteArray(student.ImageFullUrl);
-					finalPath += "_full.png";
-					break;
-				case FileFormat.SmallImage:
-					fileToDownload = await GetByteArray(student.SmallImageUrl);
-					finalPath += "_small.png";
-					break;
-				case FileFormat.Audio:
-					fileToDownload = await GetByteArray(student.AudioUrl);
-					finalPath += ".ogg";
-					break;
-				default:
-					throw new Exception("ERROR: Invalid file Format.");
-			}
-			await File.WriteAllBytesAsync(finalPath, fileToDownload);
+				byte[] fileToDownload;
+				string schoolPath = Path.Join(Constants.MediaPath, student.School);
+				CreateFolderIfNotExist(schoolPath);
+				string finalPath = Path.Join(schoolPath, student.CharaName);
+				switch (fileFormat)
+				{
+					case FileFormat.ImageProfile:
+						fileToDownload = await GetByteArray(student.ImageProfileUrl);
+						Notifier.MessageTaskCompleted($"Downloaded image profile of'{student.CharaName}' from '{student.ImageProfileUrl}'");
+						finalPath += ".png";
+						break;
+					case FileFormat.ImageFull:
+						fileToDownload = await GetByteArray(student.ImageFullUrl);
+						finalPath += "_full.png";
+						break;
+					case FileFormat.SmallImage:
+						fileToDownload = await GetByteArray(student.SmallImageUrl);
+						finalPath += "_small.png";
+						break;
+					case FileFormat.Audio:
+						fileToDownload = await GetByteArray(student.AudioUrl);
+						finalPath += ".ogg";
+						break;
+					default:
+						throw new Exception("ERROR: Invalid file Format.");
+				}
+				await File.WriteAllBytesAsync(finalPath, fileToDownload);
+			}, $"Downloading {fileFormat} of {student.CharaName}", TimeSpan.FromSeconds(5));
 		}
 		catch (Exception)
 		{
@@ -111,8 +115,9 @@ public class Downloader : IDownloader
 	{
 		try
 		{
-			byte[] res = await HttpClient.GetByteArrayAsync(fileUrl);
-			return res;
+			return await Retry.WithRetryAsync(
+				async () => await HttpClient.GetByteArrayAsync(fileUrl),
+				$"Getting ByteArray from URL: '{fileUrl}'", TimeSpan.FromSeconds(5));
 		}
 		catch (HttpRequestException httpRequestException)
 		{

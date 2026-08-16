@@ -7,6 +7,7 @@ using System.Linq;
 using System.Data;
 using Dapper;
 using Scanner.Model;
+using Retry = Scanner.Utils.Retry;
 
 namespace Main.Repository;
 
@@ -38,32 +39,35 @@ public class Repository(StudentContext context) : IRepository<Student>
 	public async Task SaveInDatabase(IEnumerable<Student> students)
 	{
 		Notifier.MessageInitiatingTask("Saving data in Database");
-		using var connection = context.CreateConnection();
-		await connection.OpenAsync();
-		using var transaction = await connection.BeginTransactionAsync();
-
-		try
+		await Retry.WithRetryAsync(async () =>
 		{
-			const string sql = @"
-				INSERT OR IGNORE INTO students (
-					charaName, name, lastName, school, age, height, birthday, hobbies, designer, illustrator,
-					voice, releaseDate, skinSet, pageUrl, imageProfileUrl, imageFullUrl, smallImageUrl, audioUrl, createdAt
-				) VALUES (
-					@CharaName, @Name, @LastName, @School, @Age, @Height, @Birthday, @Hobbies, @Designer, @Illustrator,
-					@Voice, @ReleaseDate, @SkinSet, @PageUrl, @ImageProfileUrl, @ImageFullUrl, @SmallImageUrl, @AudioUrl, @CreatedAt
-				);";
+			using var connection = context.CreateConnection();
+			await connection.OpenAsync();
+			using var transaction = await connection.BeginTransactionAsync();
 
-			await connection.ExecuteAsync(sql, students, transaction);
-			await transaction.CommitAsync();
+			try
+			{
+				const string sql = @"
+					INSERT OR IGNORE INTO students (
+						charaName, name, lastName, school, age, height, birthday, hobbies, designer, illustrator,
+						voice, releaseDate, skinSet, pageUrl, imageProfileUrl, imageFullUrl, smallImageUrl, audioUrl, createdAt
+					) VALUES (
+						@CharaName, @Name, @LastName, @School, @Age, @Height, @Birthday, @Hobbies, @Designer, @Illustrator,
+						@Voice, @ReleaseDate, @SkinSet, @PageUrl, @ImageProfileUrl, @ImageFullUrl, @SmallImageUrl, @AudioUrl, @CreatedAt
+					);";
 
-			Notifier.MessageTaskCompleted("Database updated successfully");
-		}
-		catch (Exception ex)
-		{
-			await transaction.RollbackAsync();
-			Console.WriteLine($"Error saving Students: {ex.Message}");
-			throw;
-		}
+				await connection.ExecuteAsync(sql, students, transaction);
+				await transaction.CommitAsync();
+
+				Notifier.MessageTaskCompleted("Database updated successfully");
+			}
+			catch (Exception ex)
+			{
+				await transaction.RollbackAsync();
+				Console.WriteLine($"Error saving Students: {ex.Message}");
+				throw;
+			}
+		}, "Saving Students in Database", TimeSpan.FromSeconds(5));
 	}
 
 	public async Task SaveInDbFromJsonFile(string jsonFilePath)

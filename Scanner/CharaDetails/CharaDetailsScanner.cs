@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -49,6 +50,14 @@ public class CharaDetailsScanner(IHtmlHandler htmlHandler) : ICharaDetailsScanne
 	}
 	public async Task<StudentDetailsItem[]> ScanStudentDetails(IEnumerable<StudentListItem> students)
 	{
-		return await Task.WhenAll(students.Select(s => ScanStudentDetails(s.CharaName)));
+		var results = new ConcurrentBag<StudentDetailsItem>();
+		await Parallel.ForEachAsync(students,
+			new ParallelOptions { MaxDegreeOfParallelism = 4 },
+			async (student, _) =>
+			{
+				StudentDetailsItem item = await ScanStudentDetails(student.CharaName);
+				results.Add(item);
+			});
+		return results.ToArray();
 	}
 }

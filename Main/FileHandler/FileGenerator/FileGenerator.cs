@@ -8,6 +8,8 @@ using Repository;
 
 using Scanner.Model;
 
+using Retry = Scanner.Utils.Retry;
+
 using Utils;
 
 
@@ -18,8 +20,11 @@ public class FileGenerator : IFileGenerator<Student>
 		const string fileName = "data";
 		string finalPath = Path.Join(Constants.DataPath, fileName + ".json");
 
-		string jsonData = JsonSerializer.Serialize<IEnumerable<Student>>(studentData, Constants.JsonOptions);
-		await File.WriteAllTextAsync(finalPath, jsonData);
+		await Retry.WithRetryAsync(async () =>
+		{
+			string jsonData = JsonSerializer.Serialize<IEnumerable<Student>>(studentData, Constants.JsonOptions);
+			await File.WriteAllTextAsync(finalPath, jsonData);
+		}, $"Generating JSON: {finalPath}", TimeSpan.FromSeconds(2));
 
 		Notifier.MessageTaskCompleted($"data json generated: {finalPath}");
 		return finalPath;
@@ -33,10 +38,13 @@ public class FileGenerator : IFileGenerator<Student>
 		string htmlFinalPath = Path.Join(Constants.DataPath, $"{fileName}.html");
 		
 
-		string htmlContent = GenerateHtmlContent(allSchools);
-		string finalHtml = $"{GetHtmlHeader()}\n{htmlContent}\n{GetHtmlFooter()}";
+		await Retry.WithRetryAsync(async () =>
+		{
+			string htmlContent = GenerateHtmlContent(allSchools);
+			string finalHtml = $"{GetHtmlHeader()}\n{htmlContent}\n{GetHtmlFooter()}";
 
-		await File.WriteAllTextAsync(htmlFinalPath, finalHtml);
+			await File.WriteAllTextAsync(htmlFinalPath, finalHtml);
+		}, $"Generating HTML preview: {htmlFinalPath}", TimeSpan.FromSeconds(2));
 		
 		Notifier.MessageTaskCompleted($"HTML data preview generated: {htmlFinalPath}");
 		return htmlFinalPath;

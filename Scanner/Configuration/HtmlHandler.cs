@@ -1,13 +1,15 @@
 ﻿namespace Scanner.Configuration;
 using HtmlAgilityPack;
+using Utils;
 
 public class HtmlHandler : IHtmlHandler
 {
 	public Task<HtmlDocument> ScanHtml(string url)
 	{
-		var web = new HtmlWeb();
-		var htmlDoc = web.LoadFromWebAsync(url);
-
-		return htmlDoc;
+		return Retry.WithRetryAsync(async () =>
+		{
+			var web = new HtmlWeb { Timeout = 300_000 };
+			return await web.LoadFromWebAsync(url);
+		}, $"Fetching HTML: {url}", TimeSpan.FromSeconds(10));
 	}
 }
