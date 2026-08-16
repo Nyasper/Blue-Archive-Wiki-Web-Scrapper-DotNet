@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
@@ -28,10 +28,16 @@ jobs:
           dotnet publish Main/Main.csproj \
             -c Release -r linux-x64 --self-contained false -o publish-linux
 
+      - name: Publish (framework-dependent, win-x64)
+        run: |
+          dotnet publish Main/Main.csproj \
+            -c Release -r win-x64 --self-contained false -o publish-win
+
       - name: Package binaries
         run: |
           mkdir -p dist
           tar -czf dist/BlueArchiveWS-linux-x64.tar.gz -C publish-linux .
+          cd publish-win && zip -r ../dist/BlueArchiveWS-win-x64.zip .
 
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
