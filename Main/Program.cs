@@ -19,12 +19,17 @@ using Scanner.CharaList;
 using Scanner.Configuration;
 using Scanner.Model;
 
+using Utils;
+
 
 public static class Program
 {
-	public static async Task Main()
+	public static async Task Main(string[] args)
 	{
+		bool autoApprove = args.Any(a => string.Equals(a, "-y", StringComparison.OrdinalIgnoreCase) || string.Equals(a, "--yes", StringComparison.OrdinalIgnoreCase));
+
 		IServiceProvider services = new ServiceCollection()
+			.AddSingleton(new CliOptions(autoApprove))
 			.AddSingleton<StudentContext>()
 			.AddSingleton<IRepository<Student>, Repository.Repository>()
 			.AddSingleton<IHtmlHandler, HtmlHandler>()
@@ -48,7 +53,10 @@ public static class Program
 		IUpdater updater = services.GetRequiredService<IUpdater>();
 		await updater.Update();
 
-		Console.WriteLine("Press any key to finish");
-		Console.ReadKey();
+		if (!services.GetRequiredService<CliOptions>().AutoApprove)
+		{
+			Console.WriteLine("Press any key to finish");
+			Console.ReadKey();
+		}
 	}
 }

@@ -11,7 +11,8 @@ public class Updater(
 	IRepository<Student> studentRepository,
 	IVerifier<Student> verifier,
 	IFileGenerator<Student> fileGenerator,
-	IDownloader downloader) : IUpdater
+	IDownloader downloader,
+	CliOptions options) : IUpdater
 {
 	public async Task Update()
 	{
@@ -81,8 +82,10 @@ public class Updater(
 		return true;
 	}
 
-	private static bool YesNoQuestion(string questionMessage)
+	private bool YesNoQuestion(string questionMessage)
 	{
+		if (options.AutoApprove) return true;
+
 		Console.WriteLine(Environment.NewLine + questionMessage + " (y/n)" + Environment.NewLine);
 		char key = char.ToLower(Console.ReadKey(intercept: true).KeyChar);
 		bool response = key == 'y';

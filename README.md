@@ -40,6 +40,10 @@ dotnet build
 
 # Run the application
 dotnet run --project Main
+
+# Run the application answering "yes" to all prompts automatically
+dotnet run --project Main -- -y
+dotnet run --project Main -- --yes
 ```
 
 ## Project Architecture
